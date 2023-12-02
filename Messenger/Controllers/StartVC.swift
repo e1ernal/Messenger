@@ -25,6 +25,26 @@ class StartVC: UIViewController {
         return button
     }()
     
+    private lazy var tabBarControllerButton: UIButton = {
+       let button = UIButton()
+        button.setTitle("→ TabBC", for: .normal)
+        button.backgroundColor = .systemBlue
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 15, weight: .semibold)
+        button.heightAnchor.constraint(equalToConstant: heightConstraint).isActive = true
+        button.layer.cornerRadius = heightConstraint / 5
+        button.addTarget(self, action: #selector(tabBarControllerButtonPressed), for: .touchUpInside)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
+    private lazy var buttonsStack: UIStackView = {
+        let stack = UIStackView(arrangedSubviews: [loginVCButton, tabBarControllerButton])
+        stack.axis = .vertical
+        stack.spacing = 10
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        return stack
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -35,17 +55,22 @@ class StartVC: UIViewController {
         title = "StartVC"
         view.backgroundColor = .systemBackground
         
-        view.addSubview(loginVCButton)
+        view.addSubview(buttonsStack)
         
         NSLayoutConstraint.activate([
-            loginVCButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            loginVCButton.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            loginVCButton.widthAnchor.constraint(equalToConstant: view.frame.width * 2/3)
+            buttonsStack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            buttonsStack.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            buttonsStack.widthAnchor.constraint(equalToConstant: view.frame.width * 2/3)
         ])
     }
     
     @objc private func loginVCButtonPressed() {
         let nextVC = LoginVC()
+        navigationController?.pushViewController(nextVC, animated: true)
+    }
+    
+    @objc private func tabBarControllerButtonPressed() {
+        let nextVC = TabBarController()
         navigationController?.pushViewController(nextVC, animated: true)
     }
 }
