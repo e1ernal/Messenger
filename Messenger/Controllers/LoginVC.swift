@@ -52,10 +52,11 @@ class LoginVC: UIViewController, UITextFieldDelegate {
         let field = UITextField()
         field.placeholder = "0 000 000 0000"
         field.autocapitalizationType = .none
+        field.font = UIFont.systemFont(ofSize: CGFloat(20), weight: .regular)
         field.autocorrectionType = .no
         field.delegate = self
         field.textAlignment = .center
-        field.keyboardType = .phonePad
+        field.keyboardType = .numberPad
         field.heightAnchor.constraint(equalToConstant: heightConstraint).isActive = true
         field.translatesAutoresizingMaskIntoConstraints = false
         return field

@@ -15,7 +15,8 @@ class StartVC: UIViewController {
     
     private lazy var loginVCButton: UIButton = {
        let button = UIButton()
-        button.setTitle("→ LoginVC", for: .normal)
+        button.setTitle("  → Login", for: .normal)
+        button.contentHorizontalAlignment = .left
         button.backgroundColor = .systemBlue
         button.titleLabel?.font = UIFont.systemFont(ofSize: 15, weight: .semibold)
         button.heightAnchor.constraint(equalToConstant: heightConstraint).isActive = true
@@ -27,7 +28,8 @@ class StartVC: UIViewController {
     
     private lazy var tabBarControllerButton: UIButton = {
        let button = UIButton()
-        button.setTitle("→ TabBC", for: .normal)
+        button.setTitle("  → Tab Bar", for: .normal)
+        button.contentHorizontalAlignment = .left
         button.backgroundColor = .systemBlue
         button.titleLabel?.font = UIFont.systemFont(ofSize: 15, weight: .semibold)
         button.heightAnchor.constraint(equalToConstant: heightConstraint).isActive = true
@@ -37,8 +39,21 @@ class StartVC: UIViewController {
         return button
     }()
     
+    private lazy var loginConfirmButton: UIButton = {
+       let button = UIButton()
+        button.setTitle("  → Login Confirmation", for: .normal)
+        button.contentHorizontalAlignment = .left
+        button.backgroundColor = .systemBlue
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 15, weight: .semibold)
+        button.heightAnchor.constraint(equalToConstant: heightConstraint).isActive = true
+        button.layer.cornerRadius = heightConstraint / 5
+        button.addTarget(self, action: #selector(loginConfirmButtonPressed), for: .touchUpInside)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
     private lazy var buttonsStack: UIStackView = {
-        let stack = UIStackView(arrangedSubviews: [loginVCButton, tabBarControllerButton])
+        let stack = UIStackView(arrangedSubviews: [loginVCButton, tabBarControllerButton, loginConfirmButton])
         stack.axis = .vertical
         stack.spacing = 10
         stack.translatesAutoresizingMaskIntoConstraints = false
@@ -71,6 +86,11 @@ class StartVC: UIViewController {
     
     @objc private func tabBarControllerButtonPressed() {
         let nextVC = TabBarController()
+        navigationController?.pushViewController(nextVC, animated: true)
+    }
+    
+    @objc private func loginConfirmButtonPressed() {
+        let nextVC = LoginConvirmVC()
         navigationController?.pushViewController(nextVC, animated: true)
     }
 }
