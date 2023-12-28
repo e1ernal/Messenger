@@ -10,12 +10,11 @@ import UIKit
 class ChatsVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         makeUI()
     }
-    
+
     private func makeUI() {
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = Const.Color.primaryBackground
     }
 }
-
