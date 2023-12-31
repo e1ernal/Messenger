@@ -1,8 +1,8 @@
 //
 //  NetworkService.swift
-//  Networking POST [Async Await]
+//  Messenger
 //
-//  Created by e1ernal on 24.12.2023.
+//  Created by e1ernal on 26.12.2023.
 //
 
 import Foundation
@@ -63,11 +63,7 @@ final class NetworkService {
     
     func getVerificationCode(phoneNumber: String) async throws {
         let url = try URLService.shared.createURL(endPoint: .verificationCode(path: .requestCode))
-        
-        // Создание запроса
         var request = URLRequest(url: url)
-        
-        // Настройки запроса
         request.httpMethod = "POST"
         request.setValue("application/json; charset=UTF-8", forHTTPHeaderField: "Content-type")
         
@@ -95,10 +91,7 @@ final class NetworkService {
     
     func confirmVerificationCode(code: String) async throws {
         let url = try URLService.shared.createURL(endPoint: .verificationCode(path: .confirmCode))
-        // Создание запроса
         var request = URLRequest(url: url)
-        
-        // Настройки запроса
         request.httpMethod = "POST"
         request.setValue("application/json; charset=UTF-8", forHTTPHeaderField: "Content-type")
         

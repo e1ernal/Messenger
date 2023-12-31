@@ -7,7 +7,6 @@
 
 import Foundation
 
-// TODO: - раскидать по файлам
 struct User: Identifiable, Decodable {
     var id: Int
     let firstName: String

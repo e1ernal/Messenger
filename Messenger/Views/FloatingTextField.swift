@@ -10,7 +10,7 @@ import UIKit
 final class FloatingTextField: UITextField, UITextFieldDelegate {
     private let borderView: UIView = {
         let view = UIView()
-        view.layer.borderColor = Const.Color.inactive.cgColor
+        view.layer.borderColor = Color.inactive.color.cgColor
         view.layer.borderWidth = 1.0
         view.isUserInteractionEnabled = false
         view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
@@ -19,9 +19,9 @@ final class FloatingTextField: UITextField, UITextFieldDelegate {
 
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.font = Const.Font.body
-        label.textColor = Const.Color.active
-        label.backgroundColor = Const.Color.primaryBackground
+        label.font = Font.body.font
+        label.textColor = Color.active.color
+        label.backgroundColor = Color.background.color
         label.textAlignment = .center
         label.layer.opacity = 0.0
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -40,12 +40,12 @@ final class FloatingTextField: UITextField, UITextFieldDelegate {
 
     private func setupTextField(placeholder: String) {
         attributedPlaceholder = NSAttributedString(string: placeholder)
-        font = Const.Font.subtitle
+        font = Font.subtitle.font
         autocorrectionType = .no
         textAlignment = .center
         keyboardType = .default
-        heightAnchor.constraint(equalToConstant: Const.Constraint.height).isActive = true
-        borderView.layer.cornerRadius = Const.Constraint.height / 5
+        heightAnchor.constraint(equalToConstant: Constraint.height.rawValue).isActive = true
+        borderView.layer.cornerRadius = Constraint.height.rawValue / 5
 
         borderView.frame = bounds
         titleLabel.text = " " + placeholder + " "
@@ -55,19 +55,19 @@ final class FloatingTextField: UITextField, UITextFieldDelegate {
 
         NSLayoutConstraint.activate([
             titleLabel.centerYAnchor.constraint(equalTo: self.topAnchor),
-            titleLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: Const.Constraint.width)
+            titleLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: Constraint.spacing.rawValue)
         ])
     }
 
     func changeVisibility(isActive: Bool) {
         if isActive {
             UIView.animate(withDuration: 0.25) {
-                self.borderView.layer.borderColor = Const.Color.active.cgColor
+                self.borderView.layer.borderColor = Color.active.color.cgColor
                 self.titleLabel.layer.opacity = 1.0
             }
         } else {
             UIView.animate(withDuration: 0.25) {
-                self.borderView.layer.borderColor = Const.Color.inactive.cgColor
+                self.borderView.layer.borderColor = Color.inactive.color.cgColor
                 self.titleLabel.layer.opacity = 0.0
             }
         }

@@ -11,7 +11,7 @@ class PhoneVC: UIViewController, UITextFieldDelegate {
     private let emoji: UILabel = {
         let label = UILabel()
         label.text = "☎️"
-        label.font = Const.Font.large
+        label.font = Font.large.font
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -20,7 +20,7 @@ class PhoneVC: UIViewController, UITextFieldDelegate {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "Your Phone"
-        label.font = Const.Font.title
+        label.font = Font.title.font
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -29,30 +29,22 @@ class PhoneVC: UIViewController, UITextFieldDelegate {
     private let subtitleLabel: UILabel = {
         let label = UILabel()
         label.text = "Please enter your phone number"
-        label.font = Const.Font.subtitle
+        label.font = Font.subtitle.font
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
 
-    private lazy var labelsStack: UIStackView = {
-        let stack = UIStackView()
-        stack.axis = .vertical
-        stack.spacing = Const.Constraint.width
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        return stack
-    }()
-
     private lazy var numberField: UITextField = {
         let field = UITextField()
-        field.placeholder = "0 000 000 0000"
+        field.placeholder = "+0 000 000 0000"
         field.autocapitalizationType = .none
         field.font = UIFont.systemFont(ofSize: CGFloat(20), weight: .regular)
         field.autocorrectionType = .no
         field.delegate = self
         field.textAlignment = .center
         field.keyboardType = .numberPad
-        field.heightAnchor.constraint(equalToConstant: Const.Constraint.height).isActive = true
+        field.heightAnchor.constraint(equalToConstant: Constraint.height.rawValue).isActive = true
         field.translatesAutoresizingMaskIntoConstraints = false
         return field
     }()
@@ -60,19 +52,19 @@ class PhoneVC: UIViewController, UITextFieldDelegate {
     private lazy var continueButton: UIButton = {
         let button = UIButton()
         button.setTitle("Continue", for: .normal)
-        button.titleLabel?.font = Const.Font.button
-        button.backgroundColor = Const.Color.inactive
-        button.heightAnchor.constraint(equalToConstant: Const.Constraint.height).isActive = true
-        button.layer.cornerRadius = Const.Constraint.height / 5
+        button.titleLabel?.font = Font.button.font
+        button.backgroundColor = Color.inactive.color
+        button.heightAnchor.constraint(equalToConstant: Constraint.height.rawValue).isActive = true
+        button.layer.cornerRadius = Constraint.height.rawValue / 5
         button.addTarget(self, action: #selector(continueButtonTapped), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
 
-    private lazy var actionsStack: UIStackView = {
+    private lazy var enterNumberStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .vertical
-        stack.spacing = Const.Constraint.height
+        stack.spacing = Constraint.spacing.rawValue
         stack.translatesAutoresizingMaskIntoConstraints = false
         return stack
     }()
@@ -80,7 +72,7 @@ class PhoneVC: UIViewController, UITextFieldDelegate {
     private lazy var numberLabel: UILabel = {
         let label = UILabel()
         label.text = numberField.text
-        label.font = Const.Font.title
+        label.font = Font.title.font
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -89,7 +81,7 @@ class PhoneVC: UIViewController, UITextFieldDelegate {
     private let subNumberLabel: UILabel = {
         let label = UILabel()
         label.text = "Is this the correct number?"
-        label.font = Const.Font.subtitle
+        label.font = Font.subtitle.font
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -98,10 +90,10 @@ class PhoneVC: UIViewController, UITextFieldDelegate {
     private lazy var editButton: UIButton = {
         let button = UIButton()
         button.setTitle("Edit", for: .normal)
-        button.titleLabel?.font = Const.Font.subtitle
+        button.titleLabel?.font = Font.subtitle.font
         button.setTitleColor(.systemBlue, for: .normal)
-        button.heightAnchor.constraint(equalToConstant: Const.Constraint.height).isActive = true
-        button.layer.cornerRadius = Const.Constraint.height / 5
+        button.heightAnchor.constraint(equalToConstant: Constraint.height.rawValue).isActive = true
+        button.layer.cornerRadius = Constraint.height.rawValue / 5
         button.addTarget(self, action: #selector(editButtonTapped), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
@@ -110,10 +102,10 @@ class PhoneVC: UIViewController, UITextFieldDelegate {
     private lazy var continueFinalButton: UIButton = {
         let button = UIButton()
         button.setTitle("Continue", for: .normal)
-        button.titleLabel?.font = Const.Font.button
+        button.titleLabel?.font = Font.button.font
         button.backgroundColor = .systemBlue
-        button.heightAnchor.constraint(equalToConstant: Const.Constraint.height).isActive = true
-        button.layer.cornerRadius = Const.Constraint.height / 5
+        button.heightAnchor.constraint(equalToConstant: Constraint.height.rawValue).isActive = true
+        button.layer.cornerRadius = Constraint.height.rawValue / 5
         button.addTarget(self, action: #selector(continueFinalButtonTapped), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
@@ -122,22 +114,22 @@ class PhoneVC: UIViewController, UITextFieldDelegate {
     private lazy var checkNumberStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .vertical
-        stack.spacing = Const.Constraint.spacing
+        stack.spacing = Constraint.spacing.rawValue
         stack.translatesAutoresizingMaskIntoConstraints = false
         return stack
     }()
 
     private lazy var alphaView: UIView = {
-        let view = UIView(frame: CGRect(x: 0, y: 0, width: view.frame.width, height: view.frame.height))
-        view.backgroundColor = Const.Color.primaryTransparentBackground
+        let view = UIView()
+        view.backgroundColor = Color.transparentBackground.color
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
 
     private lazy var popupStackView: UIView = {
         let view = UIView()
-        view.backgroundColor = Const.Color.secondaryBackground
-        view.layer.cornerRadius = Const.Constraint.width + Const.Constraint.height / 5
+        view.backgroundColor = Color.secondaryBackground.color
+        view.layer.cornerRadius = Constraint.spacing.rawValue + Constraint.height.rawValue / 5
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
@@ -150,45 +142,42 @@ class PhoneVC: UIViewController, UITextFieldDelegate {
     }
 
     private func makeUI() {
-        view.backgroundColor = Const.Color.primaryBackground
+        view.backgroundColor = Color.background.color
         navigationItem.setHidesBackButton(true, animated: true)
         
-        labelsStack.addArrangedSubview(emoji)
-        labelsStack.addArrangedSubview(titleLabel)
-        labelsStack.addArrangedSubview(subtitleLabel)
-
-        actionsStack.addArrangedSubview(numberField)
-        actionsStack.addArrangedSubview(continueButton)
-
+        enterNumberStack.addArrangedSubview(emoji)
+        enterNumberStack.addArrangedSubview(titleLabel)
+        enterNumberStack.addArrangedSubview(subtitleLabel)
+        enterNumberStack.setCustomSpacing(Constraint.doubleSpacing.rawValue, after: subtitleLabel)
+        enterNumberStack.addArrangedSubview(numberField)
+        enterNumberStack.setCustomSpacing(Constraint.doubleSpacing.rawValue, after: numberField)
+        enterNumberStack.addArrangedSubview(continueButton)
+        
         checkNumberStack.addArrangedSubview(numberLabel)
         checkNumberStack.addArrangedSubview(subNumberLabel)
+        checkNumberStack.setCustomSpacing(Constraint.doubleSpacing.rawValue, after: subNumberLabel)
         checkNumberStack.addArrangedSubview(editButton)
         checkNumberStack.addArrangedSubview(continueFinalButton)
 
         alphaView.addSubview(popupStackView)
         alphaView.addSubview(checkNumberStack)
 
-        view.addSubview(labelsStack)
-        view.addSubview(actionsStack)
+        view.addSubview(enterNumberStack)
         view.addSubview(alphaView)
 
         NSLayoutConstraint.activate([
-            actionsStack.widthAnchor.constraint(equalToConstant: view.frame.width * 2 / 3),
-            actionsStack.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            actionsStack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            enterNumberStack.widthAnchor.constraint(equalToConstant: view.frame.width * 2 / 3),
+            enterNumberStack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            enterNumberStack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
 
-            labelsStack.widthAnchor.constraint(equalToConstant: view.frame.width * 2 / 3),
-            labelsStack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            labelsStack.bottomAnchor.constraint(equalTo: actionsStack.topAnchor, constant: -Const.Constraint.height),
-
-            checkNumberStack.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             checkNumberStack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             checkNumberStack.widthAnchor.constraint(equalToConstant: view.frame.width * 2 / 3),
+            checkNumberStack.topAnchor.constraint(equalTo: numberField.topAnchor),
 
-            popupStackView.topAnchor.constraint(equalTo: checkNumberStack.topAnchor, constant: -Const.Constraint.width),
-            popupStackView.bottomAnchor.constraint(equalTo: checkNumberStack.bottomAnchor, constant: Const.Constraint.width),
-            popupStackView.leadingAnchor.constraint(equalTo: checkNumberStack.leadingAnchor, constant: -Const.Constraint.width),
-            popupStackView.trailingAnchor.constraint(equalTo: checkNumberStack.trailingAnchor, constant: Const.Constraint.width),
+            popupStackView.topAnchor.constraint(equalTo: checkNumberStack.topAnchor, constant: -Constraint.spacing.rawValue),
+            popupStackView.bottomAnchor.constraint(equalTo: checkNumberStack.bottomAnchor, constant: Constraint.spacing.rawValue),
+            popupStackView.leadingAnchor.constraint(equalTo: checkNumberStack.leadingAnchor, constant: -Constraint.spacing.rawValue),
+            popupStackView.trailingAnchor.constraint(equalTo: checkNumberStack.trailingAnchor, constant: Constraint.spacing.rawValue),
 
             alphaView.topAnchor.constraint(equalTo: view.topAnchor),
             alphaView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
@@ -202,11 +191,11 @@ class PhoneVC: UIViewController, UITextFieldDelegate {
     func textFieldDidChangeSelection(_ textField: UITextField) {
         if textField.hasText {
             UIView.animate(withDuration: 0.25) {
-                self.continueButton.backgroundColor = Const.Color.active
+                self.continueButton.backgroundColor = Color.active.color
             }
         } else {
             UIView.animate(withDuration: 0.25) {
-                self.continueButton.backgroundColor = Const.Color.inactive
+                self.continueButton.backgroundColor = Color.inactive.color
             }
         }
     }

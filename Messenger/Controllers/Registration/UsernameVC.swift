@@ -8,10 +8,14 @@
 import UIKit
 
 class UsernameVC: UIViewController, UITextFieldDelegate {
+    var firstName: String?
+    var lastName: String?
+    var profileImage: UIImage?
+    
     private let emoji: UILabel = {
         let label = UILabel()
         label.text = "💭"
-        label.font = Const.Font.large
+        label.font = Font.large.font
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -20,7 +24,7 @@ class UsernameVC: UIViewController, UITextFieldDelegate {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "Username"
-        label.font = Const.Font.title
+        label.font = Font.title.font
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -29,18 +33,10 @@ class UsernameVC: UIViewController, UITextFieldDelegate {
     private let subtitleLabel: UILabel = {
         let label = UILabel()
         label.text = "Please create your username"
-        label.font = Const.Font.subtitle
+        label.font = Font.subtitle.font
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
-    }()
-    
-    private lazy var labelsStack: UIStackView = {
-        let stack = UIStackView()
-        stack.axis = .vertical
-        stack.spacing = Const.Constraint.width
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        return stack
     }()
     
     private lazy var usernameField: UITextField = {
@@ -48,13 +44,13 @@ class UsernameVC: UIViewController, UITextFieldDelegate {
         field.placeholder = "username"
         field.autocapitalizationType = .none
         field.layer.borderWidth = 1.0
-        field.layer.cornerRadius = Const.Constraint.height / 5
+        field.layer.cornerRadius = Constraint.height.rawValue / 5
         field.font = UIFont.systemFont(ofSize: CGFloat(20), weight: .regular)
         field.autocorrectionType = .no
         field.delegate = self
         field.textAlignment = .center
         field.keyboardType = .namePhonePad
-        field.heightAnchor.constraint(equalToConstant: Const.Constraint.height).isActive = true
+        field.heightAnchor.constraint(equalToConstant: Constraint.height.rawValue).isActive = true
         field.translatesAutoresizingMaskIntoConstraints = false
         return field
     }()
@@ -62,19 +58,19 @@ class UsernameVC: UIViewController, UITextFieldDelegate {
     private lazy var continueButton: UIButton = {
         let button = UIButton()
         button.setTitle("Continue", for: .normal)
-        button.titleLabel?.font = Const.Font.button
-        button.backgroundColor = Const.Color.inactive
-        button.heightAnchor.constraint(equalToConstant: Const.Constraint.height).isActive = true
-        button.layer.cornerRadius = Const.Constraint.height / 5
+        button.titleLabel?.font = Font.button.font
+        button.backgroundColor = Color.inactive.color
+        button.heightAnchor.constraint(equalToConstant: Constraint.height.rawValue).isActive = true
+        button.layer.cornerRadius = Constraint.height.rawValue / 5
         button.addTarget(self, action: #selector(continueButtonTapped), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     
-    private lazy var actionsStack: UIStackView = {
+    private lazy var stack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .vertical
-        stack.spacing = Const.Constraint.height
+        stack.spacing = Constraint.spacing.rawValue
         stack.translatesAutoresizingMaskIntoConstraints = false
         return stack
     }()
@@ -87,26 +83,23 @@ class UsernameVC: UIViewController, UITextFieldDelegate {
     }
     
     private func makeUI() {
-        view.backgroundColor = Const.Color.primaryBackground
+        view.backgroundColor = Color.background.color
+        navigationItem.setHidesBackButton(true, animated: true)
         
-        labelsStack.addArrangedSubview(emoji)
-        labelsStack.addArrangedSubview(titleLabel)
-        labelsStack.addArrangedSubview(subtitleLabel)
+        stack.addArrangedSubview(emoji)
+        stack.addArrangedSubview(titleLabel)
+        stack.addArrangedSubview(subtitleLabel)
+        stack.setCustomSpacing(Constraint.doubleSpacing.rawValue, after: subtitleLabel)
+        stack.addArrangedSubview(usernameField)
+        stack.setCustomSpacing(Constraint.doubleSpacing.rawValue, after: usernameField)
+        stack.addArrangedSubview(continueButton)
         
-        actionsStack.addArrangedSubview(usernameField)
-        actionsStack.addArrangedSubview(continueButton)
-        
-        view.addSubview(labelsStack)
-        view.addSubview(actionsStack)
+        view.addSubview(stack)
         
         NSLayoutConstraint.activate([
-            actionsStack.widthAnchor.constraint(equalToConstant: view.frame.width * 2 / 3),
-            actionsStack.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            actionsStack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            
-            labelsStack.widthAnchor.constraint(equalToConstant: view.frame.width * 2 / 3),
-            labelsStack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            labelsStack.bottomAnchor.constraint(equalTo: actionsStack.topAnchor, constant: -Const.Constraint.height)
+            stack.widthAnchor.constraint(equalToConstant: view.frame.width * 2 / 3),
+            stack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            stack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor)
         ])
     }
     
@@ -114,8 +107,8 @@ class UsernameVC: UIViewController, UITextFieldDelegate {
         guard textField.hasText,
               let username = textField.text else {
             UIView.animate(withDuration: 0.25) {
-                self.continueButton.backgroundColor = Const.Color.inactive
-                self.usernameField.layer.borderColor = Const.Color.primaryBackground.cgColor
+                self.continueButton.backgroundColor = Color.inactive.color
+                self.usernameField.layer.borderColor = Color.background.color.cgColor
             }
             return
         }
@@ -125,15 +118,15 @@ class UsernameVC: UIViewController, UITextFieldDelegate {
             do {
                 try await NetworkService.shared.checkUsername(username: username)
                 UIView.animate(withDuration: 0.25) {
-                    self.continueButton.backgroundColor = Const.Color.active
-                    self.usernameField.layer.borderColor = Const.Color.completed.cgColor
+                    self.continueButton.backgroundColor = Color.active.color
+                    self.usernameField.layer.borderColor = Color.success.color.cgColor
                 }
                 print("OK")
             } catch {
                 print(error.localizedDescription)
                 UIView.animate(withDuration: 0.25) {
-                    self.continueButton.backgroundColor = Const.Color.inactive
-                    self.usernameField.layer.borderColor = Const.Color.wrong.cgColor
+                    self.continueButton.backgroundColor = Color.inactive.color
+                    self.usernameField.layer.borderColor = Color.noSuccess.color.cgColor
                 }
                 print("NOT")
             }
@@ -142,17 +135,27 @@ class UsernameVC: UIViewController, UITextFieldDelegate {
     
     @objc
     func continueButtonTapped() {
-        guard continueButton.backgroundColor == Const.Color.active else {
+        print("Username: \(String(describing: usernameField.text))")
+        print("First name: \(String(describing: firstName))")
+        print("Last name: \(String(describing: lastName))")
+        print("Image: \(String(describing: profileImage))")
+        
+        guard continueButton.backgroundColor == Color.active.color,
+              let firstName,
+              let username = usernameField.text,
+              let profileImage else {
+            print("Some problem")
             return
         }
-        // Create user
         Task {
             do {
-                try await NetworkService.shared.createUser(username: "username", firstname: "Name", lastname: "Lastname", image: UIImage(named: "image")!)
+                try await NetworkService.shared.createUser(username: username, 
+                                                           firstname: firstName,
+                                                           lastname: lastName,
+                                                           image: profileImage)
             } catch {
                 print(error.localizedDescription)
             }
         }
-        // Go to Next VC
     }
 }

@@ -11,10 +11,10 @@ class PhoneConvirmVC: UIViewController, UITextFieldDelegate {
     private let digitsCount: Int = 5
     private var digitLabels = [UILabel]()
 
-    private let codeEmoji: UILabel = {
+    private let emoji: UILabel = {
         let label = UILabel()
         label.text = "💬"
-        label.font = Const.Font.large
+        label.font = Font.large.font
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -23,7 +23,7 @@ class PhoneConvirmVC: UIViewController, UITextFieldDelegate {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "Enter Code"
-        label.font = Const.Font.title
+        label.font = Font.title.font
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -33,18 +33,10 @@ class PhoneConvirmVC: UIViewController, UITextFieldDelegate {
         let label = UILabel()
         label.text = "We're sent an SMS with an acvivation code to your phone"
         label.numberOfLines = 0
-        label.font = Const.Font.subtitle
+        label.font = Font.subtitle.font
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
-    }()
-
-    private lazy var labelsStack: UIStackView = {
-        let stack = UIStackView()
-        stack.axis = .vertical
-        stack.spacing = Const.Constraint.spacing
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        return stack
     }()
 
     private lazy var digitsStack: UIStackView = {
@@ -52,7 +44,7 @@ class PhoneConvirmVC: UIViewController, UITextFieldDelegate {
         stack.axis = .horizontal
         stack.distribution = .fillEqually
         stack.alignment = .fill
-        stack.spacing = Const.Constraint.spacing
+        stack.spacing = Constraint.spacing.rawValue
         stack.translatesAutoresizingMaskIntoConstraints = false
         return stack
     }()
@@ -64,10 +56,19 @@ class PhoneConvirmVC: UIViewController, UITextFieldDelegate {
         field.delegate = self
         field.textContentType = .oneTimeCode
         field.keyboardType = .numberPad
+        field.heightAnchor.constraint(equalToConstant: Constraint.height.rawValue * 4 / 3).isActive = true
         field.translatesAutoresizingMaskIntoConstraints = false
         return field
     }()
 
+    private lazy var stack: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .vertical
+        stack.spacing = Constraint.spacing.rawValue
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        return stack
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -76,44 +77,41 @@ class PhoneConvirmVC: UIViewController, UITextFieldDelegate {
     }
 
     private func makeUI() {
-        view.backgroundColor = Const.Color.primaryBackground
+        view.backgroundColor = Color.background.color
+        navigationItem.setHidesBackButton(true, animated: true)
         
         for _ in 1 ... digitsCount {
             let label = UILabel()
             label.translatesAutoresizingMaskIntoConstraints = false
             label.textAlignment = .center
-            label.layer.cornerRadius = Const.Constraint.height / 5
+            label.layer.cornerRadius = Constraint.height.rawValue / 5
             label.layer.borderWidth = 1.0
-            label.layer.borderColor = Const.Color.inactive.cgColor
+            label.layer.borderColor = Color.inactive.color.cgColor
             label.font = .systemFont(ofSize: 25)
-            label.isUserInteractionEnabled = true
 
             digitsStack.addArrangedSubview(label)
             digitLabels.append(label)
         }
+        digitsStack.isUserInteractionEnabled = false
+        
+        stack.addArrangedSubview(emoji)
+        stack.addArrangedSubview(titleLabel)
+        stack.addArrangedSubview(subtitleLabel)
+        stack.setCustomSpacing(Constraint.doubleSpacing.rawValue, after: subtitleLabel)
+        stack.addArrangedSubview(digitsField)
 
-        labelsStack.addArrangedSubview(codeEmoji)
-        labelsStack.addArrangedSubview(titleLabel)
-        labelsStack.addArrangedSubview(subtitleLabel)
-
-        view.addSubview(labelsStack)
+        view.addSubview(stack)
         view.addSubview(digitsStack)
-        view.addSubview(digitsField)
 
         NSLayoutConstraint.activate([
-            digitsField.widthAnchor.constraint(equalToConstant: view.frame.width * 2 / 3),
-            digitsField.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            digitsField.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            digitsField.heightAnchor.constraint(equalToConstant: Const.Constraint.height * 4 / 3),
+            stack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            stack.widthAnchor.constraint(equalToConstant: view.frame.width * 2 / 3),
+            stack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
 
             digitsStack.topAnchor.constraint(equalTo: digitsField.topAnchor),
             digitsStack.leadingAnchor.constraint(equalTo: digitsField.leadingAnchor),
             digitsStack.trailingAnchor.constraint(equalTo: digitsField.trailingAnchor),
-            digitsStack.bottomAnchor.constraint(equalTo: digitsField.bottomAnchor),
-
-            labelsStack.bottomAnchor.constraint(equalTo: digitsStack.topAnchor, constant: -Const.Constraint.height),
-            labelsStack.widthAnchor.constraint(equalToConstant: view.frame.width * 2 / 3),
-            labelsStack.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+            digitsStack.bottomAnchor.constraint(equalTo: digitsField.bottomAnchor)
         ])
     }
 
@@ -126,10 +124,10 @@ class PhoneConvirmVC: UIViewController, UITextFieldDelegate {
             if digitIndex < text.count {
                 let index = text.index(text.startIndex, offsetBy: digitIndex)
                 currentLabel.text = String(text[index])
-                currentLabel.layer.borderColor = Const.Color.active.cgColor
+                currentLabel.layer.borderColor = Color.active.color.cgColor
             } else {
                 currentLabel.text?.removeAll()
-                currentLabel.layer.borderColor = Const.Color.inactive.cgColor
+                currentLabel.layer.borderColor = Color.inactive.color.cgColor
             }
         }
 
@@ -138,7 +136,7 @@ class PhoneConvirmVC: UIViewController, UITextFieldDelegate {
                 do {
                     try await NetworkService.shared.confirmVerificationCode(code: text)
                     for label in digitLabels {
-                        label.layer.borderColor = Const.Color.completed.cgColor
+                        label.layer.borderColor = Color.success.color.cgColor
                     }
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                         self.showNextVC(nextVC: ProfileInfoVC())
@@ -146,12 +144,12 @@ class PhoneConvirmVC: UIViewController, UITextFieldDelegate {
                 } catch let error as NetworkError {
                     print(error.description)
                     for label in digitLabels {
-                        label.layer.borderColor = Const.Color.wrong.cgColor
+                        label.layer.borderColor = Color.noSuccess.color.cgColor
                     }
                 } catch {
                     print(error.localizedDescription)
                     for label in digitLabels {
-                        label.layer.borderColor = Const.Color.wrong.cgColor
+                        label.layer.borderColor = Color.noSuccess.color .cgColor
                     }
                 }
             }

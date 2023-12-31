@@ -15,6 +15,6 @@ class SettingsVC: UIViewController {
     }
 
     private func makeUI() {
-        view.backgroundColor = Const.Color.primaryBackground
+        view.backgroundColor = Color.background.color
     }
 }

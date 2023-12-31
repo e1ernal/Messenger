@@ -51,10 +51,10 @@ class StartVC: UIViewController, UIPickerViewDelegate, UIPickerViewDataSource {
     private lazy var continueButton: UIButton = {
         let button = UIButton()
         button.setTitle("Go", for: .normal)
-        button.titleLabel?.font = Const.Font.button
-        button.backgroundColor = Const.Color.active
-        button.heightAnchor.constraint(equalToConstant: Const.Constraint.height).isActive = true
-        button.layer.cornerRadius = Const.Constraint.height / 5
+        button.titleLabel?.font = Font.button.font
+        button.backgroundColor = Color.active.color
+        button.heightAnchor.constraint(equalToConstant: Constraint.height.rawValue).isActive = true
+        button.layer.cornerRadius = Constraint.height.rawValue / 5
         button.addTarget(self, action: #selector(continueButtonTapped), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
@@ -63,7 +63,7 @@ class StartVC: UIViewController, UIPickerViewDelegate, UIPickerViewDataSource {
     private lazy var actionsStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .vertical
-        stack.spacing = Const.Constraint.spacing
+        stack.spacing = Constraint.spacing.rawValue
         stack.translatesAutoresizingMaskIntoConstraints = false
         return stack
     }()
@@ -77,8 +77,8 @@ class StartVC: UIViewController, UIPickerViewDelegate, UIPickerViewDataSource {
     }
 
     private func makeUI() {
-        title = "Navigation through all VC"
-        view.backgroundColor = Const.Color.primaryBackground
+        title = "Navigation"
+        view.backgroundColor = Color.background.color
 
         actionsStack.addArrangedSubview(pickerView)
         actionsStack.addArrangedSubview(continueButton)
@@ -103,6 +103,6 @@ class StartVC: UIViewController, UIPickerViewDelegate, UIPickerViewDataSource {
     @objc 
     func continueButtonTapped() {
         let nextVC = vcArray[pickerView.selectedRow(inComponent: 0)].getClass
-        navigationController?.pushViewController(nextVC, animated: true)
+        showNextVC(nextVC: nextVC)
     }
 }
