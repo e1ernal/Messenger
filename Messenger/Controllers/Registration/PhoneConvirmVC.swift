@@ -77,7 +77,7 @@ class PhoneConvirmVC: UIViewController, UITextFieldDelegate {
 
     private func makeUI() {
         view.backgroundColor = Const.Color.primaryBackground
-
+        
         for _ in 1 ... digitsCount {
             let label = UILabel()
             label.translatesAutoresizingMaskIntoConstraints = false
@@ -137,11 +137,22 @@ class PhoneConvirmVC: UIViewController, UITextFieldDelegate {
             Task {
                 do {
                     try await NetworkService.shared.confirmVerificationCode(code: text)
-                    showNextVC(nextVC: ProfileInfoVC())
+                    for label in digitLabels {
+                        label.layer.borderColor = Const.Color.completed.cgColor
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                        self.showNextVC(nextVC: ProfileInfoVC())
+                    }
                 } catch let error as NetworkError {
                     print(error.description)
+                    for label in digitLabels {
+                        label.layer.borderColor = Const.Color.wrong.cgColor
+                    }
                 } catch {
                     print(error.localizedDescription)
+                    for label in digitLabels {
+                        label.layer.borderColor = Const.Color.wrong.cgColor
+                    }
                 }
             }
         }

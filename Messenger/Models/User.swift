@@ -17,18 +17,16 @@ struct User: Identifiable, Decodable {
     let image: String
     
     var dto: UserDTO {
-        return UserDTO(firstName: firstName,
-                       username: username,
-                       lastName: lastName,
-                       phoneNumber: phoneNumber,
+        return UserDTO(username: username,
+                       first_name: firstName,
+                       last_name: lastName,
                        image: image)
     }
     
     struct UserDTO: Encodable {
-        let firstName: String
         let username: String
-        let lastName: String?
-        let phoneNumber: String
+        let first_name: String
+        let last_name: String?
         let image: String
     }
 }
@@ -43,4 +41,8 @@ struct Code: Codable {
 
 struct CodeResponse: Codable {
     let response: Bool
+}
+
+struct Token: Codable {
+    let token: String
 }

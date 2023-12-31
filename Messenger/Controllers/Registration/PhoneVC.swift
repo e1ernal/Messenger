@@ -8,7 +8,7 @@
 import UIKit
 
 class PhoneVC: UIViewController, UITextFieldDelegate {
-    private let phoneEmoji: UILabel = {
+    private let emoji: UILabel = {
         let label = UILabel()
         label.text = "☎️"
         label.font = Const.Font.large
@@ -151,8 +151,9 @@ class PhoneVC: UIViewController, UITextFieldDelegate {
 
     private func makeUI() {
         view.backgroundColor = Const.Color.primaryBackground
-
-        labelsStack.addArrangedSubview(phoneEmoji)
+        navigationItem.setHidesBackButton(true, animated: true)
+        
+        labelsStack.addArrangedSubview(emoji)
         labelsStack.addArrangedSubview(titleLabel)
         labelsStack.addArrangedSubview(subtitleLabel)
 

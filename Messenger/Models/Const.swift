@@ -24,6 +24,8 @@ final class Const {
         static let primaryTransparentBackground: UIColor = primaryBackground.withAlphaComponent(0.5)
         static let active: UIColor = .systemBlue.withAlphaComponent(1.0)
         static let inactive: UIColor = .systemGray.withAlphaComponent(0.5)
+        static let completed: UIColor = .systemGreen.withAlphaComponent(1.0)
+        static let wrong: UIColor = .systemRed.withAlphaComponent(1.0)
     }
     /// Sizes for Fonts
     struct Font {
