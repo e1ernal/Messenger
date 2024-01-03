@@ -13,8 +13,8 @@ class ProfileInfoVC: UIViewController, UITextFieldDelegate, UINavigationControll
         let imageView = UIImageView()
         imageView.clipsToBounds = true
         imageView.layer.cornerRadius = Constraint.height.rawValue * 1.5
-        imageView.image = UIImage(systemName: "person.circle")
-        imageView.contentMode = .scaleAspectFill
+        imageView.image = UIImage(named: "addPhoto")
+        imageView.contentMode = .scaleAspectFit
         imageView.isUserInteractionEnabled = true
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView

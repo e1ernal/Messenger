@@ -17,7 +17,8 @@ final class URLService {
     func createURL(endPoint: EndPoint, parameters: [String: String]? = nil) throws -> URL {
         let urlStr = scheme + host + api + endPoint.path
         guard let baseURL = URL(string: urlStr),
-              var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: false) else {
+              var components = URLComponents(url: baseURL, 
+                                             resolvingAgainstBaseURL: false) else {
             throw NetworkError.errorURL
         }
 

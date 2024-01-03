@@ -13,6 +13,10 @@ extension UIViewController: UNUserNotificationCenterDelegate {
         navigationController?.pushViewController(nextVC, animated: true)
     }
     
+    func popBackVC() {
+        navigationController?.popViewController(animated: true)
+    }
+    
     // MARK: - Keyboard actions
     func hideKeyboardWhenTappedAround() {
         let tap = UITapGestureRecognizer(target: self, action: #selector(UIViewController.dismissKeyboard))

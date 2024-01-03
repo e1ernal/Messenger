@@ -10,7 +10,7 @@ import Foundation
 public enum NetworkError: Error {
     case errorURL
     case errorRequest
-    case errorResponce
+    case errorResponse
     case errorDecoding
     case errorUsername
     
@@ -20,8 +20,8 @@ public enum NetworkError: Error {
             return "errorURL"
         case .errorRequest:
             return "errorRequest"
-        case .errorResponce:
-            return "errorResponce"
+        case .errorResponse:
+            return "errorResponse"
         case .errorDecoding:
             return "errorDecoding"
         case .errorUsername:

@@ -9,9 +9,10 @@ import Foundation
 import UIKit
 
 enum Constraint: CGFloat {
+    case doubleHeight = 80.0
     case height = 40.0
-    case spacing = 10.0
     case doubleSpacing = 20.0
+    case spacing = 10.0
 }
 
 enum Color {
@@ -47,6 +48,7 @@ enum Font {
     case large
     case title
     case subtitle
+    case subtitleBold
     case button
     case body
     
@@ -58,6 +60,8 @@ enum Font {
             return .systemFont(ofSize: CGFloat(25), weight: .bold)
         case .subtitle:
             return .systemFont(ofSize: CGFloat(15), weight: .regular)
+        case .subtitleBold:
+            return .systemFont(ofSize: CGFloat(15), weight: .bold)
         case .button:
             return .systemFont(ofSize: CGFloat(15), weight: .semibold)
         case .body:

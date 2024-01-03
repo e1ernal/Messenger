@@ -93,7 +93,6 @@ class PhoneVC: UIViewController, UITextFieldDelegate {
         button.titleLabel?.font = Font.subtitle.font
         button.setTitleColor(.systemBlue, for: .normal)
         button.heightAnchor.constraint(equalToConstant: Constraint.height.rawValue).isActive = true
-        button.layer.cornerRadius = Constraint.height.rawValue / 5
         button.addTarget(self, action: #selector(editButtonTapped), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
@@ -104,14 +103,12 @@ class PhoneVC: UIViewController, UITextFieldDelegate {
         button.setTitle("Continue", for: .normal)
         button.titleLabel?.font = Font.button.font
         button.backgroundColor = .systemBlue
-        button.heightAnchor.constraint(equalToConstant: Constraint.height.rawValue).isActive = true
-        button.layer.cornerRadius = Constraint.height.rawValue / 5
         button.addTarget(self, action: #selector(continueFinalButtonTapped), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
 
-    private lazy var checkNumberStack: UIStackView = {
+    private let checkNumberStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .vertical
         stack.spacing = Constraint.spacing.rawValue
@@ -119,17 +116,16 @@ class PhoneVC: UIViewController, UITextFieldDelegate {
         return stack
     }()
 
-    private lazy var alphaView: UIView = {
+    private let alphaView: UIView = {
         let view = UIView()
         view.backgroundColor = Color.transparentBackground.color
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
 
-    private lazy var popupStackView: UIView = {
+    private let popupView: UIView = {
         let view = UIView()
         view.backgroundColor = Color.secondaryBackground.color
-        view.layer.cornerRadius = Constraint.spacing.rawValue + Constraint.height.rawValue / 5
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
@@ -145,6 +141,10 @@ class PhoneVC: UIViewController, UITextFieldDelegate {
         view.backgroundColor = Color.background.color
         navigationItem.setHidesBackButton(true, animated: true)
         
+        popupView.layer.cornerRadius = Constraint.spacing.rawValue + Constraint.height.rawValue / 5
+        continueFinalButton.heightAnchor.constraint(equalToConstant: Constraint.height.rawValue).isActive = true
+        continueFinalButton.layer.cornerRadius = Constraint.height.rawValue / 5
+        
         enterNumberStack.addArrangedSubview(emoji)
         enterNumberStack.addArrangedSubview(titleLabel)
         enterNumberStack.addArrangedSubview(subtitleLabel)
@@ -158,8 +158,8 @@ class PhoneVC: UIViewController, UITextFieldDelegate {
         checkNumberStack.setCustomSpacing(Constraint.doubleSpacing.rawValue, after: subNumberLabel)
         checkNumberStack.addArrangedSubview(editButton)
         checkNumberStack.addArrangedSubview(continueFinalButton)
-
-        alphaView.addSubview(popupStackView)
+        
+        alphaView.addSubview(popupView)
         alphaView.addSubview(checkNumberStack)
 
         view.addSubview(enterNumberStack)
@@ -174,11 +174,11 @@ class PhoneVC: UIViewController, UITextFieldDelegate {
             checkNumberStack.widthAnchor.constraint(equalToConstant: view.frame.width * 2 / 3),
             checkNumberStack.topAnchor.constraint(equalTo: numberField.topAnchor),
 
-            popupStackView.topAnchor.constraint(equalTo: checkNumberStack.topAnchor, constant: -Constraint.spacing.rawValue),
-            popupStackView.bottomAnchor.constraint(equalTo: checkNumberStack.bottomAnchor, constant: Constraint.spacing.rawValue),
-            popupStackView.leadingAnchor.constraint(equalTo: checkNumberStack.leadingAnchor, constant: -Constraint.spacing.rawValue),
-            popupStackView.trailingAnchor.constraint(equalTo: checkNumberStack.trailingAnchor, constant: Constraint.spacing.rawValue),
-
+            popupView.topAnchor.constraint(equalTo: checkNumberStack.topAnchor, constant: -Constraint.spacing.rawValue),
+            popupView.bottomAnchor.constraint(equalTo: checkNumberStack.bottomAnchor, constant: Constraint.spacing.rawValue),
+            popupView.leadingAnchor.constraint(equalTo: checkNumberStack.leadingAnchor, constant: -Constraint.spacing.rawValue),
+            popupView.trailingAnchor.constraint(equalTo: checkNumberStack.trailingAnchor, constant: Constraint.spacing.rawValue),
+            
             alphaView.topAnchor.constraint(equalTo: view.topAnchor),
             alphaView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             alphaView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -236,8 +236,13 @@ class PhoneVC: UIViewController, UITextFieldDelegate {
         }
         Task {
             do {
-                try await NetworkService.shared.getVerificationCode(phoneNumber: number)
-                showNextVC(nextVC: PhoneConvirmVC())
+                let code = try await NetworkService.shared.getVerificationCode(phoneNumber: number)
+                
+                let nextVC = PhoneConfirmVC()
+                nextVC.phoneNumber = numberLabel.text
+                nextVC.code = code
+                
+                showNextVC(nextVC: nextVC)
             } catch let error as NetworkError {
                 print(error.description)
             } catch {

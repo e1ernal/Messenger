@@ -22,7 +22,7 @@ final class NetworkService {
                                                   parameters: ["username": username])
         let (_, response) = try await URLSession.shared.data(from: url)
         guard let statusCode = (response as? HTTPURLResponse)?.statusCode else {
-            throw NetworkError.errorResponce
+            throw NetworkError.errorResponse
         }
         guard statusCode == 200 else {
             throw NetworkError.errorUsername
@@ -48,7 +48,7 @@ final class NetworkService {
         // Отправка запроса, получение ответа
         let (data, response) = try await URLSession.shared.data(for: request)
         guard let statusCode = (response as? HTTPURLResponse)?.statusCode else {
-            throw NetworkError.errorResponce
+            throw NetworkError.errorResponse
         }
         print("statusCode: \(statusCode)")
         
@@ -61,7 +61,7 @@ final class NetworkService {
         }
     }
     
-    func getVerificationCode(phoneNumber: String) async throws {
+    func getVerificationCode(phoneNumber: String) async throws -> String {
         let url = try URLService.shared.createURL(endPoint: .verificationCode(path: .requestCode))
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
@@ -76,7 +76,7 @@ final class NetworkService {
         // Отправка запроса, получение ответа
         let (data, response) = try await URLSession.shared.data(for: request)
         guard let statusCode = (response as? HTTPURLResponse)?.statusCode else {
-            throw NetworkError.errorResponce
+            throw NetworkError.errorResponse
         }
         print("statusCode: \(statusCode)")
         
@@ -87,6 +87,7 @@ final class NetworkService {
         guard statusCode == 200 else {
             throw NetworkError.errorRequest
         }
+        return result.code
     }
     
     func confirmVerificationCode(code: String) async throws {
@@ -107,11 +108,11 @@ final class NetworkService {
         // Декодирование полученных данных в Swift-модель
         let decoder = JSONDecoder()
         guard let statusCode = (response as? HTTPURLResponse)?.statusCode else {
-            throw NetworkError.errorResponce
+            throw NetworkError.errorResponse
         }
         let result = try decoder.decode(CodeResponse.self, from: data)
         guard let statusCode = (response as? HTTPURLResponse)?.statusCode else {
-            throw NetworkError.errorResponce
+            throw NetworkError.errorResponse
         }
         guard statusCode == 200 else {
             throw NetworkError.errorRequest
