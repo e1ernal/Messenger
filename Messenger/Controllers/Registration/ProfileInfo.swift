@@ -9,13 +9,15 @@ import Foundation
 import UIKit
 
 class ProfileInfoVC: UIViewController, UITextFieldDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
-    private var profileImage: UIImageView = {
+    private lazy var userImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.clipsToBounds = true
-        imageView.layer.cornerRadius = Constraint.height.rawValue * 1.5
+        imageView.layer.cornerRadius = .constant(.imageCornerRadius)
         imageView.image = UIImage(named: "addPhoto")
         imageView.contentMode = .scaleAspectFit
         imageView.isUserInteractionEnabled = true
+        imageView.addGestureRecognizer(UITapGestureRecognizer(target: self, 
+                                                              action: #selector(showImagePickerControllerActionSheet)))
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
@@ -23,7 +25,7 @@ class ProfileInfoVC: UIViewController, UITextFieldDelegate, UINavigationControll
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "Profile Info"
-        label.font = Font.title.font
+        label.font = .font(.title)
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -33,31 +35,31 @@ class ProfileInfoVC: UIViewController, UITextFieldDelegate, UINavigationControll
         let label = UILabel()
         label.text = "Enter your name and add a profile picture"
         label.numberOfLines = 0
-        label.font = Font.subtitle.font
+        label.font = .font(.subtitle)
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
-    private var firstNameField = FloatingTextField(placeholder: "First name (required)")
-    private var lastNameField = FloatingTextField(placeholder: "Last name (optional)")
+    private var firstNameTextField = FloatingTextField(placeholder: "First name (required)")
+    private var lastNameTextField = FloatingTextField(placeholder: "Last name (optional)")
     
     private lazy var continueButton: UIButton = {
         let button = UIButton()
         button.setTitle("Continue", for: .normal)
-        button.titleLabel?.font = Font.button.font
-        button.backgroundColor = Color.inactive.color
-        button.heightAnchor.constraint(equalToConstant: Constraint.height.rawValue).isActive = true
-        button.layer.cornerRadius = Constraint.height.rawValue / 5
+        button.titleLabel?.font = .font(.button)
+        button.backgroundColor = .color(.inactive)
+        button.heightAnchor.constraint(equalToConstant: .constant(.height)).isActive = true
+        button.layer.cornerRadius = .constant(.cornerRadius)
         button.addTarget(self, action: #selector(continueButtonTapped), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     
-    private lazy var stack: UIStackView = {
+    private lazy var uiStackView: UIStackView = {
         let stack = UIStackView()
         stack.axis = .vertical
-        stack.spacing = Constraint.spacing.rawValue
+        stack.spacing = .constant(.spacing)
         stack.translatesAutoresizingMaskIntoConstraints = false
         return stack
     }()
@@ -65,41 +67,40 @@ class ProfileInfoVC: UIViewController, UITextFieldDelegate, UINavigationControll
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        firstNameField.delegate = self
-        lastNameField.delegate = self
+        firstNameTextField.delegate = self
+        lastNameTextField.delegate = self
         
-        profileImage.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(showImagePickerControllerActionSheet)))
-        makeUI()
-        hideKeyboardWhenTappedAround()
+//        userImageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(showImagePickerControllerActionSheet)))
+        
+        setupUI()
     }
     
-    private func makeUI() {
-        view.backgroundColor = Color.background.color
-        navigationItem.setHidesBackButton(true, animated: true)
+    private func setupUI() {
+        setupVC(title: "", backButton: false)
         
-        firstNameField.translatesAutoresizingMaskIntoConstraints = false
-        lastNameField.translatesAutoresizingMaskIntoConstraints = false
+        firstNameTextField.translatesAutoresizingMaskIntoConstraints = false
+        lastNameTextField.translatesAutoresizingMaskIntoConstraints = false
         
-        stack.addArrangedSubview(titleLabel)
-        stack.addArrangedSubview(subtitleLabel)
-        stack.setCustomSpacing(Constraint.spacing.rawValue * 2, after: subtitleLabel)
-        stack.addArrangedSubview(firstNameField)
-        stack.addArrangedSubview(lastNameField)
-        stack.setCustomSpacing(Constraint.spacing.rawValue * 2, after: lastNameField)
-        stack.addArrangedSubview(continueButton)
+        uiStackView.addArrangedSubview(titleLabel)
+        uiStackView.addArrangedSubview(subtitleLabel)
+        uiStackView.setCustomSpacing(.constant(.doubleSpacing), after: subtitleLabel)
+        uiStackView.addArrangedSubview(firstNameTextField)
+        uiStackView.addArrangedSubview(lastNameTextField)
+        uiStackView.setCustomSpacing(.constant(.doubleSpacing), after: lastNameTextField)
+        uiStackView.addArrangedSubview(continueButton)
         
-        view.addSubview(profileImage)
-        view.addSubview(stack)
+        view.addSubview(userImageView)
+        view.addSubview(uiStackView)
         
         NSLayoutConstraint.activate([
-            profileImage.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            profileImage.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            profileImage.heightAnchor.constraint(equalToConstant: Constraint.height.rawValue * 3),
-            profileImage.widthAnchor.constraint(equalToConstant: Constraint.height.rawValue * 3),
+            userImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            userImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            userImageView.heightAnchor.constraint(equalToConstant: .constant(.imageHeight)),
+            userImageView.widthAnchor.constraint(equalToConstant: .constant(.imageHeight)),
             
-            stack.widthAnchor.constraint(equalToConstant: view.frame.width * 2 / 3),
-            stack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            stack.topAnchor.constraint(equalTo: profileImage.bottomAnchor, constant: Constraint.spacing.rawValue)
+            uiStackView.widthAnchor.constraint(equalToConstant: view.frame.width * 2 / 3),
+            uiStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            uiStackView.topAnchor.constraint(equalTo: userImageView.bottomAnchor, constant: .constant(.spacing))
         ])
     }
     
@@ -107,17 +108,17 @@ class ProfileInfoVC: UIViewController, UITextFieldDelegate, UINavigationControll
         if textField.hasText {
             guard let floatingTextfield = textField as? FloatingTextField else { return }
             floatingTextfield.changeVisibility(isActive: true)
-            if textField === firstNameField {
+            if textField === firstNameTextField {
                 UIView.animate(withDuration: 0.25) {
-                    self.continueButton.backgroundColor = Color.active.color
+                    self.continueButton.backgroundColor = .color(.active)
                 }
             }
         } else {
             guard let floatingTextfield = textField as? FloatingTextField else { return }
             floatingTextfield.changeVisibility(isActive: false)
-            if textField === firstNameField {
+            if textField === firstNameTextField {
                 UIView.animate(withDuration: 0.25) {
-                    self.continueButton.backgroundColor = Color.inactive.color
+                    self.continueButton.backgroundColor = .color(.inactive)
                 }
             }
         }
@@ -125,21 +126,18 @@ class ProfileInfoVC: UIViewController, UITextFieldDelegate, UINavigationControll
     
     @objc
     func continueButtonTapped() {
-        guard firstNameField.hasText,
-              let firstName = firstNameField.text else {
+        guard firstNameTextField.hasText,
+              let firstName = firstNameTextField.text else {
             print("NO User name")
             return
         }
         
-        print("Username: \(String(describing: ""))")
-        print("First name: \(String(describing: firstName))")
-        print("Last name: \(String(describing: lastNameField.text))")
-        print("Image: \(String(describing: profileImage.image))")
+        guard let image = userImageView.image else {
+            print("NO image")
+            return
+        }
         
-        let nextVC = UsernameVC()
-        nextVC.firstName = firstName
-        nextVC.lastName = lastNameField.text
-        nextVC.profileImage = profileImage.image
+        let nextVC = UsernameVC(firstName: firstName, lastName: lastNameTextField.text, profileImage: image)
         showNextVC(nextVC: nextVC)
     }
     
@@ -177,7 +175,7 @@ class ProfileInfoVC: UIViewController, UITextFieldDelegate, UINavigationControll
     func imagePickerController(_ picker: UIImagePickerController,
                                didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
         if let editedImage = info[.editedImage] as? UIImage {
-            profileImage.image = editedImage
+            userImageView.image = editedImage
         }
         dismiss(animated: true, completion: nil)
     }

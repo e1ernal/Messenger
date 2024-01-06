@@ -7,14 +7,14 @@
 
 import Foundation
 
-public enum NetworkError: Error {
+enum NetworkError: Error {
     case errorURL
     case errorRequest
     case errorResponse
     case errorDecoding
     case errorUsername
     
-    public var description: String {
+    var description: String {
         switch self {
         case .errorURL:
             return "errorURL"

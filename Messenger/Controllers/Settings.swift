@@ -11,10 +11,10 @@ class SettingsVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        makeUI()
+        setupUI()
     }
 
-    private func makeUI() {
-        view.backgroundColor = Color.background.color
+    private func setupUI() {
+        setupVC(title: TabBarItem.settings.title, backButton: false)
     }
 }

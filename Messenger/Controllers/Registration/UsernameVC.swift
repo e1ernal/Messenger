@@ -8,14 +8,22 @@
 import UIKit
 
 class UsernameVC: UIViewController, UITextFieldDelegate {
-    var firstName: String?
-    var lastName: String?
-    var profileImage: UIImage?
+    private var firstName: String?
+    private var lastName: String?
+    private var profileImage: UIImage?
+    private var isUsernameAvailable: Bool = false
+    
+    convenience init(firstName: String, lastName: String?, profileImage: UIImage) {
+        self.init()
+        self.firstName = firstName
+        self.lastName = lastName
+        self.profileImage = profileImage
+    }
     
     private let emoji: UILabel = {
         let label = UILabel()
         label.text = "💭"
-        label.font = Font.large.font
+        label.font = .font(.large)
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -24,7 +32,7 @@ class UsernameVC: UIViewController, UITextFieldDelegate {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "Username"
-        label.font = Font.title.font
+        label.font = .font(.title)
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -33,7 +41,7 @@ class UsernameVC: UIViewController, UITextFieldDelegate {
     private let subtitleLabel: UILabel = {
         let label = UILabel()
         label.text = "Please create your username"
-        label.font = Font.subtitle.font
+        label.font = .font(.subtitle)
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -44,13 +52,13 @@ class UsernameVC: UIViewController, UITextFieldDelegate {
         field.placeholder = "username"
         field.autocapitalizationType = .none
         field.layer.borderWidth = 1.0
-        field.layer.cornerRadius = Constraint.height.rawValue / 5
-        field.font = UIFont.systemFont(ofSize: CGFloat(20), weight: .regular)
+        field.layer.cornerRadius = .constant(.cornerRadius)
+        field.font = .font(.textField)
         field.autocorrectionType = .no
         field.delegate = self
         field.textAlignment = .center
         field.keyboardType = .namePhonePad
-        field.heightAnchor.constraint(equalToConstant: Constraint.height.rawValue).isActive = true
+        field.heightAnchor.constraint(equalToConstant: .constant(.height)).isActive = true
         field.translatesAutoresizingMaskIntoConstraints = false
         return field
     }()
@@ -58,19 +66,19 @@ class UsernameVC: UIViewController, UITextFieldDelegate {
     private lazy var continueButton: UIButton = {
         let button = UIButton()
         button.setTitle("Continue", for: .normal)
-        button.titleLabel?.font = Font.button.font
-        button.backgroundColor = Color.inactive.color
-        button.heightAnchor.constraint(equalToConstant: Constraint.height.rawValue).isActive = true
-        button.layer.cornerRadius = Constraint.height.rawValue / 5
+        button.titleLabel?.font = .font(.button)
+        button.backgroundColor = .color(.inactive)
+        button.heightAnchor.constraint(equalToConstant: .constant(.height)).isActive = true
+        button.layer.cornerRadius = .constant(.cornerRadius)
         button.addTarget(self, action: #selector(continueButtonTapped), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     
-    private lazy var stack: UIStackView = {
+    private lazy var uiStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .vertical
-        stack.spacing = Constraint.spacing.rawValue
+        stack.spacing = .constant(.spacing)
         stack.translatesAutoresizingMaskIntoConstraints = false
         return stack
     }()
@@ -78,28 +86,26 @@ class UsernameVC: UIViewController, UITextFieldDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        makeUI()
-        hideKeyboardWhenTappedAround()
+        setupUI()
     }
     
-    private func makeUI() {
-        view.backgroundColor = Color.background.color
-        navigationItem.setHidesBackButton(true, animated: true)
+    private func setupUI() {
+        setupVC(title: "", backButton: false)
         
-        stack.addArrangedSubview(emoji)
-        stack.addArrangedSubview(titleLabel)
-        stack.addArrangedSubview(subtitleLabel)
-        stack.setCustomSpacing(Constraint.doubleSpacing.rawValue, after: subtitleLabel)
-        stack.addArrangedSubview(usernameField)
-        stack.setCustomSpacing(Constraint.doubleSpacing.rawValue, after: usernameField)
-        stack.addArrangedSubview(continueButton)
+        uiStack.addArrangedSubview(emoji)
+        uiStack.addArrangedSubview(titleLabel)
+        uiStack.addArrangedSubview(subtitleLabel)
+        uiStack.setCustomSpacing(.constant(.doubleSpacing), after: subtitleLabel)
+        uiStack.addArrangedSubview(usernameField)
+        uiStack.setCustomSpacing(.constant(.doubleSpacing), after: usernameField)
+        uiStack.addArrangedSubview(continueButton)
         
-        view.addSubview(stack)
+        view.addSubview(uiStack)
         
         NSLayoutConstraint.activate([
-            stack.widthAnchor.constraint(equalToConstant: view.frame.width * 2 / 3),
-            stack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            stack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor)
+            uiStack.widthAnchor.constraint(equalToConstant: view.frame.width * 2 / 3),
+            uiStack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            uiStack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor)
         ])
     }
     
@@ -107,49 +113,48 @@ class UsernameVC: UIViewController, UITextFieldDelegate {
         guard textField.hasText,
               let username = textField.text else {
             UIView.animate(withDuration: 0.25) {
-                self.continueButton.backgroundColor = Color.inactive.color
-                self.usernameField.layer.borderColor = Color.background.color.cgColor
+                self.continueButton.backgroundColor = .color(.inactive)
+                self.usernameField.layer.borderColor = .color(.background)
             }
             return
         }
         
-        // Check username avaliability
+        // Check username availability
         Task {
             do {
-                try await NetworkService.shared.checkUsername(username: username)
-                UIView.animate(withDuration: 0.25) {
-                    self.continueButton.backgroundColor = Color.active.color
-                    self.usernameField.layer.borderColor = Color.success.color.cgColor
-                }
-                print("OK")
+                try await NetworkService.shared.checkUsername(username)
+                isUsernameAvailable = true
             } catch {
                 print(error.localizedDescription)
-                UIView.animate(withDuration: 0.25) {
-                    self.continueButton.backgroundColor = Color.inactive.color
-                    self.usernameField.layer.borderColor = Color.noSuccess.color.cgColor
-                }
-                print("NOT")
+                isUsernameAvailable = false
+            }
+            let buttonColor: UIColor = isUsernameAvailable ? .color(.active) : .color(.inactive)
+            let fieldColor: CGColor = isUsernameAvailable ? .color(.success) : .color(.failure)
+            
+            UIView.animate(withDuration: 0.25) {
+                self.continueButton.backgroundColor = buttonColor
+                self.usernameField.layer.borderColor = fieldColor
             }
         }
     }
     
     @objc
     func continueButtonTapped() {
-        print("Username: \(String(describing: usernameField.text))")
-        print("First name: \(String(describing: firstName))")
-        print("Last name: \(String(describing: lastName))")
-        print("Image: \(String(describing: profileImage))")
-        
-        guard continueButton.backgroundColor == Color.active.color,
-              let firstName,
-              let username = usernameField.text,
-              let profileImage else {
-            print("Some problem")
+        guard isUsernameAvailable else {
+            print("Username isn't available")
             return
         }
+        
+        guard let firstName,
+              let username = usernameField.text,
+              let profileImage else {
+            print("Some user data doesn't exist")
+            return
+        }
+        
         Task {
             do {
-                try await NetworkService.shared.createUser(username: username, 
+                try await NetworkService.shared.createUser(username: username,
                                                            firstname: firstName,
                                                            lastname: lastName,
                                                            image: profileImage)

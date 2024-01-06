@@ -28,4 +28,15 @@ extension UIViewController: UNUserNotificationCenterDelegate {
     func dismissKeyboard() {
         view.endEditing(true)
     }
+    
+    // MARK: - Setup basic View Controller
+    /// - Parameters:
+    ///     - title: Title to View Controller
+    ///     - backButton: Show back button as navigationItem
+    func setupVC(title: String?, backButton: Bool) {
+        self.title = title
+        view.backgroundColor = .color(.background)
+        navigationItem.setHidesBackButton(!backButton, animated: true)
+        hideKeyboardWhenTappedAround()
+    }
 }

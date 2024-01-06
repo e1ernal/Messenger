@@ -10,13 +10,19 @@ import UIKit
 class PhoneConfirmVC: UIViewController, UITextFieldDelegate {
     private let digitsCount: Int = 5
     private var digitLabels = [UILabel]()
-    var phoneNumber: String?
-    var code: String?
+    private var phoneNumber: String?
+    private var code: String?
     
-    private let emoji: UILabel = {
+    convenience init(phoneNumber: String, code: String) {
+        self.init()
+        self.phoneNumber = phoneNumber
+        self.code = code
+    }
+    
+    private let emojiLabel: UILabel = {
         let label = UILabel()
         label.text = "💬"
-        label.font = Font.large.font
+        label.font = .font(.large)
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -25,7 +31,7 @@ class PhoneConfirmVC: UIViewController, UITextFieldDelegate {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "Enter Code"
-        label.font = Font.title.font
+        label.font = .font(.title)
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -34,78 +40,78 @@ class PhoneConfirmVC: UIViewController, UITextFieldDelegate {
     private lazy var subtitleLabel: UILabel = {
         let label = UILabel()
         label.attributedText = NSMutableAttributedString()
-            .font("We're sent an SMS with an activation code to your phone: ", font: Font.subtitle.font)
-            .font(phoneNumber ?? "undefined", font: Font.subtitleBold.font)
+            .font("We're sent an SMS with an activation code to your phone: ", .font(.subtitle))
+            .font(phoneNumber ?? "undefined", .font(.subtitleBold))
         label.numberOfLines = 0
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
-    private lazy var digitsStack: UIStackView = {
+    private lazy var digitsStackView: UIStackView = {
         let stack = UIStackView()
         stack.axis = .horizontal
         stack.distribution = .fillEqually
         stack.alignment = .fill
-        stack.spacing = Constraint.spacing.rawValue
+        stack.spacing = .constant(.spacing)
         stack.translatesAutoresizingMaskIntoConstraints = false
         return stack
     }()
     
-    private lazy var digitsField: UITextField = {
+    private lazy var digitsTextField: UITextField = {
         let field = UITextField()
         field.tintColor = .clear
         field.textColor = .clear
         field.delegate = self
         field.textContentType = .oneTimeCode
         field.keyboardType = .numberPad
-        field.heightAnchor.constraint(equalToConstant: Constraint.height.rawValue * 4 / 3).isActive = true
+        field.heightAnchor.constraint(equalToConstant: .constant(.digitsHeight)).isActive = true
         field.translatesAutoresizingMaskIntoConstraints = false
         return field
     }()
     
-    private lazy var noCodeButton: UIButton = {
+    private lazy var helpButton: UIButton = {
         let button = UIButton()
         button.setTitle("Haven't received the code?", for: .normal)
-        button.titleLabel?.font = Font.subtitle.font
+        button.titleLabel?.font = .font(.subtitle)
         button.setTitleColor(.systemBlue, for: .normal)
-        button.heightAnchor.constraint(equalToConstant: Constraint.height.rawValue).isActive = true
-        button.layer.cornerRadius = Constraint.height.rawValue / 5
+        button.heightAnchor.constraint(equalToConstant: .constant(.height)).isActive = true
+        button.layer.cornerRadius = .constant(.cornerRadius)
         button.addTarget(self, action: #selector(noCodeButtonTapped), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     
-    private lazy var uiStack: UIStackView = {
+    private lazy var uiStackView: UIStackView = {
         let stack = UIStackView()
         stack.axis = .vertical
-        stack.spacing = Constraint.spacing.rawValue
+        stack.spacing = .constant(.spacing)
         stack.translatesAutoresizingMaskIntoConstraints = false
         return stack
     }()
     
-    private lazy var noCodeLabel: UILabel = {
+    private lazy var helpLabel: UILabel = {
         let label = UILabel()
         label.attributedText = NSMutableAttributedString()
-            .font("Sorry", font: Font.title.font)
-            .font("\n\nIf you don't get the code by SMS, please check your ", font: Font.subtitle.font)
-            .font("cellular data settings", font: Font.subtitleBold.font)
-            .font(" and phone number:\n\n", font: Font.subtitle.font)
-            .font(phoneNumber ?? "undefined", font: Font.subtitleBold.font)
-            .font("\n\nYour remaining option is to try another number", font: Font.subtitle.font)
+            .font("Sorry", .font(.title))
+            .font("\n\nIf you don't get the code by SMS, please check your ", .font(.subtitle))
+            .font("cellular data settings", .font(.subtitleBold))
+            .font(" and phone number:\n\n", .font(.subtitle))
+            .font(phoneNumber ?? "undefined", .font(.subtitleBold))
+            .font("\n\nYour remaining option is to try another number", .font(.subtitle))
         label.numberOfLines = 0
         label.textAlignment = .left
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
-    private lazy var noCodeGoBackButton: UIButton = {
+    private lazy var editNumberButton: UIButton = {
         let button = UIButton()
         button.setTitle("Edit Number", for: .normal)
-        button.titleLabel?.font = Font.button.font
+        button.titleLabel?.font = .font(.button)
         button.backgroundColor = .systemBlue
-        button.heightAnchor.constraint(equalToConstant: Constraint.height.rawValue).isActive = true
-        button.layer.cornerRadius = Constraint.height.rawValue / 5
+        button.heightAnchor.constraint(equalToConstant: .constant(.height)).isActive = true
+        button.layer.cornerRadius = .constant(.cornerRadius)
         button.addTarget(self, action: #selector(noCodeGoBackButtonTapped), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
@@ -114,31 +120,31 @@ class PhoneConfirmVC: UIViewController, UITextFieldDelegate {
     private lazy var closeButton: UIButton = {
         let button = UIButton()
         button.setTitle("Close", for: .normal)
-        button.titleLabel?.font = Font.subtitle.font
+        button.titleLabel?.font = .font(.subtitle)
         button.setTitleColor(.systemBlue, for: .normal)
         button.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     
-    private let noCodeStack: UIStackView = {
+    private let helpStackView: UIStackView = {
         let stack = UIStackView()
         stack.axis = .vertical
-        stack.spacing = Constraint.spacing.rawValue
+        stack.spacing = .constant(.spacing)
         stack.translatesAutoresizingMaskIntoConstraints = false
         return stack
     }()
     
     private let popupView: UIView = {
         let view = UIView()
-        view.backgroundColor = Color.secondaryBackground.color
+        view.backgroundColor = .color(.secondaryBackground)
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
     private let alphaView: UIView = {
         let view = UIView()
-        view.backgroundColor = Color.transparentBackground.color
+        view.backgroundColor = .color(.transparentBackground)
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
@@ -146,75 +152,69 @@ class PhoneConfirmVC: UIViewController, UITextFieldDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        makeUI()
-        hideKeyboardWhenTappedAround()
+        setupUI()
         
-        let alert = UIAlertController(title: "Alert", message: "Your code: \(code ?? "no code")", preferredStyle: .alert)
+        let alert = UIAlertController(title: "Alert", message: "Your code: " + (code ?? "no code"), preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Close", style: .cancel, handler: nil))
         self.present(alert, animated: true, completion: nil)
     }
     
-    private func makeUI() {
-        view.backgroundColor = Color.background.color
-        navigationItem.setHidesBackButton(true, animated: true)
+    private func setupUI() {
+        setupVC(title: "", backButton: false)
         
         for _ in 1 ... digitsCount {
             let label = UILabel()
             label.translatesAutoresizingMaskIntoConstraints = false
             label.textAlignment = .center
-            label.layer.cornerRadius = Constraint.height.rawValue / 5
+            label.layer.cornerRadius = .constant(.cornerRadius)
             label.layer.borderWidth = 1.0
-            label.layer.borderColor = Color.inactive.color.cgColor
-            label.font = .systemFont(ofSize: 25)
+            label.layer.borderColor = .color(.inactive)
+            label.font = .font(.codeField)
             
-            digitsStack.addArrangedSubview(label)
+            digitsStackView.addArrangedSubview(label)
             digitLabels.append(label)
         }
-        digitsStack.isUserInteractionEnabled = false
+        digitsStackView.isUserInteractionEnabled = false
         
-        uiStack.addArrangedSubview(emoji)
-        uiStack.addArrangedSubview(titleLabel)
-        uiStack.addArrangedSubview(subtitleLabel)
-        uiStack.setCustomSpacing(Constraint.doubleSpacing.rawValue, after: subtitleLabel)
-        uiStack.addArrangedSubview(digitsField)
-        uiStack.setCustomSpacing(Constraint.doubleSpacing.rawValue, after: digitsField)
-        uiStack.addArrangedSubview(noCodeButton)
+        uiStackView.addArrangedSubview(emojiLabel)
+        uiStackView.addArrangedSubview(titleLabel)
+        uiStackView.addArrangedSubview(subtitleLabel)
+        uiStackView.setCustomSpacing(.constant(.doubleSpacing), after: subtitleLabel)
+        uiStackView.addArrangedSubview(digitsTextField)
+        uiStackView.setCustomSpacing(.constant(.doubleSpacing), after: digitsTextField)
+        uiStackView.addArrangedSubview(helpButton)
         
-        popupView.layer.cornerRadius = Constraint.spacing.rawValue + Constraint.height.rawValue / 5
+        popupView.layer.cornerRadius = .constant(.spacing) + .constant(.cornerRadius)
         
-        noCodeStack.addArrangedSubview(noCodeLabel)
-        noCodeStack.addArrangedSubview(closeButton)
-        noCodeStack.addArrangedSubview(noCodeGoBackButton)
+        helpStackView.addArrangedSubview(helpLabel)
+        helpStackView.addArrangedSubview(closeButton)
+        helpStackView.addArrangedSubview(editNumberButton)
         
         alphaView.addSubview(popupView)
-        alphaView.addSubview(noCodeStack)
+        alphaView.addSubview(helpStackView)
         
-        view.addSubview(uiStack)
-        view.addSubview(digitsStack)
+        view.addSubview(uiStackView)
+        view.addSubview(digitsStackView)
         view.addSubview(alphaView)
         
         NSLayoutConstraint.activate([
-            uiStack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            uiStack.widthAnchor.constraint(equalToConstant: view.frame.width * 2 / 3),
-            uiStack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            uiStackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            uiStackView.widthAnchor.constraint(equalToConstant: view.frame.width * 2 / 3),
+            uiStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
-            digitsStack.topAnchor.constraint(equalTo: digitsField.topAnchor),
-            digitsStack.leadingAnchor.constraint(equalTo: digitsField.leadingAnchor),
-            digitsStack.trailingAnchor.constraint(equalTo: digitsField.trailingAnchor),
-            digitsStack.bottomAnchor.constraint(equalTo: digitsField.bottomAnchor),
+            digitsStackView.topAnchor.constraint(equalTo: digitsTextField.topAnchor),
+            digitsStackView.leadingAnchor.constraint(equalTo: digitsTextField.leadingAnchor),
+            digitsStackView.trailingAnchor.constraint(equalTo: digitsTextField.trailingAnchor),
+            digitsStackView.bottomAnchor.constraint(equalTo: digitsTextField.bottomAnchor),
             
-            noCodeStack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            noCodeStack.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            noCodeStack.widthAnchor.constraint(equalToConstant: view.frame.width * 2 / 3),
-
-            popupView.topAnchor.constraint(equalTo: noCodeStack.topAnchor, constant: -Constraint.spacing.rawValue),
-            popupView.bottomAnchor.constraint(equalTo: noCodeStack.bottomAnchor, constant: Constraint.spacing.rawValue),
-            popupView.leadingAnchor.constraint(equalTo: noCodeStack.leadingAnchor, constant: -Constraint.spacing.rawValue),
-            popupView.trailingAnchor.constraint(equalTo: noCodeStack.trailingAnchor, constant: Constraint.spacing.rawValue),
+            helpStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            helpStackView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            helpStackView.widthAnchor.constraint(equalToConstant: view.frame.width * 2 / 3),
             
-            popupView.widthAnchor.constraint(equalToConstant: view.frame.width * 2 / 3),
-            popupView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            popupView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            popupView.topAnchor.constraint(equalTo: helpStackView.topAnchor, constant: -.constant(.spacing)),
+            popupView.bottomAnchor.constraint(equalTo: helpStackView.bottomAnchor, constant: .constant(.spacing)),
+            popupView.leadingAnchor.constraint(equalTo: helpStackView.leadingAnchor, constant: -.constant(.spacing)),
+            popupView.trailingAnchor.constraint(equalTo: helpStackView.trailingAnchor, constant: .constant(.spacing)),
             
             alphaView.topAnchor.constraint(equalTo: view.topAnchor),
             alphaView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
@@ -234,10 +234,10 @@ class PhoneConfirmVC: UIViewController, UITextFieldDelegate {
             if digitIndex < text.count {
                 let index = text.index(text.startIndex, offsetBy: digitIndex)
                 currentLabel.text = String(text[index])
-                currentLabel.layer.borderColor = Color.active.color.cgColor
+                currentLabel.layer.borderColor = .color(.active)
             } else {
                 currentLabel.text?.removeAll()
-                currentLabel.layer.borderColor = Color.inactive.color.cgColor
+                currentLabel.layer.borderColor = .color(.inactive)
             }
         }
         
@@ -246,7 +246,7 @@ class PhoneConfirmVC: UIViewController, UITextFieldDelegate {
                 do {
                     try await NetworkService.shared.confirmVerificationCode(code: text)
                     for label in digitLabels {
-                        label.layer.borderColor = Color.success.color.cgColor
+                        label.layer.borderColor = .color(.success)
                     }
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                         self.showNextVC(nextVC: ProfileInfoVC())
@@ -254,12 +254,12 @@ class PhoneConfirmVC: UIViewController, UITextFieldDelegate {
                 } catch let error as NetworkError {
                     print(error.description)
                     for label in digitLabels {
-                        label.layer.borderColor = Color.noSuccess.color.cgColor
+                        label.layer.borderColor = .color(.failure)
                     }
                 } catch {
                     print(error.localizedDescription)
                     for label in digitLabels {
-                        label.layer.borderColor = Color.noSuccess.color .cgColor
+                        label.layer.borderColor = .color(.failure)
                     }
                 }
             }

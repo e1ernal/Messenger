@@ -8,16 +8,16 @@
 import UIKit
 
 class WelcomeVC: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
-    private let appNameLabel: UILabel = {
+    private let nameLabel: UILabel = {
         let label = UILabel()
         label.text = "Messenger"
-        label.font = Font.title.font
+        label.font = .font(.title)
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
-    private let appFeaturesCollection: UICollectionView = {
+    private let featuresCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
         layout.minimumLineSpacing = 0
@@ -33,29 +33,31 @@ class WelcomeVC: UIViewController, UICollectionViewDelegate, UICollectionViewDat
         return collection
     }()
     
-    private lazy var pageControl: UIPageControl = {
+    private lazy var featuresPageControl: UIPageControl = {
         let pageControl = UIPageControl()
         pageControl.currentPage = 0
+        pageControl.currentPageIndicatorTintColor = .color(.pageControlCurrent)
+        pageControl.pageIndicatorTintColor = .color(.pageControlTint)
         pageControl.addTarget(self, action: #selector(changePage), for: UIControl.Event.valueChanged)
         pageControl.translatesAutoresizingMaskIntoConstraints = false
         return pageControl
     }()
     
-    private lazy var startMessagingButton: UIButton = {
+    private lazy var startButton: UIButton = {
         let button = UIButton()
         button.setTitle("Start Messaging", for: .normal)
-        button.titleLabel?.font = Font.button.font
-        button.backgroundColor = Color.active.color
-        button.layer.cornerRadius = Constraint.height.rawValue / 5
+        button.titleLabel?.font = .font(.button)
+        button.backgroundColor = .color(.active)
+        button.layer.cornerRadius = .constant(.cornerRadius)
         button.addTarget(self, action: #selector(continueButtonTapped), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     
-    private lazy var uiStack: UIStackView = {
+    private lazy var uiStackView: UIStackView = {
         let stack = UIStackView()
         stack.axis = .vertical
-        stack.spacing = Constraint.spacing.rawValue
+        stack.spacing = .constant(.spacing)
         stack.translatesAutoresizingMaskIntoConstraints = false
         return stack
     }()
@@ -63,42 +65,40 @@ class WelcomeVC: UIViewController, UICollectionViewDelegate, UICollectionViewDat
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        makeUI()
-        hideKeyboardWhenTappedAround()
+        setupUI()
     }
     
-    private func makeUI() {
-        view.backgroundColor = Color.background.color
-        navigationItem.setHidesBackButton(true, animated: true)
+    private func setupUI() {
+        setupVC(title: "", backButton: false)
         
-        appFeaturesCollection.delegate = self
-        appFeaturesCollection.dataSource = self
+        featuresCollectionView.delegate = self
+        featuresCollectionView.dataSource = self
         
-        pageControl.numberOfPages = features.count
+        featuresPageControl.numberOfPages = features.count
         
-        view.addSubview(appNameLabel)
-        view.addSubview(appFeaturesCollection)
-        view.addSubview(startMessagingButton)
-        view.addSubview(pageControl)
+        view.addSubview(nameLabel)
+        view.addSubview(featuresCollectionView)
+        view.addSubview(startButton)
+        view.addSubview(featuresPageControl)
         
         NSLayoutConstraint.activate([
-            appFeaturesCollection.widthAnchor.constraint(equalToConstant: view.frame.width * 2 / 3),
-            appFeaturesCollection.heightAnchor.constraint(equalToConstant: Constraint.doubleHeight.rawValue),
-            appFeaturesCollection.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            appFeaturesCollection.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            featuresCollectionView.widthAnchor.constraint(equalToConstant: view.frame.width * 2 / 3),
+            featuresCollectionView.heightAnchor.constraint(equalToConstant: .constant(.doubleHeight)),
+            featuresCollectionView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            featuresCollectionView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             
-            appNameLabel.widthAnchor.constraint(equalToConstant: view.frame.width * 2 / 3),
-            appNameLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            appNameLabel.bottomAnchor.constraint(equalTo: appFeaturesCollection.topAnchor),
+            nameLabel.widthAnchor.constraint(equalToConstant: view.frame.width * 2 / 3),
+            nameLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            nameLabel.bottomAnchor.constraint(equalTo: featuresCollectionView.topAnchor),
             
-            pageControl.widthAnchor.constraint(equalToConstant: view.frame.width * 2 / 3),
-            pageControl.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            pageControl.topAnchor.constraint(equalTo: appFeaturesCollection.bottomAnchor),
+            featuresPageControl.widthAnchor.constraint(equalToConstant: view.frame.width * 2 / 3),
+            featuresPageControl.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            featuresPageControl.topAnchor.constraint(equalTo: featuresCollectionView.bottomAnchor),
             
-            startMessagingButton.widthAnchor.constraint(equalToConstant: view.frame.width * 2 / 3),
-            startMessagingButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            startMessagingButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -Constraint.doubleHeight.rawValue),
-            startMessagingButton.heightAnchor.constraint(equalToConstant: Constraint.height.rawValue)
+            startButton.widthAnchor.constraint(equalToConstant: view.frame.width * 2 / 3),
+            startButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            startButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -.constant(.doubleHeight)),
+            startButton.heightAnchor.constraint(equalToConstant: .constant(.height))
         ])
     }
     
@@ -106,11 +106,10 @@ class WelcomeVC: UIViewController, UICollectionViewDelegate, UICollectionViewDat
     /// Change CollectionView page by tapping on pageControl
     @objc
     func changePage() {
-        let number = pageControl.currentPage
-        appFeaturesCollection.selectItem(at: IndexPath(row: number,
-                                                       section: 0),
-                                         animated: true,
-                                         scrollPosition: .centeredHorizontally)
+        let number = featuresPageControl.currentPage
+        featuresCollectionView.selectItem(at: IndexPath(row: number, section: 0),
+                                          animated: true,
+                                          scrollPosition: .centeredHorizontally)
     }
     
     // MARK: - Button Method
@@ -142,10 +141,10 @@ class WelcomeVC: UIViewController, UICollectionViewDelegate, UICollectionViewDat
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: self.view.frame.width * 2 / 3, height: Constraint.doubleHeight.rawValue)
+        return CGSize(width: self.view.frame.width * 2 / 3, height: .constant(.doubleHeight))
     }
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        pageControl.currentPage = indexPath.row
+        featuresPageControl.currentPage = indexPath.row
     }
 }

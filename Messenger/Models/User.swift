@@ -16,17 +16,17 @@ struct User: Identifiable, Decodable {
     let image: String
     
     var dto: UserDTO {
-        return UserDTO(username: username,
-                       first_name: firstName,
+        return UserDTO(first_name: firstName,
                        last_name: lastName,
-                       image: image)
+                       image: image,
+                       username: username)
     }
     
     struct UserDTO: Encodable {
-        let username: String
         let first_name: String
         let last_name: String?
         let image: String
+        let username: String
     }
 }
 

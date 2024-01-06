@@ -17,8 +17,8 @@ final class NetworkService {
     }
     
     /// Check if the username is free
-    func checkUsername(username: String) async throws {
-        let url = try URLService.shared.createURL(endPoint: .users(path: .username),
+    func checkUsername(_ username: String) async throws {
+        let url = try URLService.shared.createURL(endPoint: .users(.username),
                                                   parameters: ["username": username])
         let (_, response) = try await URLSession.shared.data(from: url)
         guard let statusCode = (response as? HTTPURLResponse)?.statusCode else {
@@ -34,9 +34,13 @@ final class NetworkService {
         guard let imageBase64 = image.jpegData(compressionQuality: 1)?.base64EncodedString() else {
             throw NetworkError.errorRequest
         }
-        let user = User.UserDTO(username: username, first_name: firstname, last_name: lastname, image: imageBase64)
         
-        let url = try URLService.shared.createURL(endPoint: .users(path: .createUser))
+        let user = User.UserDTO(first_name: firstname, 
+                                last_name: lastname,
+                                image: "data:image/png;base64," + imageBase64,
+                                username: username)
+        
+        let url = try URLService.shared.createURL(endPoint: .users(.createUser))
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json; charset=UTF-8", forHTTPHeaderField: "Content-type")
@@ -45,14 +49,12 @@ final class NetworkService {
         let body = try encoder.encode(user)
         request.httpBody = body
         
-        // Отправка запроса, получение ответа
         let (data, response) = try await URLSession.shared.data(for: request)
         guard let statusCode = (response as? HTTPURLResponse)?.statusCode else {
             throw NetworkError.errorResponse
         }
         print("statusCode: \(statusCode)")
         
-        // Декодирование полученных данных в Swift-модель
         let decoder = JSONDecoder()
         let result = try decoder.decode(Token.self, from: data)
         print(result)
@@ -62,7 +64,7 @@ final class NetworkService {
     }
     
     func getVerificationCode(phoneNumber: String) async throws -> String {
-        let url = try URLService.shared.createURL(endPoint: .verificationCode(path: .requestCode))
+        let url = try URLService.shared.createURL(endPoint: .verificationCode(.requestCode))
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json; charset=UTF-8", forHTTPHeaderField: "Content-type")
@@ -73,14 +75,12 @@ final class NetworkService {
         let body = try encoder.encode(number)
         request.httpBody = body
         
-        // Отправка запроса, получение ответа
         let (data, response) = try await URLSession.shared.data(for: request)
         guard let statusCode = (response as? HTTPURLResponse)?.statusCode else {
             throw NetworkError.errorResponse
         }
         print("statusCode: \(statusCode)")
         
-        // Декодирование полученных данных в Swift-модель
         let decoder = JSONDecoder()
         let result = try decoder.decode(Code.self, from: data)
         print(result)
@@ -91,7 +91,7 @@ final class NetworkService {
     }
     
     func confirmVerificationCode(code: String) async throws {
-        let url = try URLService.shared.createURL(endPoint: .verificationCode(path: .confirmCode))
+        let url = try URLService.shared.createURL(endPoint: .verificationCode(.confirmCode))
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json; charset=UTF-8", forHTTPHeaderField: "Content-type")
@@ -102,10 +102,8 @@ final class NetworkService {
         let body = try encoder.encode(codeDTO)
         request.httpBody = body
         
-        // Отправка запроса, получение ответа
         let (data, response) = try await URLSession.shared.data(for: request)
         
-        // Декодирование полученных данных в Swift-модель
         let decoder = JSONDecoder()
         guard let statusCode = (response as? HTTPURLResponse)?.statusCode else {
             throw NetworkError.errorResponse

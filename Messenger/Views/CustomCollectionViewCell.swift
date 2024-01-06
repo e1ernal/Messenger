@@ -13,7 +13,7 @@ class CustomCollectionViewCell: UICollectionViewCell {
     
     private let textLabel: UILabel = {
         let label = UILabel()
-        label.font = Font.subtitle.font
+        label.font = .font(.subtitle)
         label.numberOfLines = 0
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false

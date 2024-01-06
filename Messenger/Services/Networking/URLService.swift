@@ -52,8 +52,8 @@ enum Codes: String {
 }
 
 enum EndPoint {
-    case users(path: Users)
-    case verificationCode(path: Codes)
+    case users(_ path: Users)
+    case verificationCode(_ path: Codes)
 
     var path: String {
         switch self {

@@ -9,7 +9,8 @@ import Foundation
 import UIKit
 
 extension NSMutableAttributedString {
-    func font(_ value: String, font: UIFont) -> NSMutableAttributedString {
+    func font(_ value: String, 
+              _ font: UIFont) -> NSMutableAttributedString {
         let attributes: [NSAttributedString.Key: Any] = [
             .font: font
         ]
@@ -17,18 +18,22 @@ extension NSMutableAttributedString {
         return self
     }
     
-    func highlighted(_ value: String, font: UIFont, foregroundColor: UIColor, backgroundColor: UIColor) -> NSMutableAttributedString {
+    func highlighted(_ value: String, 
+                     _ font: UIFont,
+                     foreground: UIColor,
+                     background: UIColor) -> NSMutableAttributedString {
         let attributes: [NSAttributedString.Key: Any] = [
             .font: font,
-            .foregroundColor: foregroundColor,
-            .backgroundColor: backgroundColor
+            .foregroundColor: foreground,
+            .backgroundColor: background
         ]
         
         self.append(NSAttributedString(string: value, attributes: attributes))
         return self
     }
     
-    func underlined(_ value: String, font: UIFont) -> NSMutableAttributedString {
+    func underlined(_ value: String, 
+                    _ font: UIFont) -> NSMutableAttributedString {
         let attributes: [NSAttributedString.Key: Any] = [
             .font: font,
             .underlineStyle: NSUnderlineStyle.single.rawValue

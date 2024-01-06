@@ -11,10 +11,10 @@ class ChatsVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        makeUI()
+        setupUI()
     }
 
-    private func makeUI() {
-        view.backgroundColor = Color.background.color
+    private func setupUI() {
+        setupVC(title: TabBarItem.chats.title, backButton: false)
     }
 }
