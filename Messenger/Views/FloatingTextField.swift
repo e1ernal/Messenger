@@ -7,6 +7,11 @@
 
 import UIKit
 
+enum Visibility {
+    case visible
+    case invisible
+}
+
 final class FloatingTextField: UITextField, UITextFieldDelegate {
     private let borderView: UIView = {
         let view = UIView()
@@ -39,6 +44,7 @@ final class FloatingTextField: UITextField, UITextFieldDelegate {
     }
 
     private func setupTextField(placeholder: String) {
+        translatesAutoresizingMaskIntoConstraints = false
         attributedPlaceholder = NSAttributedString(string: placeholder)
         font = .font(.textField)
         autocorrectionType = .no
@@ -58,9 +64,18 @@ final class FloatingTextField: UITextField, UITextFieldDelegate {
         ])
     }
 
-    func changeVisibility(isActive: Bool) {
-        let color: CGColor = isActive ? .color(.active) : .color(.inactive)
-        let opacity: Float = isActive ? 1.0 : 0.0
+    func setState(_ state: ViewState) {
+        var color: CGColor
+        var opacity: Float
+        
+        switch state {
+        case .active:
+            color = .color(.active)
+            opacity = 1.0
+        case .inactive:
+            color = .color(.inactive)
+            opacity = 0.0
+        }
         
         UIView.animate(withDuration: 0.25) {
             self.borderView.layer.borderColor = color

@@ -8,33 +8,10 @@
 import UIKit
 
 class PhoneVC: UIViewController, UITextFieldDelegate {
-    private let emojiLabel: UILabel = {
-        let label = UILabel()
-        label.text = "☎️"
-        label.font = .font(.large)
-        label.textAlignment = .center
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-
-    private let titleLabel: UILabel = {
-        let label = UILabel()
-        label.text = "Your Phone"
-        label.font = .font(.title)
-        label.textAlignment = .center
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-
-    private let subtitleLabel: UILabel = {
-        let label = UILabel()
-        label.text = "Please enter your phone number"
-        label.font = .font(.subtitle)
-        label.textAlignment = .center
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-
+    private let emojiLabel = BasicLabel("☎️", .font(.large))
+    private let titleLabel = BasicLabel("Your Phone", .font(.title))
+    private let subtitleLabel = BasicLabel("Please enter your phone number", .font(.subtitle))
+    
     private lazy var numberTextField: UITextField = {
         let field = UITextField()
         field.placeholder = "+0 000 000 0000"
@@ -49,17 +26,9 @@ class PhoneVC: UIViewController, UITextFieldDelegate {
         return field
     }()
 
-    private lazy var continueButton: UIButton = {
-        let button = UIButton()
-        button.setTitle("Continue", for: .normal)
-        button.titleLabel?.font = .font(.button)
-        button.backgroundColor = .color(.inactive)
-        button.heightAnchor.constraint(equalToConstant: .constant(.height)).isActive = true
-        button.layer.cornerRadius = .constant(.cornerRadius)
-        button.addTarget(self, action: #selector(continueButtonTapped), for: .touchUpInside)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
+    private lazy var continueButton = BasicButton(title: "Continue", style: .filled(.inactive)) {
+        self.continueButtonTapped()
+    }
 
     private lazy var numberStackView: UIStackView = {
         let stack = UIStackView()
@@ -68,45 +37,16 @@ class PhoneVC: UIViewController, UITextFieldDelegate {
         stack.translatesAutoresizingMaskIntoConstraints = false
         return stack
     }()
-
-    private lazy var numberLabel: UILabel = {
-        let label = UILabel()
-        label.text = numberTextField.text
-        label.font = .font(.title)
-        label.textAlignment = .center
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-
-    private let questionLabel: UILabel = {
-        let label = UILabel()
-        label.text = "Is this the correct number?"
-        label.font = .font(.subtitle)
-        label.textAlignment = .center
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-
-    private lazy var editButton: UIButton = {
-        let button = UIButton()
-        button.setTitle("Edit", for: .normal)
-        button.titleLabel?.font = .font(.button)
-        button.setTitleColor(.systemBlue, for: .normal)
-        button.heightAnchor.constraint(equalToConstant: .constant(.height)).isActive = true
-        button.addTarget(self, action: #selector(editButtonTapped), for: .touchUpInside)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
-
-    private lazy var continueFinalButton: UIButton = {
-        let button = UIButton()
-        button.setTitle("Continue", for: .normal)
-        button.titleLabel?.font = .font(.button)
-        button.backgroundColor = .systemBlue
-        button.addTarget(self, action: #selector(continueFinalButtonTapped), for: .touchUpInside)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
+    
+    private let numberLabel = BasicLabel("", .font(.title))
+    private let questionLabel = BasicLabel("Is this the correct number?", .font(.subtitle))
+    
+    private lazy var editButton = BasicButton(title: "Edit", style: .clear(.active)) {
+        self.editButtonTapped()
+    }
+    private lazy var continueFinalButton = BasicButton(title: "Continue", style: .filled(.active)) {
+        self.continueFinalButtonTapped()
+    }
 
     private let checkNumberStackView: UIStackView = {
         let stack = UIStackView()
@@ -187,15 +127,7 @@ class PhoneVC: UIViewController, UITextFieldDelegate {
     }
 
     func textFieldDidChangeSelection(_ textField: UITextField) {
-        if textField.hasText {
-            UIView.animate(withDuration: 0.25) {
-                self.continueButton.backgroundColor = .color(.active)
-            }
-        } else {
-            UIView.animate(withDuration: 0.25) {
-                self.continueButton.backgroundColor = .color(.inactive)
-            }
-        }
+        continueButton.setState(textField.hasText ? .active : .inactive)
     }
 
     @objc 

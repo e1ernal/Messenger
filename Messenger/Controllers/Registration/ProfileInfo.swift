@@ -22,39 +22,15 @@ class ProfileInfoVC: UIViewController, UITextFieldDelegate, UINavigationControll
         return imageView
     }()
     
-    private let titleLabel: UILabel = {
-        let label = UILabel()
-        label.text = "Profile Info"
-        label.font = .font(.title)
-        label.textAlignment = .center
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-    
-    private let subtitleLabel: UILabel = {
-        let label = UILabel()
-        label.text = "Enter your name and add a profile picture"
-        label.numberOfLines = 0
-        label.font = .font(.subtitle)
-        label.textAlignment = .center
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
+    private let titleLabel = BasicLabel("Profile Info", .font(.title))
+    private let subtitleLabel = BasicLabel("Enter your name and add a profile picture", .font(.subtitle))
     
     private var firstNameTextField = FloatingTextField(placeholder: "First name (required)")
     private var lastNameTextField = FloatingTextField(placeholder: "Last name (optional)")
     
-    private lazy var continueButton: UIButton = {
-        let button = UIButton()
-        button.setTitle("Continue", for: .normal)
-        button.titleLabel?.font = .font(.button)
-        button.backgroundColor = .color(.inactive)
-        button.heightAnchor.constraint(equalToConstant: .constant(.height)).isActive = true
-        button.layer.cornerRadius = .constant(.cornerRadius)
-        button.addTarget(self, action: #selector(continueButtonTapped), for: .touchUpInside)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
+    private lazy var continueButton = BasicButton(title: "Continue", style: .filled(.inactive)) {
+        self.continueButtonTapped()
+    }
     
     private lazy var uiStackView: UIStackView = {
         let stack = UIStackView()
@@ -70,16 +46,11 @@ class ProfileInfoVC: UIViewController, UITextFieldDelegate, UINavigationControll
         firstNameTextField.delegate = self
         lastNameTextField.delegate = self
         
-//        userImageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(showImagePickerControllerActionSheet)))
-        
         setupUI()
     }
     
     private func setupUI() {
         setupVC(title: "", backButton: false)
-        
-        firstNameTextField.translatesAutoresizingMaskIntoConstraints = false
-        lastNameTextField.translatesAutoresizingMaskIntoConstraints = false
         
         uiStackView.addArrangedSubview(titleLabel)
         uiStackView.addArrangedSubview(subtitleLabel)
@@ -105,22 +76,15 @@ class ProfileInfoVC: UIViewController, UITextFieldDelegate, UINavigationControll
     }
     
     func textFieldDidChangeSelection(_ textField: UITextField) {
-        if textField.hasText {
-            guard let floatingTextfield = textField as? FloatingTextField else { return }
-            floatingTextfield.changeVisibility(isActive: true)
-            if textField === firstNameTextField {
-                UIView.animate(withDuration: 0.25) {
-                    self.continueButton.backgroundColor = .color(.active)
-                }
-            }
-        } else {
-            guard let floatingTextfield = textField as? FloatingTextField else { return }
-            floatingTextfield.changeVisibility(isActive: false)
-            if textField === firstNameTextField {
-                UIView.animate(withDuration: 0.25) {
-                    self.continueButton.backgroundColor = .color(.inactive)
-                }
-            }
+        guard let textField = textField as? FloatingTextField else {
+            return
+        }
+        
+        let fieldState: ViewState = textField.hasText ? .active : .inactive
+        textField.setState(fieldState)
+        
+        if textField === firstNameTextField {
+            continueButton.setState(textField.hasText ? .active : .inactive)
         }
     }
     
@@ -145,13 +109,15 @@ class ProfileInfoVC: UIViewController, UITextFieldDelegate, UINavigationControll
     @objc
     func showImagePickerControllerActionSheet() {
         let photoLibraryAction = UIAlertAction(title: "Open Gallery",
-                                               style: .default) { _ in
+                                               style: .default) {_ in
             self.showImagePickerController(sourceType: .photoLibrary)
         }
+        
         let cameraAction = UIAlertAction(title: "Take a photo",
                                          style: .default) { _ in
             self.showImagePickerController(sourceType: .camera)
         }
+        
         let cancelAction = UIAlertAction(title: "Cancel",
                                          style: .cancel,
                                          handler: nil)

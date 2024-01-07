@@ -8,14 +8,7 @@
 import UIKit
 
 class WelcomeVC: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
-    private let nameLabel: UILabel = {
-        let label = UILabel()
-        label.text = "Messenger"
-        label.font = .font(.title)
-        label.textAlignment = .center
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
+    private let nameLabel = BasicLabel("Messenger", .font(.title))
     
     private let featuresCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -27,8 +20,8 @@ class WelcomeVC: UIViewController, UICollectionViewDelegate, UICollectionViewDat
         collection.showsHorizontalScrollIndicator = false
         collection.showsVerticalScrollIndicator = false
         collection.isPagingEnabled = true
-        collection.register(CustomCollectionViewCell.self,
-                            forCellWithReuseIdentifier: CustomCollectionViewCell.identifier)
+        collection.register(LabelCollectionViewCell.self,
+                            forCellWithReuseIdentifier: LabelCollectionViewCell.identifier)
         collection.translatesAutoresizingMaskIntoConstraints = false
         return collection
     }()
@@ -43,16 +36,9 @@ class WelcomeVC: UIViewController, UICollectionViewDelegate, UICollectionViewDat
         return pageControl
     }()
     
-    private lazy var startButton: UIButton = {
-        let button = UIButton()
-        button.setTitle("Start Messaging", for: .normal)
-        button.titleLabel?.font = .font(.button)
-        button.backgroundColor = .color(.active)
-        button.layer.cornerRadius = .constant(.cornerRadius)
-        button.addTarget(self, action: #selector(continueButtonTapped), for: .touchUpInside)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
+    private lazy var startButton = BasicButton(title: "Start Messaging", style: .filled(.active)) {
+        self.continueButtonTapped()
+    }
     
     private lazy var uiStackView: UIStackView = {
         let stack = UIStackView()
@@ -132,8 +118,8 @@ class WelcomeVC: UIViewController, UICollectionViewDelegate, UICollectionViewDat
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CustomCollectionViewCell.identifier,
-                                                            for: indexPath) as? CustomCollectionViewCell else {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: LabelCollectionViewCell.identifier,
+                                                            for: indexPath) as? LabelCollectionViewCell else {
             fatalError("Can't convert to CustomCollectionViewCell")
         }
         cell.setText(text: features[indexPath.row])

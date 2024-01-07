@@ -8,7 +8,7 @@
 import Foundation
 
 struct User: Identifiable, Decodable {
-    var id: Int
+    let id: Int
     let firstName: String
     let username: String
     let lastName: String?

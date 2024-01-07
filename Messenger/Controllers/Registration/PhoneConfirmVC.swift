@@ -19,34 +19,12 @@ class PhoneConfirmVC: UIViewController, UITextFieldDelegate {
         self.code = code
     }
     
-    private let emojiLabel: UILabel = {
-        let label = UILabel()
-        label.text = "💬"
-        label.font = .font(.large)
-        label.textAlignment = .center
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-    
-    private let titleLabel: UILabel = {
-        let label = UILabel()
-        label.text = "Enter Code"
-        label.font = .font(.title)
-        label.textAlignment = .center
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-    
-    private lazy var subtitleLabel: UILabel = {
-        let label = UILabel()
-        label.attributedText = NSMutableAttributedString()
-            .font("We're sent an SMS with an activation code to your phone: ", .font(.subtitle))
-            .font(phoneNumber ?? "undefined", .font(.subtitleBold))
-        label.numberOfLines = 0
-        label.textAlignment = .center
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
+    private let emojiLabel = BasicLabel("💬", .font(.large))
+    private let titleLabel = BasicLabel("Enter Code", .font(.title))
+    private lazy var subtitleLabel = BasicLabel(NSMutableAttributedString()
+        .font("We're sent an SMS with an activation code to your phone:\n", .font(.subtitle))
+        .font(phoneNumber ?? "undefined", .font(.subtitleBold))
+    )
     
     private lazy var digitsStackView: UIStackView = {
         let stack = UIStackView()
@@ -70,17 +48,9 @@ class PhoneConfirmVC: UIViewController, UITextFieldDelegate {
         return field
     }()
     
-    private lazy var helpButton: UIButton = {
-        let button = UIButton()
-        button.setTitle("Haven't received the code?", for: .normal)
-        button.titleLabel?.font = .font(.subtitle)
-        button.setTitleColor(.systemBlue, for: .normal)
-        button.heightAnchor.constraint(equalToConstant: .constant(.height)).isActive = true
-        button.layer.cornerRadius = .constant(.cornerRadius)
-        button.addTarget(self, action: #selector(noCodeButtonTapped), for: .touchUpInside)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
+    private lazy var helpButton = BasicButton(title: "Haven't received the code?", style: .clear(.active)) {
+        self.helpButtonTapped()
+    }
     
     private lazy var uiStackView: UIStackView = {
         let stack = UIStackView()
@@ -90,42 +60,22 @@ class PhoneConfirmVC: UIViewController, UITextFieldDelegate {
         return stack
     }()
     
-    private lazy var helpLabel: UILabel = {
-        let label = UILabel()
-        label.attributedText = NSMutableAttributedString()
-            .font("Sorry", .font(.title))
-            .font("\n\nIf you don't get the code by SMS, please check your ", .font(.subtitle))
-            .font("cellular data settings", .font(.subtitleBold))
-            .font(" and phone number:\n\n", .font(.subtitle))
-            .font(phoneNumber ?? "undefined", .font(.subtitleBold))
-            .font("\n\nYour remaining option is to try another number", .font(.subtitle))
-        label.numberOfLines = 0
-        label.textAlignment = .left
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
+    private lazy var helpLabel = BasicLabel(NSMutableAttributedString()
+        .font("Sorry", .font(.title))
+        .font("\n\nIf you don't get the code by SMS, please check your ", .font(.subtitle))
+        .font("cellular data settings", .font(.subtitleBold))
+        .font(" and phone number:\n\n", .font(.subtitle))
+        .font(phoneNumber ?? "undefined", .font(.subtitleBold))
+        .font("\n\nYour remaining option is to try another number", .font(.subtitle))
+    )
     
-    private lazy var editNumberButton: UIButton = {
-        let button = UIButton()
-        button.setTitle("Edit Number", for: .normal)
-        button.titleLabel?.font = .font(.button)
-        button.backgroundColor = .systemBlue
-        button.heightAnchor.constraint(equalToConstant: .constant(.height)).isActive = true
-        button.layer.cornerRadius = .constant(.cornerRadius)
-        button.addTarget(self, action: #selector(noCodeGoBackButtonTapped), for: .touchUpInside)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
+    private lazy var editNumberButton = BasicButton(title: "Edit Number", style: .filled(.active)) {
+        self.editNumberButtonTapped()
+    }
     
-    private lazy var closeButton: UIButton = {
-        let button = UIButton()
-        button.setTitle("Close", for: .normal)
-        button.titleLabel?.font = .font(.subtitle)
-        button.setTitleColor(.systemBlue, for: .normal)
-        button.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
+    private lazy var closeButton = BasicButton(title: "Close", style: .clear(.active)) {
+        self.closeButtonTapped()
+    }
     
     private let helpStackView: UIStackView = {
         let stack = UIStackView()
@@ -274,14 +224,14 @@ class PhoneConfirmVC: UIViewController, UITextFieldDelegate {
     }
     
     @objc
-    func noCodeButtonTapped() {
+    func helpButtonTapped() {
         UIView.animate(withDuration: 0.25) {
             self.alphaView.isHidden = false
         }
     }
     
     @objc
-    func noCodeGoBackButtonTapped() {
+    func editNumberButtonTapped() {
         popBackVC()
     }
     

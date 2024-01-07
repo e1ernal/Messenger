@@ -7,6 +7,7 @@
 
 import Foundation
 
+// какие есть стандартные ошибки?
 enum NetworkError: Error {
     case errorURL
     case errorRequest
