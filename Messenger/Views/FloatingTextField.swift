@@ -12,7 +12,7 @@ enum Visibility {
     case invisible
 }
 
-final class FloatingTextField: UITextField, UITextFieldDelegate {
+class FloatingTextField: UITextField, UITextFieldDelegate {
     private let borderView: UIView = {
         let view = UIView()
         view.layer.borderColor = .color(.inactive)
@@ -32,7 +32,7 @@ final class FloatingTextField: UITextField, UITextFieldDelegate {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-
+    
     init(placeholder: String) {
         super.init(frame: .zero)
         setupTextField(placeholder: placeholder)
@@ -49,6 +49,7 @@ final class FloatingTextField: UITextField, UITextFieldDelegate {
         font = .font(.textField)
         autocorrectionType = .no
         textAlignment = .center
+        autocapitalizationType = .none
         keyboardType = .default
         borderView.layer.cornerRadius = .constant(.cornerRadius)
         heightAnchor.constraint(equalToConstant: .constant(.height)).isActive = true

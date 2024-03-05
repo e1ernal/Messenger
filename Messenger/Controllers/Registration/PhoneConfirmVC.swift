@@ -7,7 +7,7 @@
 
 import UIKit
 
-class PhoneConfirmVC: UIViewController, UITextFieldDelegate {
+class PhoneConfirmViewController: UIViewController, UITextFieldDelegate {
     private let digitsCount: Int = 5
     private var digitLabels = [UILabel]()
     private var phoneNumber: String?
@@ -26,15 +26,7 @@ class PhoneConfirmVC: UIViewController, UITextFieldDelegate {
         .font(phoneNumber ?? "undefined", .font(.subtitleBold))
     )
     
-    private lazy var digitsStackView: UIStackView = {
-        let stack = UIStackView()
-        stack.axis = .horizontal
-        stack.distribution = .fillEqually
-        stack.alignment = .fill
-        stack.spacing = .constant(.spacing)
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        return stack
-    }()
+    private let digitsStackView = BasicStackView(.horizontal, .constant(.spacing), .fillEqually, .fill)
     
     private lazy var digitsTextField: UITextField = {
         let field = UITextField()
@@ -49,16 +41,12 @@ class PhoneConfirmVC: UIViewController, UITextFieldDelegate {
     }()
     
     private lazy var helpButton = BasicButton(title: "Haven't received the code?", style: .clear(.active)) {
-        self.helpButtonTapped()
+        UIView.animate(withDuration: 0.25) {
+            self.alphaView.isHidden = false
+        }
     }
     
-    private lazy var uiStackView: UIStackView = {
-        let stack = UIStackView()
-        stack.axis = .vertical
-        stack.spacing = .constant(.spacing)
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        return stack
-    }()
+    private let uiStackView = BasicStackView(.vertical, .constant(.spacing), nil, nil)
     
     private lazy var helpLabel = BasicLabel(NSMutableAttributedString()
         .font("Sorry", .font(.title))
@@ -70,20 +58,16 @@ class PhoneConfirmVC: UIViewController, UITextFieldDelegate {
     )
     
     private lazy var editNumberButton = BasicButton(title: "Edit Number", style: .filled(.active)) {
-        self.editNumberButtonTapped()
+        self.navigate(.back)
     }
     
     private lazy var closeButton = BasicButton(title: "Close", style: .clear(.active)) {
-        self.closeButtonTapped()
+        UIView.animate(withDuration: 0.25) {
+            self.alphaView.isHidden = true
+        }
     }
     
-    private let helpStackView: UIStackView = {
-        let stack = UIStackView()
-        stack.axis = .vertical
-        stack.spacing = .constant(.spacing)
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        return stack
-    }()
+    private let helpStackView = BasicStackView(.vertical, .constant(.spacing), nil, nil)
     
     private let popupView: UIView = {
         let view = UIView()
@@ -99,18 +83,16 @@ class PhoneConfirmVC: UIViewController, UITextFieldDelegate {
         return view
     }()
     
+    // MARK: - Controller Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         
         setupUI()
-        
-        let alert = UIAlertController(title: "Alert", message: "Your code: " + (code ?? "no code"), preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "Close", style: .cancel, handler: nil))
-        self.present(alert, animated: true, completion: nil)
+        self.showSnackBar(text: "Your code: \(code ?? "Error: No code")", image: .systemImage(.number, color: nil), on: self)
     }
     
     private func setupUI() {
-        setupVC(title: "", backButton: false)
+        configureVC(title: "", backButton: false)
         
         for _ in 1 ... digitsCount {
             let label = UILabel()
@@ -194,20 +176,26 @@ class PhoneConfirmVC: UIViewController, UITextFieldDelegate {
         if text.count == digitsCount {
             Task {
                 do {
-                    try await NetworkService.shared.confirmVerificationCode(code: text)
+                    let (isNewUser, token) = try await NetworkService.shared.confirmVerificationCode(code: text)
                     for label in digitLabels {
                         label.layer.borderColor = .color(.success)
                     }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                        self.showNextVC(nextVC: ProfileInfoVC())
-                    }
-                } catch let error as NetworkError {
-                    print(error.description)
-                    for label in digitLabels {
-                        label.layer.borderColor = .color(.failure)
+                    
+                    if isNewUser {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            self.navigate(.next(ProfileInfoViewController(), .fullScreen))
+                        }
+                    } else {
+                        if let token {
+                            UserDefaults.loginUser(token: token)
+                        }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            let nextVC = LaunchScreenVC(greeting: "Welcome")
+                            self.navigate(.root(nextVC))
+                        }
                     }
                 } catch {
-                    print(error.localizedDescription)
+                    self.showSnackBar(text: "Invalid confirmation code", image: .systemImage(.warning, color: nil), on: self)
                     for label in digitLabels {
                         label.layer.borderColor = .color(.failure)
                     }
@@ -221,24 +209,5 @@ class PhoneConfirmVC: UIViewController, UITextFieldDelegate {
                    replacementString string: String) -> Bool {
         guard let characterCount = textField.text?.count else { return false }
         return characterCount < digitsCount || string.isEmpty
-    }
-    
-    @objc
-    func helpButtonTapped() {
-        UIView.animate(withDuration: 0.25) {
-            self.alphaView.isHidden = false
-        }
-    }
-    
-    @objc
-    func editNumberButtonTapped() {
-        popBackVC()
-    }
-    
-    @objc
-    func closeButtonTapped() {
-        UIView.animate(withDuration: 0.25) {
-            self.alphaView.isHidden = true
-        }
     }
 }

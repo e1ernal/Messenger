@@ -5,29 +5,38 @@
 //  Created by e1ernal on 26.12.2023.
 //
 
-import Foundation
+import UIKit
 
-struct User: Identifiable, Decodable {
+struct User {
+    var firstName: String
+    var lastName: String
+    var image: UIImage
+    var phoneNumber: String
+    var username: String
+}
+
+struct UserPost: Codable {
+    let first_name: String?
+    let last_name: String?
+    let image: String?
+    let username: String?
+}
+
+struct UserGet: Identifiable, Codable {
     let id: Int
-    let firstName: String
+    let first_name: String
     let username: String
-    let lastName: String?
-    let phoneNumber: String
+    let last_name: String?
+    let phone_number: String
     let image: String
-    
-    var dto: UserDTO {
-        return UserDTO(first_name: firstName,
-                       last_name: lastName,
-                       image: image,
-                       username: username)
-    }
-    
-    struct UserDTO: Encodable {
-        let first_name: String
-        let last_name: String?
-        let image: String
-        let username: String
-    }
+}
+
+struct UserUpdate: Identifiable, Codable {
+    let id: Int
+    let first_name: String
+    let username: String
+    let last_name: String?
+    let image: String
 }
 
 struct PhoneNumber: Codable {

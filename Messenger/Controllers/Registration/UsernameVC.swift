@@ -7,11 +7,11 @@
 
 import UIKit
 
-class UsernameVC: UIViewController, UITextFieldDelegate {
+class UsernameViewController: UIViewController, UITextFieldDelegate {
     private var firstName: String?
     private var lastName: String?
     private var profileImage: UIImage?
-    private var isUsernameAvailable: Bool = false
+    private var isUsernameAvailable = false
     
     convenience init(firstName: String, lastName: String?, profileImage: UIImage) {
         self.init()
@@ -44,14 +44,9 @@ class UsernameVC: UIViewController, UITextFieldDelegate {
         self.continueButtonTapped()
     }
     
-    private lazy var uiStackView: UIStackView = {
-        let stack = UIStackView()
-        stack.axis = .vertical
-        stack.spacing = .constant(.spacing)
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        return stack
-    }()
+    private let uiStackView = BasicStackView(.vertical, .constant(.spacing), nil, nil)
     
+    // MARK: - Controller Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -59,7 +54,7 @@ class UsernameVC: UIViewController, UITextFieldDelegate {
     }
     
     private func setupUI() {
-        setupVC(title: "", backButton: false)
+        configureVC(title: "", backButton: false)
         
         uiStackView.addArrangedSubview(emojiLabel)
         uiStackView.addArrangedSubview(titleLabel)
@@ -79,8 +74,7 @@ class UsernameVC: UIViewController, UITextFieldDelegate {
     }
     
     func textFieldDidChangeSelection(_ textField: UITextField) {
-        guard textField.hasText,
-              let username = textField.text else {
+        guard textField.hasText, let username = textField.text else {
             continueButton.setState(.inactive)
             UIView.animate(withDuration: 0.25) {
                 self.usernameTextField.layer.borderColor = .color(.background)
@@ -95,6 +89,7 @@ class UsernameVC: UIViewController, UITextFieldDelegate {
                 isUsernameAvailable = true
             } catch {
                 print(error.localizedDescription)
+                self.showSnackBar(text: "The username is not available", image: .systemImage(.warning, color: nil), on: self)
                 isUsernameAvailable = false
             }
             let buttonState: ViewState = isUsernameAvailable ? .active : .inactive
@@ -107,28 +102,31 @@ class UsernameVC: UIViewController, UITextFieldDelegate {
         }
     }
     
-    @objc
-    func continueButtonTapped() {
+    @objc func continueButtonTapped() {
         guard isUsernameAvailable else {
-            print("Username isn't available")
             return
         }
         
         guard let firstName,
               let username = usernameTextField.text,
               let profileImage else {
-            print("Some user data doesn't exist")
+            self.showSnackBar(text: "Error: Some user data doesn't exist", image: .systemImage(.warning, color: nil), on: self)
             return
         }
         
         Task {
             do {
-                try await NetworkService.shared.createUser(username: username,
-                                                           firstname: firstName,
-                                                           lastname: lastName,
-                                                           image: profileImage)
+                let token = try await NetworkService.shared.createUser(username: username,
+                                                                       firstname: firstName,
+                                                                       lastname: lastName,
+                                                                       image: profileImage)
+                
+                UserDefaults.loginUser(token: token)
+                let nextVC = LaunchScreenVC(greeting: "Welcome")
+                self.navigate(.root(nextVC))
             } catch {
                 print(error.localizedDescription)
+                self.showSnackBar(text: "Error: Can't create user", image: .systemImage(.warning, color: nil), on: self)
             }
         }
     }

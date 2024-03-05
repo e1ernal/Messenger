@@ -8,7 +8,7 @@
 import Foundation
 
 final class URLService {
-    static let shared = URLService(); private init() { }
+    static let shared = URLService(); private init() {}
 
     private let scheme = "http://"
     private let host = "45.131.41.158"
@@ -30,25 +30,41 @@ final class URLService {
         guard let url = components.url else {
             throw NetworkError.errorURL
         }
-
+        
         return url
+    }
+    
+    func createDownloadImageURL(parameters: String) throws -> URL {
+        let urlStr = scheme + host + parameters
+        
+        guard let baseURL = URL(string: urlStr) else {
+            throw NetworkError.errorURL
+        }
+        
+        return baseURL
     }
 }
 
 enum Users: String {
-    /// GET - user info
-    case me = "/me/"
-    /// GET - check username
-    case username = "/username/"
-    /// POST - create user without path
-    case createUser = "/"
+    // GET Methods
+    case me = "/me/" /* user info */
+    case username = "/username/" /* check username */
+    case search = "/search/" /* search users by username */
+    
+    // PATCH Methods
+    case update = "/update/" /* update user data */
+    
+    // POST Methods
+    case createUser = "/" /* create user */
+    
+    // DELETE Methods
+    case delete = "/delete/" /* delete user */
 }
 
 enum Codes: String {
-    /// POST - check verification code
-    case confirmCode = "/confirm/"
-    /// POST - request for phone number verification
-    case requestCode = "/"
+    // POST Methods
+    case confirmCode = "/confirm/" /* check verification code */
+    case requestCode = "/" /* request for phone number verification */
 }
 
 enum EndPoint {

@@ -7,7 +7,7 @@
 
 import UIKit
 
-class PhoneVC: UIViewController, UITextFieldDelegate {
+class PhoneViewController: UIViewController, UITextFieldDelegate {
     private let emojiLabel = BasicLabel("☎️", .font(.large))
     private let titleLabel = BasicLabel("Your Phone", .font(.title))
     private let subtitleLabel = BasicLabel("Please enter your phone number", .font(.subtitle))
@@ -25,59 +25,55 @@ class PhoneVC: UIViewController, UITextFieldDelegate {
         field.translatesAutoresizingMaskIntoConstraints = false
         return field
     }()
-
-    private lazy var continueButton = BasicButton(title: "Continue", style: .filled(.inactive)) {
-        self.continueButtonTapped()
-    }
-
-    private lazy var numberStackView: UIStackView = {
-        let stack = UIStackView()
-        stack.axis = .vertical
-        stack.spacing = .constant(.spacing)
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        return stack
-    }()
     
+    private lazy var continueButton = BasicButton(title: "Continue", style: .filled(.inactive)) {
+        if self.numberTextField.hasText {
+            self.numberLabel.text = self.numberTextField.text
+            UIView.animate(withDuration: 0.25) {
+                self.alphaView.isHidden = false
+            }
+        }
+    }
+    
+    private let numberStackView = BasicStackView(.vertical, .constant(.spacing), nil, nil)
     private let numberLabel = BasicLabel("", .font(.title))
     private let questionLabel = BasicLabel("Is this the correct number?", .font(.subtitle))
     
     private lazy var editButton = BasicButton(title: "Edit", style: .clear(.active)) {
-        self.editButtonTapped()
+        UIView.animate(withDuration: 0.25) {
+            self.alphaView.isHidden = true
+        }
     }
+    
     private lazy var continueFinalButton = BasicButton(title: "Continue", style: .filled(.active)) {
         self.continueFinalButtonTapped()
     }
-
-    private let checkNumberStackView: UIStackView = {
-        let stack = UIStackView()
-        stack.axis = .vertical
-        stack.spacing = .constant(.spacing)
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        return stack
-    }()
-
+    
+    private let checkNumberStackView = BasicStackView(.vertical, .constant(.spacing), nil, nil)
+    
     private let alphaView: UIView = {
         let view = UIView()
         view.backgroundColor = .color(.transparentBackground)
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
-
+    
     private let popupView: UIView = {
         let view = UIView()
         view.backgroundColor = .color(.secondaryBackground)
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
-
+    
+    // MARK: - Controller Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        setupUI()
+        
+        configureUI()
     }
-
-    private func setupUI() {
-        setupVC(title: "", backButton: false)
+    
+    private func configureUI() {
+        configureVC(title: "", backButton: false)
         
         popupView.layer.cornerRadius = .constant(.spacing) + .constant(.cornerRadius)
         continueFinalButton.heightAnchor.constraint(equalToConstant: .constant(.height)).isActive = true
@@ -99,19 +95,19 @@ class PhoneVC: UIViewController, UITextFieldDelegate {
         
         alphaView.addSubview(popupView)
         alphaView.addSubview(checkNumberStackView)
-
+        
         view.addSubview(numberStackView)
         view.addSubview(alphaView)
-
+        
         NSLayoutConstraint.activate([
             numberStackView.widthAnchor.constraint(equalToConstant: view.frame.width * 2 / 3),
             numberStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             numberStackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-
+            
             checkNumberStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             checkNumberStackView.widthAnchor.constraint(equalToConstant: view.frame.width * 2 / 3),
             checkNumberStackView.topAnchor.constraint(equalTo: numberTextField.topAnchor),
-
+            
             popupView.topAnchor.constraint(equalTo: checkNumberStackView.topAnchor, constant: -.constant(.spacing)),
             popupView.bottomAnchor.constraint(equalTo: checkNumberStackView.bottomAnchor, constant: .constant(.spacing)),
             popupView.leadingAnchor.constraint(equalTo: checkNumberStackView.leadingAnchor, constant: -.constant(.spacing)),
@@ -122,82 +118,40 @@ class PhoneVC: UIViewController, UITextFieldDelegate {
             alphaView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             alphaView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
-
+        
         alphaView.isHidden = true
     }
-
+    
     func textFieldDidChangeSelection(_ textField: UITextField) {
         continueButton.setState(textField.hasText ? .active : .inactive)
     }
-
-    @objc 
-    func continueButtonTapped() {
-        if numberTextField.hasText {
-            UIView.animate(withDuration: 0.25) {
-                self.numberLabel.text = self.numberTextField.text
-                self.alphaView.isHidden = false
-            }
-        }
-    }
-
-    @objc 
-    func editButtonTapped() {
-        UIView.animate(withDuration: 0.25) {
-            self.alphaView.isHidden = true
-        }
-    }
-
-    @objc 
-    func continueFinalButtonTapped() {
-        guard let text = numberLabel.text else {
-            print("Error: Phone number is empty")
-            // TODO: - добавить сюда алерт
-            return
-        }
-
-        let number = text.filter { digit in
-            "+0123456789".contains(digit)
-        }
-        
-        guard number.count == 12 else {
-            print("Error: Invalid count of numbers")
-            // TODO: - добавить сюда алерт
-            return
-        }
+    
+    @objc func continueFinalButtonTapped() {
         Task {
             do {
+                guard let text = numberLabel.text else {
+                    throw DescriptionError.error("Phone number is empty")
+                }
+                
+                let number = text.filter { digit in "+0123456789".contains(digit) }
+                guard number.count == 12 else {
+                    throw DescriptionError.error("Invalid count of numbers")
+                }
+                
                 let code = try await NetworkService.shared.getVerificationCode(phoneNumber: number)
-
-                let nextVC = PhoneConfirmVC(phoneNumber: text, code: code)
-                showNextVC(nextVC: nextVC)
-            } catch let error as NetworkError {
-                print(error.description)
+                
+                let nextVC = PhoneConfirmViewController(phoneNumber: text, code: code)
+                navigate(.next(nextVC, .fullScreen))
             } catch {
-                print(error.localizedDescription)
+                self.showSnackBar(text: error.localizedDescription, image: .systemImage(.warning, color: nil), on: self)
             }
         }
     }
-
-    @objc 
-    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+    
+    @objc func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         guard let text = numberTextField.text else { return false }
         let newString = (text as NSString).replacingCharacters(in: range, with: string)
-        numberTextField.text = formatter(mask: "+X (XXX) XXX-XXXX", phoneNumber: newString)
+        numberTextField.text = numberFormatter(newString)
         return false
-    }
-
-    func formatter(mask: String, phoneNumber: String) -> String {
-        let number = phoneNumber.replacingOccurrences(of: "[^0-9]", with: "", options: .regularExpression)
-        var result: String = ""
-        var index = number.startIndex
-        for character in mask where index < number.endIndex {
-            if character == "X" {
-                result.append(number[index])
-                index = number.index(after: index)
-            } else {
-                result.append(character)
-            }
-        }
-        return result
     }
 }

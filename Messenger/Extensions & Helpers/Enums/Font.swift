@@ -11,9 +11,11 @@ enum Font {
     // Label
     case large
     case title
+    case secondaryTitle
     case subtitle
     case subtitleBold
     case body
+    case appName
     
     // Button
     case button
@@ -28,8 +30,12 @@ extension UIFont {
         switch font {
         case .large:
             return .systemFont(ofSize: CGFloat(70), weight: .heavy)
+        case .appName:
+            return .systemFont(ofSize: CGFloat(30), weight: .bold)
         case .title:
             return .systemFont(ofSize: CGFloat(25), weight: .bold)
+        case .secondaryTitle:
+            return .systemFont(ofSize: CGFloat(18), weight: .bold)
         case .subtitle:
             return .systemFont(ofSize: CGFloat(15), weight: .regular)
         case .subtitleBold:

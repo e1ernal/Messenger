@@ -23,9 +23,9 @@ enum TabBarItem {
     var iconName: String {
         switch self {
         case .chats:
-            return "ellipsis.message.fill"
+            return Image.chats.rawValue
         case .settings:
-            return "gear"
+            return Image.settings.rawValue
         }
     }
 }
