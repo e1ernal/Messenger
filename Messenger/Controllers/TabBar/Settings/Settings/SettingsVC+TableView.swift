@@ -10,8 +10,9 @@ import UIKit
 // MARK: - Configure Table View
 extension SettingsViewController {
     internal func configureTableView() {
-        tableView.register(ImageWithLabelsTableViewCell.self, 
-                           forCellReuseIdentifier: ImageWithLabelsTableViewCell.identifier)
+        tableView.register(ProfileCell.self, 
+                           forCellReuseIdentifier: ProfileCell.identifier)
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
     }
     
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
@@ -35,24 +36,33 @@ extension SettingsViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: ImageWithLabelsTableViewCell.identifier,
-                                                       for: indexPath) as? ImageWithLabelsTableViewCell else {
-            fatalError("Error: The TableView could not dequeue a \(ImageWithLabelsTableViewCell.identifier)")
-        }
-        
         let row = sections[indexPath.section].rows[indexPath.row].getValue()
-        if let top = row["top"], let bottom = row["bottom"] {
-            cell.configure(image: user.image,
+        
+        switch indexPath.section {
+        case 0:
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: ProfileCell.identifier,
+                                                           for: indexPath) as? ProfileCell else {
+                fatalError("Error: The TableView could not dequeue a \(ProfileCell.identifier)")
+            }
+            
+            guard let image = row["image"]?.toImage(),
+                  let top = row["top"],
+                  let bottom = row["bottom"] else {
+                return cell
+            }
+            cell.configure(image: image,
                            title: top,
                            subtitle: bottom)
+            cell.accessoryType = .disclosureIndicator
+            return cell
+        default:
+            fatalError("Error: Can't configure Cell for TableView")
         }
-        cell.accessoryType = .disclosureIndicator
-        return cell
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        let nextVC = InfoProfileViewController(user: user, delegate: self)
+        let nextVC = InfoProfileViewController(style: .insetGrouped)
         self.navigate(.next(nextVC, .fullScreen))
     }
 }

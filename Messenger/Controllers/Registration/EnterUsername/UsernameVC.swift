@@ -7,24 +7,17 @@
 
 import UIKit
 
-class UsernameViewController: UIViewController, UITextFieldDelegate {
-    private var firstName: String?
-    private var lastName: String?
-    private var profileImage: UIImage?
-    private var isUsernameAvailable = false
-    
-    convenience init(firstName: String, lastName: String?, profileImage: UIImage) {
-        self.init()
-        self.firstName = firstName
-        self.lastName = lastName
-        self.profileImage = profileImage
-    }
+class UsernameViewController: UIViewController {
+    private var firstName: String
+    private var lastName: String
+    private var profileImage: UIImage
+    internal var isUsernameAvailable = false
     
     private let emojiLabel = BasicLabel("💭", .font(.large))
     private let titleLabel = BasicLabel("Username", .font(.title))
     private let subtitleLabel = BasicLabel("Please create your username", .font(.subtitle))
     
-    private lazy var usernameTextField: UITextField = {
+    internal lazy var usernameTextField: UITextField = {
         let field = UITextField()
         field.placeholder = "username"
         field.autocapitalizationType = .none
@@ -40,11 +33,25 @@ class UsernameViewController: UIViewController, UITextFieldDelegate {
         return field
     }()
     
-    private lazy var continueButton = BasicButton(title: "Continue", style: .filled(.inactive)) {
+    internal lazy var continueButton = BasicButton(title: "Continue", style: .filled(.inactive)) {
         self.continueButtonTapped()
     }
     
     private let uiStackView = BasicStackView(.vertical, .constant(.spacing), nil, nil)
+    
+    // MARK: - Init UIViewController
+    init(firstName: String, lastName: String, profileImage: UIImage) {
+        self.firstName = firstName
+        self.lastName = lastName
+        self.profileImage = profileImage
+        
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     // MARK: - Controller Lifecycle
     override func viewDidLoad() {
@@ -73,44 +80,14 @@ class UsernameViewController: UIViewController, UITextFieldDelegate {
         ])
     }
     
-    func textFieldDidChangeSelection(_ textField: UITextField) {
-        guard textField.hasText, let username = textField.text else {
-            continueButton.setState(.inactive)
-            UIView.animate(withDuration: 0.25) {
-                self.usernameTextField.layer.borderColor = .color(.background)
-            }
-            return
-        }
-        
-        // Check username availability
-        Task {
-            do {
-                try await NetworkService.shared.checkUsername(username)
-                isUsernameAvailable = true
-            } catch {
-                print(error.localizedDescription)
-                self.showSnackBar(text: "The username is not available", image: .systemImage(.warning, color: nil), on: self)
-                isUsernameAvailable = false
-            }
-            let buttonState: ViewState = isUsernameAvailable ? .active : .inactive
-            let fieldColor: CGColor = isUsernameAvailable ? .color(.success) : .color(.failure)
-            
-            UIView.animate(withDuration: 0.25) {
-                self.usernameTextField.layer.borderColor = fieldColor
-            }
-            continueButton.setState(buttonState)
-        }
-    }
-    
+    // MARK: - Actions
     @objc func continueButtonTapped() {
-        guard isUsernameAvailable else {
-            return
-        }
+        guard isUsernameAvailable else { return }
         
-        guard let firstName,
-              let username = usernameTextField.text,
-              let profileImage else {
-            self.showSnackBar(text: "Error: Some user data doesn't exist", image: .systemImage(.warning, color: nil), on: self)
+        guard let username = usernameTextField.text else {
+            self.showSnackBar(text: "Error: Username is empty", 
+                              image: .systemImage(.warning, color: nil),
+                              on: self)
             return
         }
         
@@ -121,12 +98,14 @@ class UsernameViewController: UIViewController, UITextFieldDelegate {
                                                                        lastname: lastName,
                                                                        image: profileImage)
                 
-                UserDefaults.loginUser(token: token)
+                try Storage.shared.save(token, as: .token, in: .account)
                 let nextVC = LaunchScreenVC(greeting: "Welcome")
                 self.navigate(.root(nextVC))
             } catch {
                 print(error.localizedDescription)
-                self.showSnackBar(text: "Error: Can't create user", image: .systemImage(.warning, color: nil), on: self)
+                self.showSnackBar(text: "Error: Can't create user", 
+                                  image: .systemImage(.warning, color: nil),
+                                  on: self)
             }
         }
     }

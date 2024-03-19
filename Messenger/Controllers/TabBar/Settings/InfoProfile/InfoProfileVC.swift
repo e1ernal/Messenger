@@ -7,37 +7,20 @@
 
 import UIKit
 
-class InfoProfileViewController: UITableViewController, UpdateUserDelegate {
-    internal var user: User
+class InfoProfileViewController: UITableViewController {
     internal var sections: [Section] = []
-    weak var delegate: UpdateUserDelegate?
-    
-    // MARK: - Init UITableViewController
-    init(user: User, delegate: UpdateUserDelegate) {
-        self.user = user
-        self.delegate = delegate
-        super.init(style: .insetGrouped)
-    }
-    
-    @available(*, unavailable)
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
     
     // MARK: - Controller Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        configureSections()
         configureUI()
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-
-        if self.isMovingFromParent {
-            delegate?.updateUser(user: user)
-        }
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        configureSections()
     }
     
     // MARK: - Configure ViewController UI
@@ -48,22 +31,25 @@ class InfoProfileViewController: UITableViewController, UpdateUserDelegate {
     }
     
     private func configureSections() {
-        sections = [
-            Section(rows: [.emptyRow]),
-            Section(header: "Profile Info",
-                    footer: "",
-                    rows: [
-                        .doubleLabelRow(left: "name", right: user.firstName + " " + user.lastName),
-                        .doubleLabelRow(left: "username", right: "@" + user.username),
-                        .doubleLabelRow(left: "mobile", right: user.phoneNumber)
-                    ])
-        ]
-        tableView.reloadData()
-    }
-    
-    // MARK: - Protocol Methods
-    func updateUser(user: User) {
-        self.user = user
-        configureSections()
+        do {
+            let user = try Storage.shared.get(service: .user, as: User.self, in: .account)
+            sections = [
+                Section(rows: [
+                    .imageRow(image: user.image.toString())
+                ]),
+                Section(header: "Profile Info",
+                        footer: "",
+                        rows: [
+                            .doubleLabelRow(left: "name", right: user.firstName + " " + user.lastName),
+                            .doubleLabelRow(left: "username", right: "@" + user.username),
+                            .doubleLabelRow(left: "mobile", right: user.phoneNumber)
+                        ])
+            ]
+            tableView.reloadData()
+        } catch {
+            self.showSnackBar(text: error.localizedDescription,
+                              image: .systemImage(.warning, color: nil),
+                              on: self)
+        }
     }
 }

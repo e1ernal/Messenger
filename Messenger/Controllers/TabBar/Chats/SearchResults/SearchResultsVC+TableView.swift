@@ -10,8 +10,8 @@ import UIKit
 // MARK: - Configure Table View
 extension SearchResultsTableViewController {
     internal func configureTableView() {
-        tableView.register(UserSearchResultsTableViewCell.self,
-                           forCellReuseIdentifier: UserSearchResultsTableViewCell.identifier)
+        tableView.register(SearchResultsCell.self,
+                           forCellReuseIdentifier: SearchResultsCell.identifier)
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -27,13 +27,9 @@ extension SearchResultsTableViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard !searchResults.isEmpty else {
-            fatalError("Error: No search results")
-        }
-        
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: UserSearchResultsTableViewCell.identifier,
-                                                       for: indexPath) as? UserSearchResultsTableViewCell else {
-            fatalError("Error: The TableView could not dequeue a \(UserSearchResultsTableViewCell.identifier)")
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: SearchResultsCell.identifier,
+                                                       for: indexPath) as? SearchResultsCell else {
+            fatalError("Error: The TableView could not dequeue a \(SearchResultsCell.identifier)")
         }
         
         let userData = self.searchResults[indexPath.row]

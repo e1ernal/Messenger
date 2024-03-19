@@ -9,22 +9,11 @@ import UIKit
 
 class FoundUserTableViewController: UITableViewController {
     internal var user: User
-    internal var sections: [Section]
+    internal var sections: [Section] = []
     
     // MARK: - Init UITableViewController
     init(user: User) {
         self.user = user
-        sections = [
-            Section(rows: [.emptyRow]),
-            Section(header: "Profile Info",
-                    rows: [
-                        .doubleLabelRow(left: "username", right: "@" + user.username),
-                        .doubleLabelRow(left: "mobile", right: user.phoneNumber)
-                    ]),
-            Section(rows: [
-                .regularRow(text: "Send a Message")
-            ])
-        ]
         
         super.init(style: .insetGrouped)
     }
@@ -42,8 +31,26 @@ class FoundUserTableViewController: UITableViewController {
     }
     
     private func configureUI() {
-        configureVC(title: user.firstName + " " + user.lastName, backButton: true)
-        configureTableView()
+        configureVC(title: "Profile", backButton: true)
         configureNavigationBar()
+        configureTableView()
+        configureSections()
+    }
+    
+    private func configureSections() {
+        sections = [
+            Section(rows: [
+                .imageRow(image: user.image.toString())
+            ]),
+            Section(header: "Profile Info",
+                    footer: "",
+                    rows: [
+                        .doubleLabelRow(left: "name", right: user.firstName + " " + user.lastName),
+                        .doubleLabelRow(left: "username", right: "@" + user.username),
+                        .doubleLabelRow(left: "mobile", right: user.phoneNumber)
+                    ]),
+            Section(rows: [.regularRow(text: "Send a message")])
+        ]
+        tableView.reloadData()
     }
 }

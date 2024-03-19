@@ -24,7 +24,10 @@ enum Row {
     case textFieldRow(placeholder: String, text: String)
     case doubleLabelRow(left: String, right: String)
     case regularRow(text: String)
-    case verticalDoubleLabelRow(top: String, bottom: String)
+    case imageDoubleLabelRow(image: String, top: String, bottom: String)
+    case imageRow(image: String)
+    case imageWithButtonRow(image: String, buttonText: String)
+    case chatRow(image: String, name: String, message: String, date: String)
     
     func getValue() -> [String: String] {
         switch self {
@@ -34,10 +37,16 @@ enum Row {
             return ["placeholder": placeholder, "text": text]
         case let .doubleLabelRow(left, right):
             return ["left": left, "right": right]
-        case .regularRow(let text):
+        case let .regularRow(text):
             return ["text": text]
-        case let .verticalDoubleLabelRow(top, bottom):
-            return ["top": top, "bottom": bottom]
+        case let .imageDoubleLabelRow(image, top, bottom):
+            return ["image": image, "top": top, "bottom": bottom]
+        case let .imageRow(image):
+            return ["image": image]
+        case let .imageWithButtonRow(image, buttonText):
+            return ["image": image, "buttonText": buttonText]
+        case let .chatRow(image, name, message, date):
+            return ["image": image, "name": name, "message": message, "date": date]
         }
     }
 }

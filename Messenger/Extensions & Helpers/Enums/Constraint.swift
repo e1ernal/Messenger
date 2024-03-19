@@ -12,6 +12,7 @@ enum Constraint {
     case doubleHeight
     case digitsHeight
     case imageHeight
+    case chatImageHeight
     case height
     
     // Spacing
@@ -22,6 +23,7 @@ enum Constraint {
     // Corner Radius
     case cornerRadius
     case imageCornerRadius
+    case chatImageCornerRadius
 }
 
 extension CGFloat {
@@ -31,6 +33,8 @@ extension CGFloat {
             return 80.0
         case .imageHeight:
             return 60.0
+        case .chatImageHeight:
+            return 50.0
         case .digitsHeight:
             return 54.0 /* height * 1.34 */
         case .height:
@@ -45,6 +49,8 @@ extension CGFloat {
             return 8.0 /* height * 0.25 */
         case .imageCornerRadius:
             return 30.0 /* imageHeight * 0.5 */
+        case .chatImageCornerRadius:
+            return 25.0 /* chatImageHeight * 0.5 */
         }
     }
 }

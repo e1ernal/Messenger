@@ -63,30 +63,54 @@ class LaunchScreenVC: UIViewController {
         Task {
             do {
                 indicator(animating: .start, completion: nil)
-                let user = try await getUserData()
+                try await getUserData()
+                try await getChatsData()
+                
                 indicator(animating: .stop) { _ in
-                    let nextVC = TabBarController(user: user)
+                    let nextVC = TabBarController()
                     self.navigate(.root(nextVC))
                 }
             } catch {
+                print(error)
                 showSnackBar(text: error.localizedDescription, image: .systemImage(.warning, color: nil), on: self)
+                do {
+                    try Storage.shared.logOut()
+                    let nextVC = OnboardingViewController()
+                    navigate(.rootNavigation(nextVC))
+                } catch {
+                    print(error)
+                }
             }
         }
     }
     
-    private func getUserData() async throws -> User {
-        guard let userToken = UserDefaults.getUserToken() else {
-            throw DescriptionError.error("No user token")
+    private func getChatsData() async throws {
+        let token = try Storage.shared.get(service: .token, as: String.self, in: .account)
+        let chats = try await NetworkService.shared.getChats(token: token)
+        do {
+            try Storage.shared.save(chats, as: .chats, in: .account)
+        } catch {
+            try Storage.shared.update(chats, as: .chats, in: .account)
         }
-        
-        let userGet = try await NetworkService.shared.getUserInfo(token: userToken)
+    }
+    
+    private func getUserData() async throws {
+        let token = try Storage.shared.get(service: .token, as: String.self, in: .account)
+        let userGet = try await NetworkService.shared.getUserInfo(token: token)
         let image = try await NetworkService.shared.getUserImage(imagePath: userGet.image)
         
-        return User(firstName: userGet.first_name,
-                    lastName: userGet.last_name ?? "",
-                    image: image,
-                    phoneNumber: numberFormatter(userGet.phone_number),
-                    username: userGet.username)
+        let user = User(id: userGet.id,
+                        firstName: userGet.first_name,
+                        lastName: userGet.last_name ?? "",
+                        image: image,
+                        phoneNumber: numberFormatter(userGet.phone_number),
+                        username: userGet.username)
+        
+        do {
+            try Storage.shared.save(user, as: .user, in: .account)
+        } catch {
+            try Storage.shared.update(user, as: .user, in: .account)
+        }
     }
     
     private func indicator(animating: LoadingIndicator, completion: ((Bool) -> Void)?) {

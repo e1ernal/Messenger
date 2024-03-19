@@ -7,8 +7,8 @@
 
 import UIKit
 
-class ImageTableViewCell: UITableViewCell {
-    static let identifier = "ImageTableViewCell"
+class SquareImageCell: UITableViewCell {
+    static let identifier = "SquareImageCell"
     
     private lazy var photoImageView: UIImageView = {
         let imageView = UIImageView()
@@ -25,13 +25,17 @@ class ImageTableViewCell: UITableViewCell {
         contentView.addSubview(photoImageView)
         backgroundColor = .clear
         
+        // Lower priority to avoid warnings
+        let photoImageViewHeightConstraint = photoImageView.heightAnchor.constraint(equalTo: contentView.widthAnchor)
+        photoImageViewHeightConstraint.priority = .defaultHigh
+        
         NSLayoutConstraint.activate([
             photoImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             photoImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             photoImageView.topAnchor.constraint(equalTo: contentView.topAnchor),
             photoImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
             photoImageView.widthAnchor.constraint(equalTo: contentView.widthAnchor),
-            photoImageView.heightAnchor.constraint(equalTo: contentView.widthAnchor)
+            photoImageViewHeightConstraint
         ])
     }
     

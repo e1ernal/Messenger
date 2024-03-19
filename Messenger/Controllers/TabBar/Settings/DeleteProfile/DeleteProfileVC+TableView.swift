@@ -44,12 +44,9 @@ extension DeleteProfileViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         Task {
             do {
-                guard let userToken = UserDefaults.getUserToken() else {
-                    throw DescriptionError.error("No user token")
-                }
-                
-                try await NetworkService.shared.deleteUser(token: userToken)
-                UserDefaults.logOutUser()
+                let token = try Storage.shared.get(service: .token, as: String.self, in: .account)
+                try await NetworkService.shared.deleteUser(token: token)
+                try Storage.shared.logOut()
                 
                 let nextVC = OnboardingViewController()
                 navigate(.rootNavigation(nextVC))

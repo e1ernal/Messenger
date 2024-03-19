@@ -7,8 +7,8 @@
 
 import UIKit
 
-class TextFieldTableViewCell: UITableViewCell {
-    static let identifier = "TextFieldTableView"
+class TextFieldCell: UITableViewCell {
+    static let identifier = "TextFieldCell"
     
     private let textField: UITextField = {
         let textField = UITextField()

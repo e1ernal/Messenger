@@ -1,14 +1,14 @@
 //
-//  InfoProfileVC+TableView.swift
+//  FoundUser+TableView.swift
 //  Messenger
 //
-//  Created by e1ernal on 05.03.2024.
+//  Created by e1ernal on 07.03.2024.
 //
 
 import UIKit
 
 // MARK: - Configure Table View
-extension InfoProfileViewController {
+extension FoundUserTableViewController {
     internal func configureTableView() {
         tableView.tableHeaderView = UIView(frame: CGRect(x: 0,
                                                          y: 0,
@@ -17,7 +17,7 @@ extension InfoProfileViewController {
         
         tableView.register(DoubleLabelCell.self, forCellReuseIdentifier: DoubleLabelCell.identifier)
         tableView.register(SquareImageCell.self, forCellReuseIdentifier: SquareImageCell.identifier)
-        tableView.allowsSelection = false
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
     }
     
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
@@ -61,8 +61,49 @@ extension InfoProfileViewController {
                 cell.configure(left: leftText, right: rightText)
             }
             return cell
+        case 2:
+            let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
+            var background = UIBackgroundConfiguration.listSidebarCell()
+            background.backgroundColor = .active
+            
+            var content = UIListContentConfiguration.cell()
+            let row = sections[indexPath.section].rows[indexPath.row].getValue()
+            if let text = row["text"] { content.text = text }
+            content.textProperties.alignment = .center
+            
+            cell.contentConfiguration = content
+            cell.backgroundConfiguration = background
+            return cell
         default:
             fatalError("Error: Can't configure Cell for TableView")
+        }
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        
+        guard indexPath.section == 2 && indexPath.row == 0 else {
+            return
+        }
+        
+        Task {
+            do {
+                var chats = try Storage.shared.get(service: .chats, as: [Chats].self, in: .account)
+                if !chats.contains(where: { chat in
+                    chat.username == user.username
+                }) {
+                    let token = try Storage.shared.get(service: .token, as: String.self, in: .account)
+                    try await NetworkService.shared.createChatWithUser(userId: user.id, token: token)
+                    
+                    chats = try await NetworkService.shared.getChats(token: token)
+                    try Storage.shared.update(chats, as: .chats, in: .account)
+                    
+                    navigate(.back)
+                }
+                dismiss(animated: true)
+            } catch {
+                showSnackBar(text: error.localizedDescription, image: .systemImage(.warning, color: nil), on: self)
+            }
         }
     }
 }

@@ -15,7 +15,7 @@ extension EditUsernameViewController {
                                                          width: 0,
                                                          height: CGFloat.leastNormalMagnitude))
         
-        tableView.register(TextFieldTableViewCell.self, forCellReuseIdentifier: TextFieldTableViewCell.identifier)
+        tableView.register(TextFieldCell.self, forCellReuseIdentifier: TextFieldCell.identifier)
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -35,12 +35,26 @@ extension EditUsernameViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: TextFieldTableViewCell.identifier,
-                                                       for: indexPath) as? TextFieldTableViewCell else {
-            fatalError("Error: The TableView could not dequeue a \(TextFieldTableViewCell.identifier)")
+        let row = sections[indexPath.section].rows[indexPath.row].getValue()
+        
+        switch indexPath.section {
+        case 0:
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: TextFieldCell.identifier,
+                                                           for: indexPath) as? TextFieldCell else {
+                fatalError("Error: The TableView could not dequeue a \(TextFieldCell.identifier)")
+            }
+            guard let placeholder = row["placeholder"],
+                  let text = row["text"] else {
+                return cell
+            }
+            
+            cell.configure(placeholder: placeholder,
+                           text: text,
+                           tag: indexPath.row,
+                           delegate: self)
+            return cell
+        default:
+            fatalError("Error: Can't configure Cell for TableView")
         }
-
-        cell.configure(placeholder: "username", text: username, tag: indexPath.row, delegate: self)
-        return cell
     }
 }

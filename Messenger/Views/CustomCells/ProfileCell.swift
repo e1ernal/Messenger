@@ -7,14 +7,14 @@
 
 import UIKit
 
-class ImageWithLabelsTableViewCell: UITableViewCell {
-    static let identifier = "ImageWithLabelsTableViewCell"
+class ProfileCell: UITableViewCell {
+    static let identifier = "ProfileCell"
     
     private lazy var roundImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.clipsToBounds = true
         imageView.layer.cornerRadius = .constant(.imageCornerRadius)
-        imageView.image = .assetImage(.addPhoto)
+        imageView.image = .systemImage(.addPhoto, color: nil)
         imageView.contentMode = .scaleAspectFit
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
@@ -37,11 +37,15 @@ class ImageWithLabelsTableViewCell: UITableViewCell {
         contentView.addSubview(titleLabel)
         contentView.addSubview(subtitleLabel)
 
+        // Lower priority to avoid warnings
+        let roundImageViewHeightConstraint = roundImageView.heightAnchor.constraint(equalToConstant: ceil(.constant(.imageHeight)))
+        roundImageViewHeightConstraint.priority = .defaultHigh
+        
         NSLayoutConstraint.activate([
             roundImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: .constant(.spacing)),
             roundImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: .constant(.spacing)),
             roundImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -.constant(.spacing)),
-            roundImageView.heightAnchor.constraint(equalToConstant: .constant(.imageHeight)),
+            roundImageViewHeightConstraint,
             roundImageView.widthAnchor.constraint(equalToConstant: .constant(.imageHeight)),
 
             titleLabel.leadingAnchor.constraint(equalTo: roundImageView.trailingAnchor, constant: .constant(.spacing)),

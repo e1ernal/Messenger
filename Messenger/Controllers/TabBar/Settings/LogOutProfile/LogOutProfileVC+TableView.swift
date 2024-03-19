@@ -41,8 +41,12 @@ extension LogOutProfileViewController {
     
     // MARK: - Log Out Profile
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        UserDefaults.logOutUser()
-        let nextVC = OnboardingViewController()
-        navigate(.rootNavigation(nextVC))
+        do {
+            try Storage.shared.logOut()
+            let nextVC = OnboardingViewController()
+            navigate(.rootNavigation(nextVC))
+        } catch {
+            showSnackBar(text: error.localizedDescription, image: .systemImage(.warning, color: .label), on: self)
+        }
     }
 }

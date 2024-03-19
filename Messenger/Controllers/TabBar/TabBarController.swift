@@ -12,18 +12,6 @@ final class TabBarController: UITabBarController {
     static let nameVC: String = "TabBarController"
     private var firstItemImageView = UIImageView()
     private var secondItemImageView = UIImageView()
-    private let user: User
-    
-    // MARK: - Init UITabBarController
-    init(user: User) {
-        self.user = user
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    @available(*, unavailable)
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -36,11 +24,11 @@ final class TabBarController: UITabBarController {
         self.viewControllers = dataSource.map { controller in
             switch controller {
             case .chats:
-                let chats = ChatsViewController(style: .insetGrouped)
+                let chats = ChatsViewController(style: .plain)
                 chats.title = dataSource[0].title
                 return UINavigationController(rootViewController: chats)
             case .settings:
-                let settings = SettingsViewController(user: user)
+                let settings = SettingsViewController(style: .insetGrouped)
                 settings.title = dataSource[1].title
                 return UINavigationController(rootViewController: settings)
             }

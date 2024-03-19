@@ -8,6 +8,8 @@
 import UIKit
 
 class ChatsViewController: UITableViewController, UISearchResultsUpdating, UISearchControllerDelegate {
+    internal var sections: [Section] = []
+    
     internal let searchController: UISearchController = {
         let searchController = UISearchController(searchResultsController: SearchResultsTableViewController(style: .insetGrouped))
         searchController.searchBar.autocapitalizationType = .none
@@ -22,8 +24,46 @@ class ChatsViewController: UITableViewController, UISearchResultsUpdating, UISea
         configureUI()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        configureSections()
+    }
+    
+    internal func configureSections() {
+        Task {
+            do {
+                let chats = try Storage.shared.get(service: .chats, as: [Chats].self, in: .account)
+                
+                if !chats.isEmpty {
+                    var section = Section()
+                    
+                    for chat in chats {
+                        let image = try await NetworkService.shared.getUserImage(imagePath: chat.image)
+                        section.rows.append(.chatRow(image: image.toString(),
+                                                     name: chat.first_name + " " + chat.last_name,
+                                                     message: chat.last_message ?? "",
+                                                     date: (chat.last_message_created ?? "").toDate())
+                        )
+                    }
+                    if sections.isEmpty {
+                        sections.append(section)
+                    } else {
+                        sections[0] = section
+                    }
+                }
+                
+                tableView.reloadData()
+            } catch {
+                print(error)
+            }
+        }
+    }
+    
     // MARK: - Configure ViewController UI
     private func configureUI() {
         configureSearchController()
+        configureTableView()
+        configureNavigationBar()
     }
 }

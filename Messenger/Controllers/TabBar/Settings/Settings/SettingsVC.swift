@@ -7,24 +7,8 @@
 
 import UIKit
 
-protocol UpdateUserDelegate: AnyObject {
-    func updateUser(user: User)
-}
-
-class SettingsViewController: UITableViewController, UpdateUserDelegate {
-    internal var user: User
+class SettingsViewController: UITableViewController {
     internal var sections: [Section] = []
-    
-    // MARK: - Init UITableViewController
-    init(user: User) {
-        self.user = user
-        super.init(style: .insetGrouped)
-    }
-    
-    @available(*, unavailable)
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
     
     // MARK: - Controller Lifecycle
     override func viewDidLoad() {
@@ -33,25 +17,32 @@ class SettingsViewController: UITableViewController, UpdateUserDelegate {
         configureUI()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        configureSections()
+    }
+    
     // MARK: - Configure ViewController UI
     private func configureUI() {
-        configureSections()
         configureTableView()
     }
     
     internal func configureSections() {
-        sections = [
-            Section(rows: [
-                .verticalDoubleLabelRow(top: user.firstName + " " + user.lastName,
-                                        bottom: "Account & Profile")
-            ])
-        ]
-        tableView.reloadData()
-    }
-    
-    // MARK: - Protocol Methods
-    func updateUser(user: User) {
-        self.user = user
-        configureSections()
+        do {
+            let user = try Storage.shared.get(service: .user, as: User.self, in: .account)
+            sections = [
+                Section(rows: [
+                    .imageDoubleLabelRow(image: user.image.toString(), 
+                                         top: user.firstName + " " + user.lastName,
+                                         bottom: "Account & Profile")
+                ])
+            ]
+            tableView.reloadData()
+        } catch {
+            self.showSnackBar(text: error.localizedDescription,
+                              image: .systemImage(.warning, color: nil),
+                              on: self)
+        }
     }
 }

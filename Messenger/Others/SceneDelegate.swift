@@ -22,7 +22,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         
         let window = UIWindow(windowScene: windowScene)
-        let rootViewController = UserDefaults.isUserLoggedIn() ? LaunchScreenVC(greeting: "Messenger") : UINavigationController(rootViewController: OnboardingViewController())
+        let rootViewController = Storage.shared.isLoggedIn() ? LaunchScreenVC(greeting: "Messenger") : UINavigationController(rootViewController: OnboardingViewController())
+//        let rootViewController = MessagesVC()
         window.rootViewController = rootViewController
         window.makeKeyAndVisible()
         self.window = window

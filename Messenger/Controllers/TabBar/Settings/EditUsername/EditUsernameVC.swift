@@ -8,24 +8,8 @@
 import UIKit
 
 class EditUsernameViewController: UITableViewController {
-    internal var username: String
     internal var sections: [Section] = []
-    internal var updatedUsername: (isAvailable: Bool, username: String)
-    weak var delegate: UpdateUsernameDelegate?
-    
-    // MARK: - Init UITableViewController
-    init(username: String, delegate: UpdateUsernameDelegate) {
-        self.username = username
-        self.delegate = delegate
-        self.updatedUsername = (false, "")
-        
-        super.init(style: .insetGrouped)
-    }
-    
-    @available(*, unavailable)
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
+    internal var updatedUsername: String?
     
     // MARK: - Controller Lifecycle
     override func viewDidLoad() {
@@ -36,15 +20,23 @@ class EditUsernameViewController: UITableViewController {
     }
     
     func configureSections() {
-        sections = [
-            Section(header: "Username",
-                    footer: """
+        do {
+            let user = try Storage.shared.get(service: .user, as: User.self, in: .account)
+            sections = [
+                Section(header: "Username",
+                        footer: """
                             You can choose username on Messenger. If you do, people will de able to find you by this username and contact you without needing your phone number
                             \nYou can use a-z, 0-9 and underscores. Minimum length is 5 characters
                             """,
-                    rows: [.textFieldRow(placeholder: "new username", text: username)]
-                   )
-        ]
+                        rows: [.textFieldRow(placeholder: "new username", text: user.username)]
+                       )
+            ]
+            tableView.reloadData()
+        } catch {
+            self.showSnackBar(text: error.localizedDescription,
+                              image: .systemImage(.warning, color: nil),
+                              on: self)
+        }
     }
     
     // MARK: - Configure ViewController UI
@@ -65,20 +57,23 @@ class EditUsernameViewController: UITableViewController {
     // MARK: - Navigation Bar Actions
     // Save new username and navigate back
     @objc func saveTapped() {
-        guard updatedUsername.isAvailable else { return }
+        guard let updatedUsername else { return }
         
         Task {
             do {
-                guard let userToken = UserDefaults.getUserToken() else {
-                    throw DescriptionError.error("No user token")
-                }
+                let token = try Storage.shared.get(service: .token, as: String.self, in: .account)
+                _ = try await NetworkService.shared.updateUserUsername(username: updatedUsername, token: token)
+                let oldUser = try Storage.shared.get(service: .user, as: User.self, in: .account)
+                let newUser = User(id: oldUser.id,
+                                   firstName: oldUser.firstName,
+                                   lastName: oldUser.lastName,
+                                   image: oldUser.image,
+                                   phoneNumber: oldUser.phoneNumber,
+                                   username: updatedUsername)
                 
-                let userGet = try await NetworkService.shared.updateUserUsername(username: updatedUsername.username, token: userToken)
-                
-                delegate?.updateUsername(username: userGet.username)
+                try Storage.shared.update(newUser, as: .user, in: .account)
                 navigate(.back)
             } catch {
-                print(updatedUsername)
                 print(error.localizedDescription)
                 showSnackBar(text: error.localizedDescription, image: .systemImage(.warning, color: .label), on: self)
             }

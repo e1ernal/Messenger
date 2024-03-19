@@ -13,17 +13,18 @@ extension EditProfileViewController: UITextFieldDelegate {
         switch textField.tag {
         case 0:
             if let newFirstName = textField.text {
-                user.firstName = newFirstName
+                updatedUser.firstName = newFirstName
             } else {
-                user.firstName = ""
+                updatedUser.firstName = nil
             }
+            
         case 1:
             if let newLastName = textField.text {
-                user.lastName = newLastName
+                updatedUser.lastName = newLastName
             } else {
-                user.lastName = ""
+                updatedUser.lastName = nil
             }
-        default:
+        default: 
             return
         }
         

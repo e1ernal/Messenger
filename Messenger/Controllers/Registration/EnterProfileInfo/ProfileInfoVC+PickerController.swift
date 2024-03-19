@@ -1,15 +1,15 @@
 //
-//  EditProfileVC+ImagePicker.swift
+//  ProfileInfoVC+PickerController.swift
 //  Messenger
 //
-//  Created by e1ernal on 04.03.2024.
+//  Created by e1ernal on 06.03.2024.
 //
 
 import UIKit
 
-// MARK: - Configure Image Picker Controller
-extension EditProfileViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-    @objc internal func showImagePickerControllerActionSheet() {
+// MARK: - Image Picker Controller Actions
+extension ProfileInfoViewController: UINavigationControllerDelegate, UIImagePickerControllerDelegate {
+    @objc func showImagePickerControllerActionSheet() {
         let photoLibraryAction = UIAlertAction(title: "Open Gallery",
                                                style: .default) {_ in
             self.showImagePickerController(sourceType: .photoLibrary)
@@ -32,7 +32,7 @@ extension EditProfileViewController: UIImagePickerControllerDelegate, UINavigati
         self.present(alert, animated: true, completion: nil)
     }
     
-    internal func showImagePickerController(sourceType: UIImagePickerController.SourceType) {
+    func showImagePickerController(sourceType: UIImagePickerController.SourceType) {
         let imagePickerController = UIImagePickerController()
         imagePickerController.delegate = self
         imagePickerController.allowsEditing = true
@@ -40,17 +40,11 @@ extension EditProfileViewController: UIImagePickerControllerDelegate, UINavigati
         present(imagePickerController, animated: true)
     }
     
-    internal func imagePickerController(_ picker: UIImagePickerController,
-                                        didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
+    func imagePickerController(_ picker: UIImagePickerController,
+                               didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
         if let editedImage = info[.editedImage] as? UIImage {
-            updatedUser.image = editedImage
-            configureSections()
+            userImageView.image = editedImage
         }
         dismiss(animated: true, completion: nil)
-    }
-    
-    // MARK: - Delegate Methods
-    func setNewPhoto() {
-        showImagePickerControllerActionSheet()
     }
 }

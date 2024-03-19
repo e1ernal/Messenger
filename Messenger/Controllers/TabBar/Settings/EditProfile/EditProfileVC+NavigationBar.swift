@@ -18,23 +18,35 @@ extension EditProfileViewController {
     
     // Save and update user data
     @objc func saveTapped() {
-        guard !user.firstName.isEmpty, !user.lastName.isEmpty else {
+        guard let firstName = updatedUser.firstName,
+              let lastName = updatedUser.lastName,
+              let image = updatedUser.image else {
+            return
+        }
+        
+        guard !firstName.isEmpty else {
             return
         }
         
         Task {
             do {
-                guard let userToken = UserDefaults.getUserToken() else {
-                    throw DescriptionError.error("No user token")
-                }
+                let token = try Storage.shared.get(service: .token, as: String.self, in: .account)
                 
                 _ = try await NetworkService.shared.updateUser(username: "",
-                                                               firstname: user.firstName,
-                                                               lastname: user.lastName,
-                                                               image: user.image,
-                                                               token: userToken)
+                                                               firstname: firstName,
+                                                               lastname: lastName,
+                                                               image: image,
+                                                               token: token)
                 
-                delegate?.updateUser(user: user)
+                let oldUser = try Storage.shared.get(service: .user, as: User.self, in: .account)
+                let newUser = User(id: oldUser.id,
+                                   firstName: firstName,
+                                   lastName: lastName,
+                                   image: image,
+                                   phoneNumber: oldUser.phoneNumber,
+                                   username: oldUser.username)
+                
+                try Storage.shared.update(newUser, as: .user, in: .account)
                 navigate(.back)
             } catch {
                 showSnackBar(text: error.localizedDescription, image: .systemImage(.warning, color: .label), on: self)
@@ -43,6 +55,6 @@ extension EditProfileViewController {
     }
     
     internal func updateSaveButtonState() {
-        navigationItem.rightBarButtonItem?.isEnabled = !user.firstName.isEmpty && !user.lastName.isEmpty
+        navigationItem.rightBarButtonItem?.isEnabled = updatedUser.firstName != nil && updatedUser.lastName != nil
     }
 }

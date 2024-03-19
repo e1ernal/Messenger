@@ -8,8 +8,8 @@
 import Foundation
 import UIKit
 
-class ProfileInfoViewController: UIViewController, UITextFieldDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
-    private lazy var userImageView: UIImageView = {
+class ProfileInfoViewController: UIViewController {
+    internal lazy var userImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.clipsToBounds = true
         imageView.layer.cornerRadius = .constant(.imageCornerRadius)
@@ -24,11 +24,11 @@ class ProfileInfoViewController: UIViewController, UITextFieldDelegate, UINaviga
     
     private let titleLabel = BasicLabel("Profile Info", .font(.title))
     private let subtitleLabel = BasicLabel("Enter your name and add a profile picture", .font(.subtitle))
-    
-    private var firstNameTextField = FloatingTextField(placeholder: "First name (required)")
+
+    internal var firstNameTextField = FloatingTextField(placeholder: "First name (required)")
     private var lastNameTextField = FloatingTextField(placeholder: "Last name (optional)")
     
-    private lazy var continueButton = BasicButton(title: "Continue", style: .filled(.inactive)) {
+    internal lazy var continueButton = BasicButton(title: "Continue", style: .filled(.inactive)) {
         self.continueButtonTapped()
     }
 
@@ -70,72 +70,26 @@ class ProfileInfoViewController: UIViewController, UITextFieldDelegate, UINaviga
         ])
     }
     
-    func textFieldDidChangeSelection(_ textField: UITextField) {
-        guard let textField = textField as? FloatingTextField else {
-            return
-        }
-        
-        let fieldState: ViewState = textField.hasText ? .active : .inactive
-        textField.setState(fieldState)
-        
-        if textField === firstNameTextField {
-            continueButton.setState(textField.hasText ? .active : .inactive)
-        }
-    }
-    
+    // MARK: - Actions
     @objc func continueButtonTapped() {
         guard firstNameTextField.hasText,
               let firstName = firstNameTextField.text else {
-            self.showSnackBar(text: "Error: No user name", image: .systemImage(.warning, color: nil), on: self)
+            self.showSnackBar(text: "Error: No user name", 
+                              image: .systemImage(.warning, color: nil),
+                              on: self)
             return
         }
         
         guard let image = userImageView.image else {
-            self.showSnackBar(text: "Error: No user image", image: .systemImage(.warning, color: nil), on: self)
+            self.showSnackBar(text: "Error: No user image", 
+                              image: .systemImage(.warning, color: nil),
+                              on: self)
             return
         }
         
-        let nextVC = UsernameViewController(firstName: firstName, lastName: lastNameTextField.text, profileImage: image)
+        let nextVC = UsernameViewController(firstName: firstName,
+                                            lastName: lastNameTextField.text ?? "",
+                                            profileImage: image)
         navigate(.next(nextVC, .fullScreen))
-    }
-    
-    // MARK: - Image Picker Controller Actions
-    @objc func showImagePickerControllerActionSheet() {
-        let photoLibraryAction = UIAlertAction(title: "Open Gallery",
-                                               style: .default) {_ in
-            self.showImagePickerController(sourceType: .photoLibrary)
-        }
-        
-        let cameraAction = UIAlertAction(title: "Take a photo",
-                                         style: .default) { _ in
-            self.showImagePickerController(sourceType: .camera)
-        }
-        
-        let cancelAction = UIAlertAction(title: "Cancel",
-                                         style: .cancel,
-                                         handler: nil)
-        
-        let alert = UIAlertController()
-        alert.addAction(photoLibraryAction)
-        alert.addAction(cameraAction)
-        alert.addAction(cancelAction)
-        
-        self.present(alert, animated: true, completion: nil)
-    }
-    
-    func showImagePickerController(sourceType: UIImagePickerController.SourceType) {
-        let imagePickerController = UIImagePickerController()
-        imagePickerController.delegate = self
-        imagePickerController.allowsEditing = true
-        imagePickerController.sourceType = sourceType
-        present(imagePickerController, animated: true)
-    }
-    
-    func imagePickerController(_ picker: UIImagePickerController,
-                               didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
-        if let editedImage = info[.editedImage] as? UIImage {
-            userImageView.image = editedImage
-        }
-        dismiss(animated: true, completion: nil)
     }
 }

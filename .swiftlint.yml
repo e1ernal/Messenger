@@ -2,7 +2,7 @@ included:
   - Plugins
   - Source
   - Tests
-  - /Users/e1ernal/Documents/Git/Messenger
+  - /Users/e1ernal/Documents/Git/Messenger/Messenger
 excluded:
   - Tests/SwiftLintFrameworkTests/Resources
 analyzer_rules:

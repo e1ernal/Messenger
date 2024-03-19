@@ -10,27 +10,25 @@ import UIKit
 // MARK: - Handle TextField did change
 extension EditUsernameViewController: UITextFieldDelegate {
     func textFieldDidChangeSelection(_ textField: UITextField) {
-        guard textField.hasText,
-              let newUsername = textField.text,
-              newUsername != username
-        else {
-            updatedUsername.isAvailable = false
+        guard let newUsername = textField.text else {
+            updatedUsername = nil
             navigationItem.rightBarButtonItem?.tintColor = .inactive
             return
         }
         
         // Check username availability
         Task {
+            var isUsernameAvailable = false
             do {
                 try await NetworkService.shared.checkUsername(newUsername)
-                updatedUsername.isAvailable = true
-                updatedUsername.username = newUsername
+                updatedUsername = newUsername
+                isUsernameAvailable = true
             } catch {
-                updatedUsername.isAvailable = false
+                updatedUsername = nil
             }
             
-            let buttonColor: UIColor = updatedUsername.isAvailable ? .color(.active) : .color(.inactive)
-            let textFieldColor: UIColor = updatedUsername.isAvailable ? .color(.success) : .color(.failure)
+            let buttonColor: UIColor = isUsernameAvailable ? .color(.active) : .color(.inactive)
+            let textFieldColor: UIColor = isUsernameAvailable ? .color(.success) : .color(.failure)
 
             UIView.animate(withDuration: 0.25) {
                 self.navigationItem.rightBarButtonItem?.tintColor = buttonColor

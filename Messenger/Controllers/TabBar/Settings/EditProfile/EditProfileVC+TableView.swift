@@ -8,16 +8,16 @@
 import UIKit
 
 // MARK: - Configure Table View
-extension EditProfileViewController {
+extension EditProfileViewController: SetNewPhotoDelegate {
     internal func configureTableView() {
         tableView.tableHeaderView = UIView(frame: CGRect(x: 0,
                                                          y: 0,
                                                          width: 0,
                                                          height: CGFloat.leastNormalMagnitude))
  
-        tableView.register(DoubleLabelTableViewCell.self, forCellReuseIdentifier: DoubleLabelTableViewCell.identifier)
-        tableView.register(TextFieldTableViewCell.self, forCellReuseIdentifier: TextFieldTableViewCell.identifier)
-        tableView.register(ImageWithButtonTableViewCell.self, forCellReuseIdentifier: ImageWithButtonTableViewCell.identifier)
+        tableView.register(DoubleLabelCell.self, forCellReuseIdentifier: DoubleLabelCell.identifier)
+        tableView.register(TextFieldCell.self, forCellReuseIdentifier: TextFieldCell.identifier)
+        tableView.register(ImageWithButtonCell.self, forCellReuseIdentifier: ImageWithButtonCell.identifier)
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -37,34 +37,39 @@ extension EditProfileViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let row = sections[indexPath.section].rows[indexPath.row].getValue()
+        
         switch indexPath.section {
         case 0:
-            guard let cell = tableView.dequeueReusableCell(withIdentifier: ImageWithButtonTableViewCell.identifier,
-                                                           for: indexPath) as? ImageWithButtonTableViewCell else {
-                fatalError("Error: The TableView could not dequeue a \(ImageWithButtonTableViewCell.identifier)")
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: ImageWithButtonCell.identifier,
+                                                           for: indexPath) as? ImageWithButtonCell else {
+                fatalError("Error: The TableView could not dequeue a \(ImageWithButtonCell.identifier)")
             }
             
-            cell.configure(image: user.image, text: "Set New Photo", delegate: self)
+            guard let image = row["image"]?.toImage(),
+                  let buttonText = row["buttonText"] else {
+                return cell
+            }
+            
+            cell.configure(image: image, text: buttonText, delegate: self)
             return cell
         case 1:
-            guard let cell = tableView.dequeueReusableCell(withIdentifier: TextFieldTableViewCell.identifier,
-                                                           for: indexPath) as? TextFieldTableViewCell else {
-                fatalError("Error: The TableView could not dequeue a \(TextFieldTableViewCell.identifier)")
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: TextFieldCell.identifier,
+                                                           for: indexPath) as? TextFieldCell else {
+                fatalError("Error: The TableView could not dequeue a \(TextFieldCell.identifier)")
             }
             
-            let row = sections[indexPath.section].rows[indexPath.row].getValue()
             if let placeholder = row["placeholder"], let text = row["text"] {
                 cell.configure(placeholder: placeholder, text: text, tag: indexPath.row, delegate: self)
             }
             return cell
             
         case 2:
-            guard let cell = tableView.dequeueReusableCell(withIdentifier: DoubleLabelTableViewCell.identifier,
-                                                           for: indexPath) as? DoubleLabelTableViewCell else {
-                fatalError("Error: The TableView could not dequeue a \(DoubleLabelTableViewCell.identifier)")
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: DoubleLabelCell.identifier,
+                                                           for: indexPath) as? DoubleLabelCell else {
+                fatalError("Error: The TableView could not dequeue a \(DoubleLabelCell.identifier)")
             }
             
-            let row = sections[indexPath.section].rows[indexPath.row].getValue()
             if let leftText = row["left"], let rightText = row["right"] {
                 cell.configure(left: leftText, right: rightText)
             }
@@ -80,7 +85,7 @@ extension EditProfileViewController {
         tableView.deselectRow(at: indexPath, animated: true)
         
         if indexPath.section == 2 && indexPath.row == 0 {
-            let nextVC = EditUsernameViewController(username: user.username, delegate: self)
+            let nextVC = EditUsernameViewController(style: .insetGrouped)
             navigate(.next(nextVC, .fullScreen))
         }
     }

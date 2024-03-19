@@ -7,8 +7,8 @@
 
 import UIKit
 
-class UserSearchResultsTableViewCell: UITableViewCell {
-    static let identifier = "UserSearchResultsTableViewCell"
+class SearchResultsCell: UITableViewCell {
+    static let identifier = "SearchResultsCell"
     
     private lazy var photoImageView: UIImageView = {
         let imageView = UIImageView()
@@ -37,11 +37,15 @@ class UserSearchResultsTableViewCell: UITableViewCell {
         contentView.addSubview(nameLabel)
         contentView.addSubview(usernameLabel)
 
+        // Lower priority to avoid warnings
+        let photoImageViewHeightConstraint = photoImageView.heightAnchor.constraint(equalToConstant: .constant(.height))
+        photoImageViewHeightConstraint.priority = .defaultHigh
+        
         NSLayoutConstraint.activate([
             photoImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: .constant(.spacing)),
             photoImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: .constant(.spacing)),
             photoImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -.constant(.spacing)),
-            photoImageView.heightAnchor.constraint(equalToConstant: .constant(.height)),
+            photoImageViewHeightConstraint,
             photoImageView.widthAnchor.constraint(equalToConstant: .constant(.height)),
 
             nameLabel.leadingAnchor.constraint(equalTo: photoImageView.trailingAnchor, constant: .constant(.spacing)),

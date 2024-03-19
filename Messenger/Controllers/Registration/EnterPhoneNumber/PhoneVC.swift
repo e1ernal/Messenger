@@ -7,12 +7,12 @@
 
 import UIKit
 
-class PhoneViewController: UIViewController, UITextFieldDelegate {
+class PhoneViewController: UIViewController {
     private let emojiLabel = BasicLabel("☎️", .font(.large))
     private let titleLabel = BasicLabel("Your Phone", .font(.title))
     private let subtitleLabel = BasicLabel("Please enter your phone number", .font(.subtitle))
     
-    private lazy var numberTextField: UITextField = {
+    internal lazy var numberTextField: UITextField = {
         let field = UITextField()
         field.placeholder = "+0 000 000 0000"
         field.autocapitalizationType = .none
@@ -26,7 +26,7 @@ class PhoneViewController: UIViewController, UITextFieldDelegate {
         return field
     }()
     
-    private lazy var continueButton = BasicButton(title: "Continue", style: .filled(.inactive)) {
+    internal lazy var continueButton = BasicButton(title: "Continue", style: .filled(.inactive)) {
         if self.numberTextField.hasText {
             self.numberLabel.text = self.numberTextField.text
             UIView.animate(withDuration: 0.25) {
@@ -122,10 +122,7 @@ class PhoneViewController: UIViewController, UITextFieldDelegate {
         alphaView.isHidden = true
     }
     
-    func textFieldDidChangeSelection(_ textField: UITextField) {
-        continueButton.setState(textField.hasText ? .active : .inactive)
-    }
-    
+    // MARK: - Actions
     @objc func continueFinalButtonTapped() {
         Task {
             do {
@@ -146,12 +143,5 @@ class PhoneViewController: UIViewController, UITextFieldDelegate {
                 self.showSnackBar(text: error.localizedDescription, image: .systemImage(.warning, color: nil), on: self)
             }
         }
-    }
-    
-    @objc func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        guard let text = numberTextField.text else { return false }
-        let newString = (text as NSString).replacingCharacters(in: range, with: string)
-        numberTextField.text = numberFormatter(newString)
-        return false
     }
 }

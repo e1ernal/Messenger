@@ -12,7 +12,6 @@ extension ChatsViewController {
     internal func configureSearchController() {
         searchController.searchResultsUpdater = self
         searchController.delegate = self
-        
         navigationItem.searchController = searchController
     }
     
@@ -29,15 +28,14 @@ extension ChatsViewController {
         
         Task {
             do {
-                guard let userToken = UserDefaults.getUserToken() else {
-                    throw DescriptionError.error("No user token")
-                }
+                let token = try Storage.shared.get(service: .token, as: String.self, in: .account)
                 
-                let usersGet = try await NetworkService.shared.searchUsersByUsername(username: text, token: userToken)
+                let usersGet = try await NetworkService.shared.searchUsersByUsername(username: text, token: token)
                 var users: [User] = []
                 for user in usersGet {
                     let image = try await NetworkService.shared.getUserImage(imagePath: user.image)
-                    let user = User(firstName: user.first_name,
+                    let user = User(id: user.id,
+                                    firstName: user.first_name,
                                     lastName: user.last_name ?? "",
                                     image: image,
                                     phoneNumber: user.phone_number,

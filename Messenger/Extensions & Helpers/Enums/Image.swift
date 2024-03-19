@@ -21,6 +21,9 @@ enum Image: String {
     case chats = "ellipsis.message.fill"
     case settings = "gear"
     case edit = "square.and.pencil"
+    case sendMessage = "paperplane"
+    case sendButton = "arrowshape.up.circle.fill"
+    case clip = "paperclip.circle"
     
     // MARK: - Assets Images
     case addPhoto = "addPhoto"

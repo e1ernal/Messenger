@@ -9,7 +9,7 @@ import Foundation
 
 import UIKit
 
-class DoubleLabelTableViewCell: UITableViewCell {
+class DoubleLabelCell: UITableViewCell {
     static let identifier = "DoubleLabelTableViewCell"
     
     private let leftLabel = BasicLabel("", .font(.body))

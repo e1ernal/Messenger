@@ -15,6 +15,7 @@ enum Font {
     case subtitle
     case subtitleBold
     case body
+    case mini
     case appName
     
     // Button
@@ -44,6 +45,8 @@ extension UIFont {
             return .systemFont(ofSize: CGFloat(15), weight: .semibold)
         case .body:
             return .systemFont(ofSize: CGFloat(13), weight: .regular)
+        case .mini:
+            return .systemFont(ofSize: CGFloat(9), weight: .medium)
         case .textField:
             return .systemFont(ofSize: CGFloat(18), weight: .regular)
         case .codeField:

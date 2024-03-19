@@ -7,9 +7,9 @@
 
 import UIKit
 
-class PhoneConfirmViewController: UIViewController, UITextFieldDelegate {
-    private let digitsCount: Int = 5
-    private var digitLabels = [UILabel]()
+class PhoneConfirmViewController: UIViewController {
+    internal let digitsCount: Int = 5
+    internal var digitLabels = [UILabel]()
     private var phoneNumber: String?
     private var code: String?
     
@@ -88,7 +88,7 @@ class PhoneConfirmViewController: UIViewController, UITextFieldDelegate {
         super.viewDidLoad()
         
         setupUI()
-        self.showSnackBar(text: "Your code: \(code ?? "Error: No code")", image: .systemImage(.number, color: nil), on: self)
+        showConfirmCode()
     }
     
     private func setupUI() {
@@ -157,57 +157,9 @@ class PhoneConfirmViewController: UIViewController, UITextFieldDelegate {
         alphaView.isHidden = true
     }
     
-    func textFieldDidChangeSelection(_ textField: UITextField) {
-        guard let text = textField.text, text.count <= digitsCount else { return }
-        
-        for digitIndex in 0 ..< digitsCount {
-            let currentLabel = digitLabels[digitIndex]
-            
-            if digitIndex < text.count {
-                let index = text.index(text.startIndex, offsetBy: digitIndex)
-                currentLabel.text = String(text[index])
-                currentLabel.layer.borderColor = .color(.active)
-            } else {
-                currentLabel.text?.removeAll()
-                currentLabel.layer.borderColor = .color(.inactive)
-            }
-        }
-        
-        if text.count == digitsCount {
-            Task {
-                do {
-                    let (isNewUser, token) = try await NetworkService.shared.confirmVerificationCode(code: text)
-                    for label in digitLabels {
-                        label.layer.borderColor = .color(.success)
-                    }
-                    
-                    if isNewUser {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                            self.navigate(.next(ProfileInfoViewController(), .fullScreen))
-                        }
-                    } else {
-                        if let token {
-                            UserDefaults.loginUser(token: token)
-                        }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                            let nextVC = LaunchScreenVC(greeting: "Welcome")
-                            self.navigate(.root(nextVC))
-                        }
-                    }
-                } catch {
-                    self.showSnackBar(text: "Invalid confirmation code", image: .systemImage(.warning, color: nil), on: self)
-                    for label in digitLabels {
-                        label.layer.borderColor = .color(.failure)
-                    }
-                }
-            }
-        }
-    }
-    
-    func textField(_ textField: UITextField,
-                   shouldChangeCharactersIn range: NSRange,
-                   replacementString string: String) -> Bool {
-        guard let characterCount = textField.text?.count else { return false }
-        return characterCount < digitsCount || string.isEmpty
+    private func showConfirmCode() {
+        self.showSnackBar(text: "Your code: \(code ?? "Error: No code")",
+                          image: .systemImage(.number, color: nil),
+                          on: self)
     }
 }

@@ -11,7 +11,7 @@ import UIKit
 extension InfoProfileViewController {
     internal func configureNavigationBar() {
         let editProfileAction = UIAction(title: "Edit profile", image: .systemImage(.edit, color: .label)) { _ in
-            let nextVC = EditProfileViewController(user: self.user, delegate: self)
+            let nextVC = EditProfileViewController(style: .insetGrouped)
             self.navigate(.next(nextVC, .fullScreen))
         }
         

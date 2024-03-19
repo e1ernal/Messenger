@@ -11,8 +11,8 @@ protocol SetNewPhotoDelegate: AnyObject {
     func setNewPhoto()
 }
 
-class ImageWithButtonTableViewCell: UITableViewCell {
-    static let identifier = "ImageWithButtonTableViewCell"
+class ImageWithButtonCell: UITableViewCell {
+    static let identifier = "ImageWithButtonCell"
     
     weak var cellDelegate: SetNewPhotoDelegate?
     
@@ -39,9 +39,13 @@ class ImageWithButtonTableViewCell: UITableViewCell {
         contentView.addSubview(newPhotoButton)
         backgroundColor = .clear
         
+        // Lower priority to avoid warnings
+        let photoImageViewHeightConstraint = photoImageView.heightAnchor.constraint(equalToConstant: .constant(.doubleHeight))
+        photoImageViewHeightConstraint.priority = .defaultHigh
+        
         NSLayoutConstraint.activate([
             photoImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: .constant(.spacing)),
-            photoImageView.heightAnchor.constraint(equalToConstant: .constant(.doubleHeight)),
+            photoImageViewHeightConstraint,
             photoImageView.widthAnchor.constraint(equalToConstant: .constant(.doubleHeight)),
             photoImageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             

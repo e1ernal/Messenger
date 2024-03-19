@@ -7,26 +7,9 @@
 
 import UIKit
 
-protocol UpdateUsernameDelegate: AnyObject {
-    func updateUsername(username: String)
-}
-
-class EditProfileViewController: UITableViewController, UpdateUsernameDelegate, SetNewPhotoDelegate {
-    internal var user: User
+class EditProfileViewController: UITableViewController {
     internal var sections: [Section] = []
-    weak var delegate: UpdateUserDelegate?
-    
-    // MARK: - Init UITableViewController
-    init(user: User, delegate: UpdateUserDelegate) {
-        self.user = user
-        self.delegate = delegate
-        super.init(style: .insetGrouped)
-    }
-    
-    @available(*, unavailable)
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
+    internal var updatedUser: (firstName: String?, lastName: String?, image: UIImage?)
     
     // MARK: - Controller Lifecycle
     override func viewDidLoad() {
@@ -35,36 +18,48 @@ class EditProfileViewController: UITableViewController, UpdateUsernameDelegate, 
         configureUI()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        configureSections()
+    }
+    
     // MARK: - Configure ViewController UI
     private func configureUI() {
         configureVC(title: "Edit Profile", backButton: true)
-        configureSections()
         configureTableView()
         configureNavigationBar()
+        
+        do {
+            let user = try Storage.shared.get(service: .user, as: User.self, in: .account)
+            updatedUser = (user.firstName, user.lastName, user.image)
+        } catch {
+            print(error)
+        }
     }
     
     internal func configureSections() {
-        sections = [
-            Section(rows: [.emptyRow]),
-            Section(footer: "Enter your name and add an optional profile photo",
-                    rows: [
-                        .textFieldRow(placeholder: "first name (required)", text: user.firstName),
-                        .textFieldRow(placeholder: "last name (optional)", text: user.lastName)
-                    ]),
-            Section(rows: [
-                .doubleLabelRow(left: "username", right: "@" + user.username)
-            ])
-        ]
-        tableView.reloadData()
-    }
-    
-    // MARK: - Protocol Methods
-    func updateUsername(username: String) {
-        user.username = username
-        configureSections()
-    }
-    
-    func setNewPhoto() {
-        showImagePickerControllerActionSheet()
+        do {
+            let user = try Storage.shared.get(service: .user, as: User.self, in: .account)
+            
+            sections = [
+                Section(rows: [
+                    .imageWithButtonRow(image: updatedUser.image?.toString() ?? user.image.toString(), buttonText: "Set New Photo")
+                ]),
+                Section(footer: "Enter your name and add an optional profile photo",
+                        rows: [
+                            .textFieldRow(placeholder: "first name (required)", text: user.firstName),
+                            .textFieldRow(placeholder: "last name (optional)", text: user.lastName)
+                        ]),
+                Section(rows: [
+                    .doubleLabelRow(left: "username", right: "@" + user.username)
+                ])
+            ]
+            tableView.reloadData()
+        } catch {
+            self.showSnackBar(text: error.localizedDescription,
+                              image: .systemImage(.warning, color: nil),
+                              on: self)
+        }
     }
 }

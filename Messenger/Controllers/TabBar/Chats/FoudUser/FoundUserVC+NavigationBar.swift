@@ -10,12 +10,14 @@ import UIKit
 // MARK: - Configure Navigation Bar
 extension FoundUserTableViewController {
     internal func configureNavigationBar() {
-        navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .close,
+        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Back",
+                                                           style: .plain,
                                                            target: self,
-                                                           action: #selector(backBarButtonClicked))
+                                                           action: #selector(leftBarButtonClicked))
     }
     
-    @objc func backBarButtonClicked() {
+    // Navigate back to search results
+    @objc func leftBarButtonClicked() {
         dismiss(animated: true)
     }
 }
