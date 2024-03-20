@@ -88,7 +88,7 @@ extension FoundUserTableViewController {
         
         Task {
             do {
-                var chats = try Storage.shared.get(service: .chats, as: [Chats].self, in: .account)
+                var chats = try Storage.shared.get(service: .chats, as: [Chat].self, in: .account)
                 if !chats.contains(where: { chat in
                     chat.username == user.username
                 }) {

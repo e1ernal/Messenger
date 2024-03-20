@@ -59,12 +59,12 @@ class LaunchScreenVC: UIViewController {
     }
     
     // Get all data with loading animations
-    private func configureData() {
+    open func configureData() {
         Task {
             do {
                 indicator(animating: .start, completion: nil)
-                try await getUserData()
-                try await getChatsData()
+                try await Storage.shared.getUserData()
+                try await Storage.shared.getChatsData()
                 
                 indicator(animating: .stop) { _ in
                     let nextVC = TabBarController()
@@ -84,34 +84,7 @@ class LaunchScreenVC: UIViewController {
         }
     }
     
-    private func getChatsData() async throws {
-        let token = try Storage.shared.get(service: .token, as: String.self, in: .account)
-        let chats = try await NetworkService.shared.getChats(token: token)
-        do {
-            try Storage.shared.save(chats, as: .chats, in: .account)
-        } catch {
-            try Storage.shared.update(chats, as: .chats, in: .account)
-        }
-    }
     
-    private func getUserData() async throws {
-        let token = try Storage.shared.get(service: .token, as: String.self, in: .account)
-        let userGet = try await NetworkService.shared.getUserInfo(token: token)
-        let image = try await NetworkService.shared.getUserImage(imagePath: userGet.image)
-        
-        let user = User(id: userGet.id,
-                        firstName: userGet.first_name,
-                        lastName: userGet.last_name ?? "",
-                        image: image,
-                        phoneNumber: numberFormatter(userGet.phone_number),
-                        username: userGet.username)
-        
-        do {
-            try Storage.shared.save(user, as: .user, in: .account)
-        } catch {
-            try Storage.shared.update(user, as: .user, in: .account)
-        }
-    }
     
     private func indicator(animating: LoadingIndicator, completion: ((Bool) -> Void)?) {
         switch animating {

@@ -56,11 +56,13 @@ extension ChatsViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let row = sections[indexPath.section].rows[indexPath.row].getValue()
-        guard let name = row["name"] else {
+        guard let name = row["name"],
+              let chatId = row["chatId"],
+              let image = row["image"] else {
             return
         }
         
-        let nextVC = MessagesVC()
+        let nextVC = MessagesVC(name: name, image: image, chatId: chatId)
         navigate(.next(nextVC, .fullScreen))
     }
 }

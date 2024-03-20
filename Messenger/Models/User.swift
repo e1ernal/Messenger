@@ -117,7 +117,7 @@ struct EncryptedKey: Codable {
 }
 
 // MARK: - Chats
-struct Chats: Codable {
+struct Chat: Codable {
     let first_name: String
     let last_name: String
     let username: String
@@ -125,4 +125,30 @@ struct Chats: Codable {
     let last_message: String?
     let last_message_created: String?
     let direct_id: Int
+}
+
+// MARK: - Message
+struct Message: Codable {
+    let author: Author
+    let direct: Int
+    var text, createdAt, updatedAt: String
+
+    enum CodingKeys: String, CodingKey {
+        case author, direct, text
+        case createdAt = "created_at"
+        case updatedAt = "updated_at"
+    }
+}
+
+// MARK: - Author
+struct Author: Codable {
+    let id: Int
+    let username, firstName, lastName, image: String
+
+    enum CodingKeys: String, CodingKey {
+        case id, username
+        case firstName = "first_name"
+        case lastName = "last_name"
+        case image
+    }
 }

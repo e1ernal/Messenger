@@ -7,20 +7,24 @@
 
 import UIKit
 
-class MessagesVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate {
-    private var messages: [String] = []
+class MessagesVC: UIViewController {
+    internal var name: String
+    internal var image: String
+    internal var chatId: String
+    
+    internal var messages: [String: [Message]] = [:]
     
     let scrollView = UIScrollView()
     let contentView = UIView()
     
-    private let messagesTableView: UITableView = {
+    internal let messagesTableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .plain)
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.separatorStyle = .none
         return tableView
     }()
     
-    private let sendButton: UIButton = {
+    internal let sendButton: UIButton = {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
         button.layer.cornerRadius = (.constant(.height) - 2 * .constant(.halfSpacing)) * 0.5
@@ -32,7 +36,7 @@ class MessagesVC: UIViewController, UITableViewDelegate, UITableViewDataSource, 
         return button
     }()
     
-    private let messageTextField: UITextField = {
+    internal let messageTextField: UITextField = {
         let textField = UITextField(frame: .zero)
         textField.borderStyle = .none
         textField.autocorrectionType = .no
@@ -42,7 +46,7 @@ class MessagesVC: UIViewController, UITableViewDelegate, UITableViewDataSource, 
             NSAttributedString.Key.foregroundColor: UIColor.color(.inactive),
             NSAttributedString.Key.font: UIFont.font(.subtitle)
         ]
-
+        
         textField.attributedPlaceholder = NSAttributedString(string: "Message", attributes: attributes)
         
         return textField
@@ -63,7 +67,6 @@ class MessagesVC: UIViewController, UITableViewDelegate, UITableViewDataSource, 
         configureTableView()
         configureTextField()
         configureUI()
-        
         // Observe keyboard change
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(keyboardWillShow),
@@ -76,8 +79,23 @@ class MessagesVC: UIViewController, UITableViewDelegate, UITableViewDataSource, 
                                                object: nil)
     }
     
+    // MARK: - Init UIViewController
+    init(name: String, image: String, chatId: String) {
+        self.name = name
+        self.image = image
+        self.chatId = chatId
+        
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: - Deinit UIViewController
     deinit {
-         NotificationCenter.default.removeObserver(self)
+        NotificationCenter.default.removeObserver(self)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -85,6 +103,7 @@ class MessagesVC: UIViewController, UITableViewDelegate, UITableViewDataSource, 
         tabBarController?.tabBar.isHidden = false
     }
     
+    // MARK: - Configure UI
     private func configureUI() {
         configureVC(title: "Messages", backButton: true)
         tabBarController?.tabBar.isHidden = true
@@ -148,63 +167,7 @@ class MessagesVC: UIViewController, UITableViewDelegate, UITableViewDataSource, 
         ])
     }
     
-    // MARK: - Configure TableView
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return messages.count
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: MessageCell.identifier,
-                                                       for: indexPath) as? MessageCell else {
-            fatalError("Error: The TableView could not dequeue a \(MessageCell.identifier)")
-        }
-        
-        cell.configure(message: messages[indexPath.row],
-                       side: indexPath.row.isMultiple(of: 3) ? .left : .right,
-                       superViewWidth: view.frame.width,
-                       time: "12:55")
-        return cell
-    }
-    
-    private func configureTableView() {
-        messagesTableView.delegate = self
-        messagesTableView.dataSource = self
-        
-        messagesTableView.register(MessageCell.self, forCellReuseIdentifier: MessageCell.identifier)
-        configureMessages()
-    }
-    
-    private func configureMessages() {
-        messages.append("Message 1 Message Message Message Message Message Message")
-        messages.append("Short Message")
-        messages.append("Message 2 Message Message Message Message Message Message")
-        messages.append("Message 3 Message Message Message Message Message Message")
-        messages.append("Medium size message with many letters")
-        messages.append("Message 4 Message Message Message Message Message Message")
-        messages.append("Message 5 Message Message Message Message Message Message Message Message Message Message")
-        messages.append("Message 6 Message Message Message Message Message Message")
-        messages.append("Message 6 Message Message Message Message Message Message")
-        messages.append("Message 6 Message Message Message Message Message Message")
-        messages.append("Message 6 Message Message Message Message Message Message")
-        messages.append("Message 6 Message Message Message Message Message Message")
-    }
-    
-    // MARK: - Configure TextField
-    private func configureTextField() {
-        messageTextField.delegate = self
-        messageTextField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
-    }
-    
-    @objc func textFieldDidChange(_ textField: UITextField) {
-        guard let text = textField.text,
-              !text.isEmpty else {
-            sendButton.tintColor = .inactive
-            return
-        }
-        
-        sendButton.tintColor = .active
-    }
-    
+    // MARK: - Keyboard Notifications
     @objc func keyboardWillShow(notification: Notification) {
         guard let userInfo = notification.userInfo,
               let endFrame = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect,
@@ -220,7 +183,9 @@ class MessagesVC: UIViewController, UITableViewDelegate, UITableViewDataSource, 
                        options: animationCurve,
                        animations: {
             self.scrollView.contentOffset.y += endFrame.height + .constant(.spacing)
-        }, completion: nil)
+        }, completion: { _ in
+            self.messagesTableView.scrollToBottom()
+        })
     }
     
     @objc func keyboardWillHide(notification: Notification) {
@@ -239,5 +204,20 @@ class MessagesVC: UIViewController, UITableViewDelegate, UITableViewDataSource, 
                        animations: {
             self.scrollView.contentOffset.y -= endFrame.height + .constant(.spacing)
         }, completion: nil)
+    }
+}
+
+extension UITableView {
+    func scrollToBottom() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(1)) {
+            let numberOfSections = self.numberOfSections
+            guard numberOfSections > 0 else { return }
+            
+            let numberOfRows = self.numberOfRows(inSection: numberOfSections - 1)
+            guard numberOfRows > 0 else { return }
+            
+            let indexPath = IndexPath(row: numberOfRows - 1, section: numberOfSections - 1)
+            self.scrollToRow(at: indexPath, at: UITableView.ScrollPosition.bottom, animated: true)
+        }
     }
 }

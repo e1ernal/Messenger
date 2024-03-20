@@ -10,10 +10,17 @@ import Foundation
 final class URLService {
     static let shared = URLService(); private init() {}
 
+    
+    // Parameters
     private let scheme = "http://"
     private let host = "45.131.41.158"
     private let api = "/api"
-
+    
+    /// Create URL with endpoint
+    /// - Parameters:
+    ///   - endPoint: Endpoint
+    ///   - parameters: Query parameters
+    /// - Returns: URL
     func createURL(endPoint: EndPoint, parameters: [String: String]? = nil) throws -> URL {
         let urlStr = scheme + host + api + endPoint.path
         
@@ -94,11 +101,19 @@ enum Codes: String {
 enum DirectChats {
     // GET Methods
     case direct_chats /* user chats */
+    case get_messages(String) /* user messages in chat */
+    
+    // POST Methods
+    case send_message(String) /* send message to chat */
     
     var path: String {
         switch self {
         case .direct_chats:
             return "/"
+        case let .get_messages(id):
+            return "/\(id)/messages/"
+        case let .send_message(id):
+            return "/\(id)/messages/"
         }
     }
 }

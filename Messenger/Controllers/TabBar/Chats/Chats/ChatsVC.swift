@@ -33,24 +33,27 @@ class ChatsViewController: UITableViewController, UISearchResultsUpdating, UISea
     internal func configureSections() {
         Task {
             do {
-                let chats = try Storage.shared.get(service: .chats, as: [Chats].self, in: .account)
+                try await Storage.shared.getChatsData()
+                let chats = try Storage.shared.get(service: .chats, as: [Chat].self, in: .account)
                 
-                if !chats.isEmpty {
-                    var section = Section()
-                    
-                    for chat in chats {
-                        let image = try await NetworkService.shared.getUserImage(imagePath: chat.image)
-                        section.rows.append(.chatRow(image: image.toString(),
-                                                     name: chat.first_name + " " + chat.last_name,
-                                                     message: chat.last_message ?? "",
-                                                     date: (chat.last_message_created ?? "").toDate())
-                        )
-                    }
-                    if sections.isEmpty {
-                        sections.append(section)
-                    } else {
-                        sections[0] = section
-                    }
+                guard !chats.isEmpty else {
+                    return
+                }
+                
+                var section = Section()
+                for chat in chats {
+                    let image = try await NetworkService.shared.getUserImage(imagePath: chat.image)
+                    section.rows.append(.chatRow(image: image.toString(),
+                                                 name: chat.first_name + " " + chat.last_name,
+                                                 message: chat.last_message ?? "",
+                                                 date: (chat.last_message_created ?? "").toChatDate(),
+                                                 chatId: String(chat.direct_id))
+                    )
+                }
+                if sections.isEmpty {
+                    sections.append(section)
+                } else {
+                    sections[0] = section
                 }
                 
                 tableView.reloadData()

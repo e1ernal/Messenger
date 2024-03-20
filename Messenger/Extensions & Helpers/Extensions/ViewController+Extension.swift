@@ -27,7 +27,7 @@ enum Row {
     case imageDoubleLabelRow(image: String, top: String, bottom: String)
     case imageRow(image: String)
     case imageWithButtonRow(image: String, buttonText: String)
-    case chatRow(image: String, name: String, message: String, date: String)
+    case chatRow(image: String, name: String, message: String, date: String, chatId: String)
     
     func getValue() -> [String: String] {
         switch self {
@@ -45,8 +45,8 @@ enum Row {
             return ["image": image]
         case let .imageWithButtonRow(image, buttonText):
             return ["image": image, "buttonText": buttonText]
-        case let .chatRow(image, name, message, date):
-            return ["image": image, "name": name, "message": message, "date": date]
+        case let .chatRow(image, name, message, date, chatId):
+            return ["image": image, "name": name, "message": message, "date": date, "chatId": chatId]
         }
     }
 }
@@ -116,24 +116,6 @@ extension UIViewController {
         view.backgroundColor = .color(.background)
         navigationItem.setHidesBackButton(!backButton, animated: true)
         hideKeyboardWhenTappedAround()
-    }
-    
-    func numberFormatter(_ number: String) -> String {
-        let mask = "+X (XXX) XXX-XXXX"
-        let number = number.replacingOccurrences(of: "[^0-9]",
-                                                 with: "",
-                                                 options: .regularExpression)
-        var result: String = ""
-        var index = number.startIndex
-        for character in mask where index < number.endIndex {
-            if character == "X" {
-                result.append(number[index])
-                index = number.index(after: index)
-            } else {
-                result.append(character)
-            }
-        }
-        return result
     }
     
     func showSnackBar(text: String, image: UIImage, on vc: UIViewController) {

@@ -15,6 +15,7 @@ enum Font {
     case subtitle
     case subtitleBold
     case body
+    case header
     case mini
     case appName
     
@@ -43,6 +44,8 @@ extension UIFont {
             return .systemFont(ofSize: CGFloat(15), weight: .bold)
         case .button:
             return .systemFont(ofSize: CGFloat(15), weight: .semibold)
+        case .header:
+            return .systemFont(ofSize: CGFloat(11), weight: .medium)
         case .body:
             return .systemFont(ofSize: CGFloat(13), weight: .regular)
         case .mini:

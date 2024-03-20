@@ -12,6 +12,7 @@ final class NetworkService {
     static let shared = NetworkService(); private init() {}
     
     // MARK: - GET Methods
+    
     /// Get user data by token
     func getUserInfo(token: String) async throws -> UserGet {
         let url = try URLService.shared.createURL(endPoint: .users(.me))
@@ -108,7 +109,7 @@ final class NetworkService {
         }
     }
     
-    func getChats(token: String) async throws -> [Chats] {
+    func getChats(token: String) async throws -> [Chat] {
         let url = try URLService.shared.createURL(endPoint: .direct_chats(.direct_chats))
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
@@ -128,7 +129,34 @@ final class NetworkService {
         
         do {
             let decoder = JSONDecoder()
-            return try decoder.decode([Chats].self, from: data)
+            return try decoder.decode([Chat].self, from: data)
+        } catch {
+            throw NetworkError.errorDecoding
+        }
+    }
+    
+    func getMessages(chatId: String, token: String) async throws -> [Message] {
+        let url = try URLService.shared.createURL(endPoint: .direct_chats(.get_messages(chatId)))
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("application/json; charset=UTF-8", forHTTPHeaderField: "Content-type")
+        request.setValue("Token " + token, forHTTPHeaderField: "Authorization")
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let statusCode = (response as? HTTPURLResponse)?.statusCode else {
+            throw NetworkError.errorResponse
+        }
+        
+        guard statusCode == 201 else {
+            print("Status Code: \(statusCode)")
+            throw NetworkError.errorStatusCode
+        }
+        
+        do {
+            let decoder = JSONDecoder()
+            return try decoder.decode([Message].self, from: data)
         } catch {
             throw NetworkError.errorDecoding
         }
