@@ -105,7 +105,8 @@ class MessagesVC: UIViewController {
     
     // MARK: - Configure UI
     private func configureUI() {
-        configureVC(title: "Messages", backButton: true)
+        configureVC(title: name, backButton: true)
+        
         tabBarController?.tabBar.isHidden = true
         
         setupScrollView()

@@ -15,17 +15,19 @@ enum MessageSide {
 class MessageCell: UITableViewCell {
     static let identifier = "MessageCell"
     
-    private let messageLabel = BasicLabel("", .font(.subtitle))
+    private let messageLabel = BasicLabel("Message", .font(.subtitle))
     private let timeLabel = BasicLabel("", .font(.mini))
+    private let cornerRadius: Double
     
     private let messageBubbleView: UIView = {
         let view = UIView(frame: .zero)
-        view.layer.cornerRadius = .constant(.spacing)
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        cornerRadius = (messageLabel.intrinsicContentSize.height + 2 * .constant(.spacing)) * 0.5
+        
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         selectionStyle = .none
         
@@ -49,6 +51,8 @@ class MessageCell: UITableViewCell {
             timeLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
             timeLabel.topAnchor.constraint(equalTo: messageBubbleView.bottomAnchor)
         ])
+        
+        messageBubbleView.layer.cornerRadius = cornerRadius
     }
     
     func configure(message: String, side: MessageSide, superViewWidth: CGFloat, time: String) {
@@ -56,8 +60,8 @@ class MessageCell: UITableViewCell {
         timeLabel.text = time
         
         let maxWidth = superViewWidth * 0.8
-        let messageSize = (message as NSString).size()
-        let optimalWidth = messageSize.width < maxWidth ? messageLabel.intrinsicContentSize.width : maxWidth
+        let messageSize = messageLabel.intrinsicContentSize.width
+        let optimalWidth = min(maxWidth, messageSize)
 
         switch side {
         case .left:

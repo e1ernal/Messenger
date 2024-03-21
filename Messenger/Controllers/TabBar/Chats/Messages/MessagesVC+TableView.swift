@@ -18,27 +18,32 @@ extension MessagesVC: UITableViewDelegate, UITableViewDataSource {
         return section.count
     }
     
-    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        let keys = messages.keys.sorted()
-        return keys[section]
-    }
-    
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let keys = messages.keys.sorted()
         let headerText = keys[section]
         
-        let headerView = UILabel(frame: CGRect(x: 0, 
-                                               y: 0,
-                                               width: tableView.frame.width,
-                                               height: .constant(.doubleSpacing)))
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.text = headerText
+        label.textColor = .inactive
+        label.backgroundColor = .background
+        label.numberOfLines = 1
+        label.textAlignment = .center
+        label.font = .font(.header)
+        label.layer.masksToBounds = true
+        label.layer.cornerRadius = (label.intrinsicContentSize.height + .constant(.spacing)) * 0.5
         
-        headerView.backgroundColor = .systemBackground
-        headerView.textAlignment = .center
-        headerView.font = .font(.header)
+        let header = UIView()
+        header.addSubview(label)
+        NSLayoutConstraint.activate([
+            label.topAnchor.constraint(equalTo: header.topAnchor, constant: .constant(.spacing)),
+            label.bottomAnchor.constraint(equalTo: header.bottomAnchor, constant: -.constant(.spacing)),
+            label.centerXAnchor.constraint(equalTo: header.centerXAnchor),
+            label.widthAnchor.constraint(equalToConstant: label.intrinsicContentSize.width + .constant(.spacing)),
+            label.heightAnchor.constraint(equalToConstant: label.intrinsicContentSize.height + .constant(.spacing))
+        ])
         
-        headerView.text = headerText
-        
-        return headerView
+        return header
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {

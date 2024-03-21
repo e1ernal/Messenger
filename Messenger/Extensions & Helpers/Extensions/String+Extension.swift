@@ -72,10 +72,6 @@ extension UIImage {
 
 extension String {
     func toDate(format: String) throws -> Date {
-        guard !self.isEmpty else {
-            throw DescriptionError.error("")
-        }
-        
         let prefixInputDate = self.prefix { $0 != "." }
         
         // Convert String to Date
@@ -94,13 +90,10 @@ extension String {
     func toChatDate() -> String {
         var date: Date?
         
-        do {
-            date = try self.toDate(format: "yyyy-MM-dd HH:mm:ss")
-        } catch { print(error) }
+        do { date = try self.toDate(format: "yyyy-MM-dd HH:mm:ss") }
+        catch { print(error) }
         
-        guard let date else {
-            return ""
-        }
+        guard let date else { return "" }
         
         // Time interval between dates
         let calendar = Calendar.current

@@ -46,7 +46,7 @@ class ChatsViewController: UITableViewController, UISearchResultsUpdating, UISea
                     section.rows.append(.chatRow(image: image.toString(),
                                                  name: chat.first_name + " " + chat.last_name,
                                                  message: chat.last_message ?? "",
-                                                 date: (chat.last_message_created ?? "").toChatDate(),
+                                                 date: chat.last_message_created?.toChatDate() ?? "",
                                                  chatId: String(chat.direct_id))
                     )
                 }
