@@ -10,79 +10,46 @@ import UIKit
 // MARK: - Configure Messages TableView
 extension MessagesVC: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        let keys = messages.keys.sorted()
-        guard let section = messages[keys[section]] else {
-            return 0
-        }
-        
-        return section.count
-    }
-    
-    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let keys = messages.keys.sorted()
-        let headerText = keys[section]
-        
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = headerText
-        label.textColor = .inactive
-        label.backgroundColor = .background
-        label.numberOfLines = 1
-        label.textAlignment = .center
-        label.font = .font(.header)
-        label.layer.masksToBounds = true
-        label.layer.cornerRadius = (label.intrinsicContentSize.height + .constant(.spacing)) * 0.5
-        
-        let header = UIView()
-        header.addSubview(label)
-        NSLayoutConstraint.activate([
-            label.topAnchor.constraint(equalTo: header.topAnchor, constant: .constant(.spacing)),
-            label.bottomAnchor.constraint(equalTo: header.bottomAnchor, constant: -.constant(.spacing)),
-            label.centerXAnchor.constraint(equalTo: header.centerXAnchor),
-            label.widthAnchor.constraint(equalToConstant: label.intrinsicContentSize.width + .constant(.spacing)),
-            label.heightAnchor.constraint(equalToConstant: label.intrinsicContentSize.height + .constant(.spacing))
-        ])
-        
-        return header
-    }
-    
-    func numberOfSections(in tableView: UITableView) -> Int {
         return messages.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: MessageCell.identifier,
-                                                       for: indexPath) as? MessageCell else {
-            fatalError("Error: The TableView could not dequeue a \(MessageCell.identifier)")
+        switch messages[indexPath.row] {
+        case let .message(messageRow):
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: MessageCell.identifier,
+                                                           for: indexPath) as? MessageCell else {
+                fatalError("Error: The TableView could not dequeue a \(MessageCell.identifier)")
+            }
+            
+            let isReceived = messageRow.authorId == userId ? false : true
+            
+            cell.configure(message: messageRow.message,
+                           side: isReceived ? .left : .right,
+                           superViewWidth: view.frame.width,
+                           time: messageRow.time)
+            return cell
+        case let .section(sectionRow):
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: MessageSectionCell.identifier,
+                                                           for: indexPath) as? MessageSectionCell else {
+                fatalError("Error: The TableView could not dequeue a \(MessageSectionCell.identifier)")
+            }
+            
+            cell.configure(date: sectionRow.sectionDate)
+            return cell
         }
-        
-        let keys = messages.keys.sorted()
-        guard let section = messages[keys[indexPath.section]] else {
-            fatalError("Error: The TableView could not dequeue a \(MessageCell.identifier)")
-        }
-        
-        let message = section[indexPath.row]
-        var isReceived = false
-        
-        do {
-            let user = try Storage.shared.get(service: .user, as: User.self, in: .account)
-            isReceived = message.author.id == user.id ? false : true
-        } catch {
-            print(error)
-        }
-        
-        cell.configure(message: message.text,
-                       side: isReceived ? .left : .right,
-                       superViewWidth: view.frame.width,
-                       time: message.createdAt.toMessageTime())
-        return cell
     }
     
     internal func configureTableView() {
         messagesTableView.delegate = self
         messagesTableView.dataSource = self
         
+        let tap = UITapGestureRecognizer(target: self,
+                                         action: #selector(UIViewController.dismissKeyboard))
+        tap.cancelsTouchesInView = false
+        messagesTableView.addGestureRecognizer(tap)
+        
         messagesTableView.register(MessageCell.self, forCellReuseIdentifier: MessageCell.identifier)
+        messagesTableView.register(MessageSectionCell.self, forCellReuseIdentifier: MessageSectionCell.identifier)
         configureMessages()
     }
     
@@ -91,13 +58,20 @@ extension MessagesVC: UITableViewDelegate, UITableViewDataSource {
         Task {
             do {
                 let token = try Storage.shared.get(service: .token, as: String.self, in: .account)
-                let allMessages = try await NetworkService.shared.getMessages(chatId: chatId, token: token)
-                messages = Dictionary(grouping: allMessages) { $0.createdAt.toMessageDate() }
+                let messagesData = try await NetworkService.shared.getMessages(chatId: chatId, token: token)
+                
+                for messageData in messagesData {
+                    let newMessage = MessageRow(authorId: messageData.author.id,
+                                                message: messageData.text,
+                                                date: messageData.createdAt,
+                                                time: messageData.createdAt.toTime())
+                    _ = configureMessages(with: newMessage)
+                }
                 messagesTableView.reloadData()
+                messagesTableView.scrollToBottom()
             } catch {
-                print(error)
+                showSnackBar(text: error.localizedDescription, image: .systemImage(.warning, color: nil), on: self)
             }
-            messagesTableView.scrollToBottom()
         }
     }
 }

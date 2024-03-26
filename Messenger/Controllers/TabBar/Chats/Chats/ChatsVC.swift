@@ -7,8 +7,16 @@
 
 import UIKit
 
+struct ChatRow {
+    let image: UIImage
+    let name: String
+    let message: String?
+    let date: String?
+    let chatId: Int
+}
+
 class ChatsViewController: UITableViewController, UISearchResultsUpdating, UISearchControllerDelegate {
-    internal var sections: [Section] = []
+    internal var chats: [ChatRow] = []
     
     internal let searchController: UISearchController = {
         let searchController = UISearchController(searchResultsController: SearchResultsTableViewController(style: .insetGrouped))
@@ -26,40 +34,26 @@ class ChatsViewController: UITableViewController, UISearchResultsUpdating, UISea
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
-        configureSections()
+        configureChatsData()
     }
     
-    internal func configureSections() {
+    internal func configureChatsData() {
         Task {
             do {
                 try await Storage.shared.getChatsData()
-                let chats = try Storage.shared.get(service: .chats, as: [Chat].self, in: .account)
+                let chatsData = try Storage.shared.get(service: .chats, as: [Chat].self, in: .account)
                 
-                guard !chats.isEmpty else {
-                    return
+                chats = []
+                for chatData in chatsData {
+                    let chatRow = ChatRow(image: try await NetworkService.shared.getUserImage(imagePath: chatData.image),
+                                          name: chatData.firstName + " " + chatData.lastName,
+                                          message: chatData.lastMessage,
+                                          date: chatData.lastMessageCreated?.toChatDate(),
+                                          chatId: chatData.directId)
+                    chats.append(chatRow)
                 }
-                
-                var section = Section()
-                for chat in chats {
-                    let image = try await NetworkService.shared.getUserImage(imagePath: chat.image)
-                    section.rows.append(.chatRow(image: image.toString(),
-                                                 name: chat.first_name + " " + chat.last_name,
-                                                 message: chat.last_message ?? "",
-                                                 date: chat.last_message_created?.toChatDate() ?? "",
-                                                 chatId: String(chat.direct_id))
-                    )
-                }
-                if sections.isEmpty {
-                    sections.append(section)
-                } else {
-                    sections[0] = section
-                }
-                
                 tableView.reloadData()
-            } catch {
-                print(error)
-            }
+            } catch { print(error) }
         }
     }
     

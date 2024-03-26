@@ -23,20 +23,19 @@ final class NetworkService {
         
         let (data, response) = try await URLSession.shared.data(for: request)
         
-        guard let statusCode = (response as? HTTPURLResponse)?.statusCode else {
-            throw NetworkError.errorResponse
+        guard let code = (response as? HTTPURLResponse)?.statusCode else {
+            throw DescriptionError.error("Can't get user info. No response")
         }
         
-        guard statusCode == 200 else {
-            print("Status Code: \(statusCode)")
-            throw NetworkError.errorStatusCode
+        guard code == 200 else {
+            throw DescriptionError.error("Can't get user info. Code: \(code)")
         }
         
         do {
             let decoder = JSONDecoder()
             return try decoder.decode(UserGet.self, from: data)
         } catch {
-            throw NetworkError.errorDecoding
+            throw DescriptionError.error("Can't get user info. Can't decode")
         }
     }
     
@@ -45,7 +44,7 @@ final class NetworkService {
         let (data, _) = try await URLSession.shared.data(from: url)
         
         guard let image = UIImage(data: data) else {
-            throw DescriptionError.error("Can't convert image data to UIImage")
+            throw DescriptionError.error("Can't get user image. Can't convert data to image")
         }
         
         return image
@@ -61,13 +60,12 @@ final class NetworkService {
         
         let (data, response) = try await URLSession.shared.data(for: request)
         
-        guard let statusCode = (response as? HTTPURLResponse)?.statusCode else {
-            throw NetworkError.errorResponse
+        guard let code = (response as? HTTPURLResponse)?.statusCode else {
+            throw DescriptionError.error("Can't find users by username. No response")
         }
         
-        guard statusCode == 200 else {
-            print("Status Code: \(statusCode)")
-            throw DescriptionError.error("Status Code: \(statusCode)")
+        guard code == 200 else {
+            throw DescriptionError.error("Can't find users by username. Code: \(code)")
         }
         
         let decoder = JSONDecoder()
@@ -79,13 +77,12 @@ final class NetworkService {
         let url = try URLService.shared.createURL(endPoint: .users(.username),
                                                   parameters: ["username": username])
         let (_, response) = try await URLSession.shared.data(from: url)
-        guard let statusCode = (response as? HTTPURLResponse)?.statusCode else {
-            throw NetworkError.errorResponse
+        guard let code = (response as? HTTPURLResponse)?.statusCode else {
+            throw DescriptionError.error("Can't check username. No response")
         }
         
-        guard statusCode == 200 else {
-            print("Status Code: \(statusCode)")
-            throw NetworkError.errorStatusCode
+        guard code == 200 else {
+            throw DescriptionError.error("Can't check username. Code: \(code)")
         }
     }
     
@@ -99,13 +96,12 @@ final class NetworkService {
         
         let (_, response) = try await URLSession.shared.data(for: request)
         
-        guard let statusCode = (response as? HTTPURLResponse)?.statusCode else {
-            throw NetworkError.errorResponse
+        guard let code = (response as? HTTPURLResponse)?.statusCode else {
+            throw DescriptionError.error("Can't delete user. No response")
         }
         
-        guard statusCode == 204 else {
-            print("Status Code: \(statusCode)")
-            throw DescriptionError.error("Can't delete user")
+        guard code == 204 else {
+            throw DescriptionError.error("Can't delete user. Code: \(code)")
         }
     }
     
@@ -118,24 +114,23 @@ final class NetworkService {
         
         let (data, response) = try await URLSession.shared.data(for: request)
         
-        guard let statusCode = (response as? HTTPURLResponse)?.statusCode else {
-            throw NetworkError.errorResponse
+        guard let code = (response as? HTTPURLResponse)?.statusCode else {
+            throw DescriptionError.error("Can't get chats. No response")
         }
         
-        guard statusCode == 200 else {
-            print("Status Code: \(statusCode)")
-            throw NetworkError.errorStatusCode
+        guard code == 200 else {
+            throw DescriptionError.error("Can't get chats. Code: \(code)")
         }
         
         do {
             let decoder = JSONDecoder()
             return try decoder.decode([Chat].self, from: data)
         } catch {
-            throw NetworkError.errorDecoding
+            throw DescriptionError.error("Can't get chats. Can't decode")
         }
     }
     
-    func getMessages(chatId: String, token: String) async throws -> [Message] {
+    func getMessages(chatId: Int, token: String) async throws -> [Message] {
         let url = try URLService.shared.createURL(endPoint: .direct_chats(.get_messages(chatId)))
         
         var request = URLRequest(url: url)
@@ -145,27 +140,26 @@ final class NetworkService {
         
         let (data, response) = try await URLSession.shared.data(for: request)
         
-        guard let statusCode = (response as? HTTPURLResponse)?.statusCode else {
-            throw NetworkError.errorResponse
+        guard let code = (response as? HTTPURLResponse)?.statusCode else {
+            throw DescriptionError.error("Can't get messages. No response")
         }
         
-        guard statusCode == 201 else {
-            print("Status Code: \(statusCode)")
-            throw NetworkError.errorStatusCode
+        guard code == 201 else {
+            throw DescriptionError.error("Can't get messages. Code: \(code)")
         }
         
         do {
             let decoder = JSONDecoder()
             return try decoder.decode([Message].self, from: data)
         } catch {
-            throw NetworkError.errorDecoding
+            throw DescriptionError.error("Can't get messages. Can't decode")
         }
     }
     
     // MARK: - POST Methods
     func createUser(username: String, firstname: String, lastname: String?, image: UIImage) async throws -> String {
         guard let imageBase64 = image.jpegData(compressionQuality: 1)?.base64EncodedString() else {
-            throw NetworkError.errorEncoding
+            throw DescriptionError.error("Can't update user. Can't convert image format")
         }
         
         let user = UserPost(first_name: firstname,
@@ -184,13 +178,12 @@ final class NetworkService {
         
         let (data, response) = try await URLSession.shared.data(for: request)
         
-        guard let statusCode = (response as? HTTPURLResponse)?.statusCode else {
-            throw NetworkError.errorResponse
+        guard let code = (response as? HTTPURLResponse)?.statusCode else {
+            throw DescriptionError.error("Can't create a user. No response")
         }
         
-        guard statusCode == 201 else {
-            print("Status Code: \(statusCode)")
-            throw NetworkError.errorStatusCode
+        guard code == 201 else {
+            throw DescriptionError.error("Can't create a user. Code: \(code)")
         }
         
         do {
@@ -199,7 +192,37 @@ final class NetworkService {
             print("Result 'token': \(result.token)")
             return result.token
         } catch {
-            throw NetworkError.errorDecoding
+            throw DescriptionError.error("Can't create a user. Can't decode")
+        }
+    }
+    
+    func sendMessage(chatId: Int, token: String, message: String) async throws -> Message {
+        let url = try URLService.shared.createURL(endPoint: .direct_chats(.send_message(chatId)))
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json; charset=UTF-8", forHTTPHeaderField: "Content-type")
+        request.setValue("Token " + token, forHTTPHeaderField: "Authorization")
+        
+        let encoder = JSONEncoder()
+        let bodyMessage = ["text": message]
+        let body = try encoder.encode(bodyMessage)
+        request.httpBody = body
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let code = (response as? HTTPURLResponse)?.statusCode else {
+            throw DescriptionError.error("Can't send a message. No response")
+        }
+        
+        guard code == 201 else {
+            throw DescriptionError.error("Can't send a message. Code: \(code)")
+        }
+        
+        do {
+            let decoder = JSONDecoder()
+            return try decoder.decode(Message.self, from: data)
+        } catch {
+            throw DescriptionError.error("Can't send a message. Can't decode")
         }
     }
     
@@ -217,21 +240,19 @@ final class NetworkService {
         
         let (data, response) = try await URLSession.shared.data(for: request)
         let decoder = JSONDecoder()
-        guard let statusCode = (response as? HTTPURLResponse)?.statusCode else {
-            throw NetworkError.errorResponse
+        guard let code = (response as? HTTPURLResponse)?.statusCode else {
+            throw DescriptionError.error("Can't get verification code. No response")
         }
         
-        guard statusCode == 200 || statusCode == 201 else {
-            print("Status Code: \(statusCode)")
-            throw NetworkError.errorStatusCode
+        guard code == 200 || code == 201 else {
+            throw DescriptionError.error("Can't get verification code. Code: \(code)")
         }
         
         do {
             let result = try decoder.decode(Code.self, from: data)
-            print("Result 'code': \(result.code)")
             return result.code
         } catch {
-            throw NetworkError.errorDecoding
+            throw DescriptionError.error("Can't get verification code. Can't decode")
         }
     }
     
@@ -250,24 +271,22 @@ final class NetworkService {
         let (data, response) = try await URLSession.shared.data(for: request)
         
         let decoder = JSONDecoder()
-        guard let statusCode = (response as? HTTPURLResponse)?.statusCode else {
-            throw NetworkError.errorResponse
+        guard let code = (response as? HTTPURLResponse)?.statusCode else {
+            throw DescriptionError.error("Can't confirm verification code. No response")
         }
         
-        switch statusCode {
+        switch code {
         case 200:
             do {
                 let result = try decoder.decode(Token.self, from: data)
                 return result.token
             } catch {
-                print("No Result as 'Token'")
-                throw NetworkError.errorDecoding
+                throw DescriptionError.error("Can't confirm verification code. Can't decode")
             }
         case 204:
             return nil
         default:
-            print("StatusCode: \(statusCode)")
-            throw NetworkError.errorStatusCode
+            throw DescriptionError.error("Can't get verification code. Code: \(code)")
         }
     }
     
@@ -286,13 +305,12 @@ final class NetworkService {
         
         let (_, response) = try await URLSession.shared.data(for: request)
         
-        guard let statusCode = (response as? HTTPURLResponse)?.statusCode else {
-            throw NetworkError.errorResponse
+        guard let code = (response as? HTTPURLResponse)?.statusCode else {
+            throw DescriptionError.error("Can't create chat with user. No response")
         }
         
-        guard statusCode == 201 else {
-            print("StatusCode: \(statusCode)")
-            throw NetworkError.errorStatusCode
+        guard code == 201 else {
+            throw DescriptionError.error("Can't create chat with user. Code: \(code)")
         }
     }
     
@@ -315,26 +333,25 @@ final class NetworkService {
         
         let (data, response) = try await URLSession.shared.data(for: request)
         
-        guard let statusCode = (response as? HTTPURLResponse)?.statusCode else {
-            throw NetworkError.errorResponse
+        guard let code = (response as? HTTPURLResponse)?.statusCode else {
+            throw DescriptionError.error("Can't update username. No response")
         }
         
-        guard statusCode == 200 else {
-            print("Status Code: \(statusCode)")
-            throw NetworkError.errorStatusCode
+        guard code == 200 else {
+            throw DescriptionError.error("Can't update username. Code: \(code)")
         }
         
         do {
             let decoder = JSONDecoder()
             return try decoder.decode(UserUpdate.self, from: data)
         } catch {
-            throw NetworkError.errorDecoding
+            throw DescriptionError.error("Can't update username. Can't decode")
         }
     }
 
     func updateUser(username: String?, firstname: String?, lastname: String?, image: UIImage?, token: String) async throws -> UserUpdate {
         guard let imageBase64 = image?.jpegData(compressionQuality: 1)?.base64EncodedString() else {
-            throw NetworkError.errorEncoding
+            throw DescriptionError.error("Can't update user. Can't convert image format")
         }
         
         let user = UserPost(first_name: firstname,
@@ -354,20 +371,19 @@ final class NetworkService {
         
         let (data, response) = try await URLSession.shared.data(for: request)
         
-        guard let statusCode = (response as? HTTPURLResponse)?.statusCode else {
-            throw NetworkError.errorResponse
+        guard let code = (response as? HTTPURLResponse)?.statusCode else {
+            throw DescriptionError.error("Can't update user. No response")
         }
         
-        guard statusCode == 200 else {
-            print("Status Code: \(statusCode)")
-            throw NetworkError.errorStatusCode
+        guard code == 200 else {
+            throw DescriptionError.error("Can't update user. Code: \(code)")
         }
         
         do {
             let decoder = JSONDecoder()
             return try decoder.decode(UserUpdate.self, from: data)
         } catch {
-            throw NetworkError.errorDecoding
+            throw DescriptionError.error("Can't update user. Can't decode")
         }
     }
 }

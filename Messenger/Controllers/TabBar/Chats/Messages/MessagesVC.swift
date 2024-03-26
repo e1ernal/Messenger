@@ -7,12 +7,29 @@
 
 import UIKit
 
+enum MessageType {
+    case message(MessageRow)
+    case section(SectionRow)
+}
+
+struct MessageRow {
+    let authorId: Int
+    let message: String
+    let date: Int
+    let time: String
+}
+
+struct SectionRow {
+    let sectionDate: String
+}
+
 class MessagesVC: UIViewController {
     internal var name: String
-    internal var image: String
-    internal var chatId: String
+    internal var image: UIImage
+    internal var chatId: Int
+    internal var userId: Int
     
-    internal var messages: [String: [Message]] = [:]
+    internal var messages: [MessageType] = []
     
     let scrollView = UIScrollView()
     let contentView = UIView()
@@ -67,6 +84,7 @@ class MessagesVC: UIViewController {
         configureTableView()
         configureTextField()
         configureUI()
+        
         // Observe keyboard change
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(keyboardWillShow),
@@ -77,13 +95,16 @@ class MessagesVC: UIViewController {
                                                selector: #selector(keyboardWillHide),
                                                name: UIResponder.keyboardWillHideNotification,
                                                object: nil)
+        
+        sendButton.addTarget(self, action: #selector(sendMessageButton), for: .touchUpInside)
     }
     
     // MARK: - Init UIViewController
-    init(name: String, image: String, chatId: String) {
+    init(name: String, image: UIImage, chatId: Int, userId: Int) {
         self.name = name
         self.image = image
         self.chatId = chatId
+        self.userId = userId
         
         super.init(nibName: nil, bundle: nil)
     }
@@ -105,9 +126,23 @@ class MessagesVC: UIViewController {
     
     // MARK: - Configure UI
     private func configureUI() {
-        configureVC(title: name, backButton: true)
+        title = name
+        view.backgroundColor = .color(.background)
         
         tabBarController?.tabBar.isHidden = true
+        
+        let height: CGFloat = 40
+        
+        let button = UIButton(type: .custom)
+        button.setImage(image, for: .normal)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.widthAnchor.constraint(equalToConstant: height).isActive = true
+        button.heightAnchor.constraint(equalToConstant: height).isActive = true
+        button.layer.cornerRadius = height * 0.5
+        button.clipsToBounds = true
+        
+        let barButton = UIBarButtonItem(customView: button)
+        self.navigationItem.rightBarButtonItem = barButton
         
         setupScrollView()
         setupViews()
@@ -162,7 +197,7 @@ class MessagesVC: UIViewController {
         
         NSLayoutConstraint.activate([
             messagesTableView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            messagesTableView.topAnchor.constraint(equalTo: contentView.topAnchor),
+            messagesTableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             messagesTableView.bottomAnchor.constraint(equalTo: sendMessageView.topAnchor, constant: -.constant(.spacing)),
             messagesTableView.widthAnchor.constraint(equalTo: contentView.widthAnchor)
         ])
@@ -183,15 +218,13 @@ class MessagesVC: UIViewController {
                        delay: 0,
                        options: animationCurve,
                        animations: {
-            self.scrollView.contentOffset.y += endFrame.height + .constant(.spacing)
-        }, completion: { _ in
-            self.messagesTableView.scrollToBottom()
-        })
+            self.scrollView.setContentOffset(CGPoint(x: 0, y: endFrame.height + .constant(.spacing)), animated: false)
+            self.view.layoutIfNeeded()
+        }, completion: nil)
     }
     
     @objc func keyboardWillHide(notification: Notification) {
         guard let userInfo = notification.userInfo,
-              let endFrame = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect,
               let animationDuration = userInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double,
               let animationCurveRawValue = userInfo[UIResponder.keyboardAnimationCurveUserInfoKey] as? Int else {
             return
@@ -203,22 +236,88 @@ class MessagesVC: UIViewController {
                        delay: 0,
                        options: animationCurve,
                        animations: {
-            self.scrollView.contentOffset.y -= endFrame.height + .constant(.spacing)
+            self.scrollView.setContentOffset(.zero, animated: false)
+            self.view.layoutIfNeeded()
         }, completion: nil)
+    }
+    
+    // MARK: Send Message
+    @objc private func sendMessageButton() {
+        guard let message = messageTextField.text,
+              !message.isEmpty else {
+            return
+        }
+        
+        Task {
+            do {
+                let token = try Storage.shared.get(service: .token, as: String.self, in: .account)
+                let messageData = try await NetworkService.shared.sendMessage(chatId: chatId, token: token, message: message)
+                
+                let newMessage = MessageRow(authorId: messageData.author.id,
+                                            message: messageData.text,
+                                            date: messageData.createdAt,
+                                            time: messageData.createdAt.toTime())
+                
+                let numberOfNewRows = configureMessages(with: newMessage)
+                
+                messagesTableView.scrollToBottom()
+                
+                // Inserting a rows at the end
+                var indexPaths: [IndexPath] = []
+                for rowNumber in 1...numberOfNewRows {
+                    indexPaths.append(IndexPath(row: messages.count - rowNumber, section: 0))
+                }
+                
+                messagesTableView.performBatchUpdates({
+                    messagesTableView.insertRows(at: indexPaths, with: .fade)
+                }, completion: nil)
+                
+                messageTextField.text = ""
+                sendButton.tintColor = .inactive
+            } catch {
+                showSnackBar(text: error.localizedDescription, image: .systemImage(.warning, color: .label), on: self)
+            }
+        }
+    }
+    
+    func configureMessages(with newMessage: MessageRow) -> Int {
+        let messageTypeMessage: MessageType = .message(newMessage)
+        
+        let sectionRow = SectionRow(sectionDate: newMessage.date.toSectionDate())
+        let messageTypeSection: MessageType = .section(sectionRow)
+        
+        if messages.isEmpty {
+            messages.append(messageTypeSection)
+            messages.append(messageTypeMessage)
+            return 2
+        }
+        
+        switch messages.last {
+        case let .message(messageRow):
+            if messageRow.date.toDateWithoutTime() != newMessage.date.toDateWithoutTime() {
+                messages.append(messageTypeSection)
+                messages.append(messageTypeMessage)
+                return 2
+            }
+            
+            messages.append(messageTypeMessage)
+            return 1
+        default:
+            return 0
+        }
     }
 }
 
 extension UITableView {
+    // Scroll to bottom of TableView
     func scrollToBottom() {
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(1)) {
             let numberOfSections = self.numberOfSections
-            guard numberOfSections > 0 else { return }
-            
             let numberOfRows = self.numberOfRows(inSection: numberOfSections - 1)
-            guard numberOfRows > 0 else { return }
-            
-            let indexPath = IndexPath(row: numberOfRows - 1, section: numberOfSections - 1)
-            self.scrollToRow(at: indexPath, at: UITableView.ScrollPosition.bottom, animated: true)
+            if numberOfRows > 0 {
+                let indexPath = IndexPath(row: numberOfRows - 1, section: numberOfSections - 1)
+                self.scrollToRow(at: indexPath, at: .bottom, animated: true)
+            }
         }
     }
 }

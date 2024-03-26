@@ -70,7 +70,98 @@ extension UIImage {
     }
 }
 
+extension Int {
+    func toDate() -> Date {
+        let myTimeInterval = TimeInterval(self)
+        let date = NSDate(timeIntervalSince1970: TimeInterval(myTimeInterval)) as Date
+        
+        return date
+    }
+    
+    func toDateWithoutTime() -> Date {
+        let date = self.toDate()
+        
+        guard let dateWithoutTime = Calendar.current.date(from: Calendar.current.dateComponents([.year, .month, .day], 
+                                                                                                from: date))
+        else { return date }
+        
+        return dateWithoutTime
+    }
+    
+    func toChatDate() -> String {
+        let date = self.toDate()
+        
+        // Time interval between dates
+        let calendar = Calendar.current
+        let interval = calendar.dateComponents([.day, .year], from: date, to: .now)
+        
+        guard let dayInterval = interval.day,
+              let yearInterval = interval.year else {
+            return ""
+        }
+        
+        // Today's message
+        if dayInterval == 0 {
+            let dateFormatter = DateFormatter()
+            dateFormatter.timeStyle = .short
+            return dateFormatter.string(from: date)
+        }
+        
+        // Last week's message
+        if dayInterval < 6 {
+            let dateFormatter = DateFormatter()
+            return dateFormatter.shortWeekdaySymbols[calendar.component(.weekday, from: date) - 1]
+        }
+        
+        // Previous years message
+        if yearInterval > 0 {
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "dd.MM.yy"
+            return dateFormatter.string(from: date)
+        }
+        
+        // Far than a week this year message
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "dd.MM"
+        return dateFormatter.string(from: date)
+    }
+    
+    func toTime() -> String {
+        let date = self.toDate()
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.timeStyle = .short
+        return dateFormatter.string(from: date)
+    }
+    
+    func toSectionDate() -> String {
+        let date = self.toDate()
+        
+        // Time interval between dates
+        let calendar = Calendar.current
+        let interval = calendar.dateComponents([.year], from: date, to: .now)
+        
+        guard let yearInterval = interval.year else { return "" }
+        
+        // Previous years message
+        if yearInterval > 0 {
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "MMMM d, yyyy"
+            return dateFormatter.string(from: date)
+        }
+        
+        // This year message
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MMMM d"
+        return dateFormatter.string(from: date)
+    }
+}
+
 extension String {
+    func withoutTime() -> String {
+        return String(self.prefix { $0 != "." })
+    }
+    
     func toDate(format: String) throws -> Date {
         let prefixInputDate = self.prefix { $0 != "." }
         
@@ -81,7 +172,7 @@ extension String {
         stringDateFormatter.dateFormat = format
         
         guard let date = stringDateFormatter.date(from: dateString) else {
-            throw DescriptionError.error("Convert string to date")
+            throw DescriptionError.error("Can't convert string to date")
         }
         
         return date
@@ -90,8 +181,8 @@ extension String {
     func toChatDate() -> String {
         var date: Date?
         
-        do { date = try self.toDate(format: "yyyy-MM-dd HH:mm:ss") }
-        catch { print(error) }
+        do { date = try self.toDate(format: "yyyy-MM-dd HH:mm:ss")
+        } catch { print(error) }
         
         guard let date else { return "" }
         
@@ -133,13 +224,10 @@ extension String {
     func toMessageTime() -> String {
         var date: Date?
         
-        do {
-            date = try self.toDate(format: "yyyy-MM-dd'T'HH:mm:ss")
+        do { date = try self.toDate(format: "yyyy-MM-dd'T'HH:mm:ss")
         } catch { print(error) }
         
-        guard let date else {
-            return ""
-        }
+        guard let date else { return "" }
         
         let dateFormatter = DateFormatter()
         dateFormatter.timeStyle = .short
@@ -149,21 +237,16 @@ extension String {
     func toMessageDate() -> String {
         var date: Date?
         
-        do {
-            date = try self.toDate(format: "yyyy-MM-dd'T'HH:mm:ss")
+        do { date = try self.toDate(format: "yyyy-MM-dd'T'HH:mm:ss")
         } catch { print(error) }
         
-        guard let date else {
-            return ""
-        }
+        guard let date else { return "" }
         
         // Time interval between dates
         let calendar = Calendar.current
         let interval = calendar.dateComponents([.year], from: date, to: .now)
         
-        guard let yearInterval = interval.year else {
-            return ""
-        }
+        guard let yearInterval = interval.year else { return "" }
         
         // Previous years message
         if yearInterval > 0 {

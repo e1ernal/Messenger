@@ -25,6 +25,9 @@ class MessageCell: UITableViewCell {
         return view
     }()
     
+    var messageLabelLeadingConstraint: NSLayoutConstraint?
+    var messageLabelTrailingConstraint: NSLayoutConstraint?
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         cornerRadius = (messageLabel.intrinsicContentSize.height + 2 * .constant(.spacing)) * 0.5
         
@@ -41,9 +44,16 @@ class MessageCell: UITableViewCell {
         contentView.addSubview(messageLabel)
         contentView.addSubview(timeLabel)
         
+        messageLabelLeadingConstraint = messageLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 2 * .constant(.spacing))
+        messageLabelTrailingConstraint = messageLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -2 * .constant(.spacing))
+        messageLabelLeadingConstraint?.priority = .defaultHigh
+        messageLabelTrailingConstraint?.priority = .defaultHigh
+        
         NSLayoutConstraint.activate([
             messageLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 2 * .constant(.spacing)),
             messageLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -2 * .constant(.spacing)),
+            messageLabel.widthAnchor.constraint(lessThanOrEqualToConstant: 250),
+            messageLabel.widthAnchor.constraint(greaterThanOrEqualToConstant: messageLabel.intrinsicContentSize.height),
             
             messageBubbleView.topAnchor.constraint(equalTo: messageLabel.topAnchor, constant: -.constant(.spacing)),
             messageBubbleView.bottomAnchor.constraint(equalTo: messageLabel.bottomAnchor, constant: .constant(.spacing)),
@@ -59,30 +69,26 @@ class MessageCell: UITableViewCell {
         messageLabel.text = message
         timeLabel.text = time
         
-        let maxWidth = superViewWidth * 0.8
-        let messageSize = messageLabel.intrinsicContentSize.width
-        let optimalWidth = min(maxWidth, messageSize)
-
         switch side {
         case .left:
             timeLabel.textAlignment = .left
             messageLabel.textColor = .label
             messageBubbleView.backgroundColor = .backgroundSecondary
-            messageLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 2 * .constant(.spacing)).isActive = true
+            messageLabelLeadingConstraint?.isActive = true
+            messageLabelTrailingConstraint?.isActive = false
+            timeLabel.leadingAnchor.constraint(equalTo: messageBubbleView.leadingAnchor, constant: .constant(.spacing)).isActive = true
         case .right:
             timeLabel.textAlignment = .right
             messageLabel.textColor = .white
             messageBubbleView.backgroundColor = .active
-            messageLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -2 * .constant(.spacing)).isActive = true
+            messageLabelLeadingConstraint?.isActive = false
+            messageLabelTrailingConstraint?.isActive = true
+            timeLabel.trailingAnchor.constraint(equalTo: messageBubbleView.trailingAnchor, constant: -.constant(.spacing)).isActive = true
         }
         
         NSLayoutConstraint.activate([
-            messageLabel.widthAnchor.constraint(equalToConstant: optimalWidth),
-            messageBubbleView.leadingAnchor.constraint(equalTo: messageLabel.leadingAnchor, constant: -.constant(.spacing)),
             messageBubbleView.trailingAnchor.constraint(equalTo: messageLabel.trailingAnchor, constant: .constant(.spacing)),
-            
-            timeLabel.leadingAnchor.constraint(equalTo: messageBubbleView.leadingAnchor, constant: .constant(.spacing)),
-            timeLabel.trailingAnchor.constraint(equalTo: messageBubbleView.trailingAnchor, constant: -.constant(.spacing))
+            messageBubbleView.leadingAnchor.constraint(equalTo: messageLabel.leadingAnchor, constant: -.constant(.spacing))
         ])
     }
     

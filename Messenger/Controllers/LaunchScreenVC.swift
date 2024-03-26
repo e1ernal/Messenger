@@ -59,10 +59,11 @@ class LaunchScreenVC: UIViewController {
     }
     
     // Get all data with loading animations
-    open func configureData() {
+    private func configureData() {
         Task {
             do {
                 indicator(animating: .start, completion: nil)
+                
                 try await Storage.shared.getUserData()
                 try await Storage.shared.getChatsData()
                 
@@ -71,20 +72,15 @@ class LaunchScreenVC: UIViewController {
                     self.navigate(.root(nextVC))
                 }
             } catch {
-                print(error)
                 showSnackBar(text: error.localizedDescription, image: .systemImage(.warning, color: nil), on: self)
                 do {
                     try Storage.shared.logOut()
                     let nextVC = OnboardingViewController()
                     navigate(.rootNavigation(nextVC))
-                } catch {
-                    print(error)
-                }
+                } catch { print(error) }
             }
         }
     }
-    
-    
     
     private func indicator(animating: LoadingIndicator, completion: ((Bool) -> Void)?) {
         switch animating {

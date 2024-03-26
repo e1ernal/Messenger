@@ -67,11 +67,11 @@ class ChatCell: UITableViewCell {
         ])
     }
     
-    func configure(image: UIImage, name: String, message: String, date: String) {
+    func configure(image: UIImage, name: String, message: String?, date: String?) {
         roundImageView.image = image
         nameLabel.text = name
-        messageLabel.text = message
-        dateLabel.text = date
+        messageLabel.text = message ?? ""
+        dateLabel.text = date ?? ""
     }
     
     @available(*, unavailable)

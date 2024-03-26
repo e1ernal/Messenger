@@ -11,6 +11,7 @@ analyzer_rules:
 opt_in_rules:
   - all
 disabled_rules:
+  - nslocalizedstring_key
   - attributes
   - override_in_extension
   - trailing_whitespace

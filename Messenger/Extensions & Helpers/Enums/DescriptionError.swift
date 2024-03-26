@@ -13,7 +13,9 @@ enum DescriptionError: Error, LocalizedError {
     var errorDescription: String? {
         switch self {
         case .error(let description):
-            return NSLocalizedString(description, bundle: .main, comment: "")
+            return NSLocalizedString(description, 
+                                     bundle: .main,
+                                     comment: "")
         }
     }
 }

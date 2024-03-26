@@ -40,7 +40,7 @@ public struct CodableImage: Codable {
     public init(wrappedValue: UIImage) {
         self.init(image: wrappedValue)
     }
-
+    
     public var wrappedValue: UIImage {
         get { image }
         set { image = newValue }
@@ -118,23 +118,33 @@ struct EncryptedKey: Codable {
 
 // MARK: - Chats
 struct Chat: Codable {
-    let first_name: String
-    let last_name: String
-    let username: String
-    let image: String
-    let last_message: String?
-    let last_message_created: String?
-    let direct_id: Int
+    let username, firstName, lastName, image: String
+    let lastMessage: String?
+    let lastMessageCreated: Int?
+    let directId: Int
+    
+    enum CodingKeys: String, CodingKey {
+        case username = "username"
+        case firstName = "first_name"
+        case lastName = "last_name"
+        case image = "image"
+        case lastMessage = "last_message"
+        case lastMessageCreated = "last_message_created"
+        case directId = "direct_id"
+    }
 }
 
 // MARK: - Message
 struct Message: Codable {
     let author: Author
-    let direct: Int
-    var text, createdAt, updatedAt: String
-
+    let directId: Int
+    let text: String
+    let createdAt, updatedAt: Int
+    
     enum CodingKeys: String, CodingKey {
-        case author, direct, text
+        case author = "author"
+        case directId = "direct"
+        case text = "text"
         case createdAt = "created_at"
         case updatedAt = "updated_at"
     }
@@ -144,11 +154,12 @@ struct Message: Codable {
 struct Author: Codable {
     let id: Int
     let username, firstName, lastName, image: String
-
+    
     enum CodingKeys: String, CodingKey {
-        case id, username
+        case id = "id"
+        case username = "username"
         case firstName = "first_name"
         case lastName = "last_name"
-        case image
+        case image = "image"
     }
 }

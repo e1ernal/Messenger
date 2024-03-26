@@ -10,7 +10,6 @@ import Foundation
 final class URLService {
     static let shared = URLService(); private init() {}
 
-    
     // Parameters
     private let scheme = "http://"
     private let host = "45.131.41.158"
@@ -27,7 +26,7 @@ final class URLService {
         guard let baseURL = URL(string: urlStr),
               var components = URLComponents(url: baseURL, 
                                              resolvingAgainstBaseURL: false) else {
-            throw NetworkError.errorURL
+            throw DescriptionError.error("Can't create a url from string")
         }
         
         if parameters != nil {
@@ -39,7 +38,7 @@ final class URLService {
         }
         
         guard let url = components.url else {
-            throw NetworkError.errorURL
+            throw DescriptionError.error("Can't create a url with components")
         }
         
         return url
@@ -49,7 +48,7 @@ final class URLService {
         let urlStr = scheme + host + parameters
         
         guard let baseURL = URL(string: urlStr) else {
-            throw NetworkError.errorURL
+            throw DescriptionError.error("Can't create a url to download image")
         }
         
         return baseURL
@@ -101,10 +100,10 @@ enum Codes: String {
 enum DirectChats {
     // GET Methods
     case direct_chats /* user chats */
-    case get_messages(String) /* user messages in chat */
+    case get_messages(Int) /* user messages in chat */
     
     // POST Methods
-    case send_message(String) /* send message to chat */
+    case send_message(Int) /* send message to chat */
     
     var path: String {
         switch self {

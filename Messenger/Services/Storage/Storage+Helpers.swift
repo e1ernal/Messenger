@@ -22,19 +22,15 @@ extension Storage {
             try Storage.shared.delete(service: .token, in: .account)
             try Storage.shared.delete(service: .user, in: .account)
             try Storage.shared.delete(service: .chats, in: .account)
-        } catch {
-            throw error
-        }
+        } catch { throw error }
     }
     
     func getChatsData() async throws {
         let token = try Storage.shared.get(service: .token, as: String.self, in: .account)
         let chats = try await NetworkService.shared.getChats(token: token)
-        do {
-            try Storage.shared.save(chats, as: .chats, in: .account)
-        } catch {
-            try Storage.shared.update(chats, as: .chats, in: .account)
-        }
+        
+        do { try Storage.shared.save(chats, as: .chats, in: .account)
+        } catch { try Storage.shared.update(chats, as: .chats, in: .account) }
     }
     
     func getUserData() async throws {
@@ -49,10 +45,7 @@ extension Storage {
                         phoneNumber: userGet.phone_number.numberFormatter(),
                         username: userGet.username)
         
-        do {
-            try Storage.shared.save(user, as: .user, in: .account)
-        } catch {
-            try Storage.shared.update(user, as: .user, in: .account)
-        }
+        do { try Storage.shared.save(user, as: .user, in: .account)
+        } catch { try Storage.shared.update(user, as: .user, in: .account) }
     }
 }

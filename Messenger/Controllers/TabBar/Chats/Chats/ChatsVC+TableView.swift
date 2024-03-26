@@ -14,55 +14,33 @@ extension ChatsViewController {
         tableView.separatorStyle = .none
     }
     
-    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return sections[section].header
-    }
-    
-    override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
-        return sections[section].footer
-    }
-    
-    override func numberOfSections(in tableView: UITableView) -> Int {
-        return sections.count
-    }
-    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return sections[section].rows.count
+        return chats.count
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let row = sections[indexPath.section].rows[indexPath.row].getValue()
-        
-        switch indexPath.section {
-        case 0:
-            guard let cell = tableView.dequeueReusableCell(withIdentifier: ChatCell.identifier,
-                                                           for: indexPath) as? ChatCell else {
-                fatalError("Error: The TableView could not dequeue a \(ChatCell.identifier)")
-            }
-            
-            guard let image = row["image"]?.toImage(),
-                  let name = row["name"],
-                  let message = row["message"],
-                  let date = row["date"] else {
-                return cell
-            }
-            
-            cell.configure(image: image, name: name, message: message, date: date)
-            return cell
-        default:
-            fatalError("Error: Can't configure Cell for TableView")
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: ChatCell.identifier,
+                                                       for: indexPath) as? ChatCell else {
+            fatalError("Error: The TableView could not dequeue a \(ChatCell.identifier)")
         }
+        
+        let row = chats[indexPath.row]
+        cell.configure(image: row.image,
+                       name: row.name,
+                       message: row.message,
+                       date: row.date)
+        return cell
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let row = sections[indexPath.section].rows[indexPath.row].getValue()
-        guard let name = row["name"],
-              let chatId = row["chatId"],
-              let image = row["image"] else {
-            return
-        }
-        
-        let nextVC = MessagesVC(name: name, image: image, chatId: chatId)
-        navigate(.next(nextVC, .fullScreen))
+        let row = chats[indexPath.row]
+        do {
+            let user = try Storage.shared.get(service: .user, as: User.self, in: .account)
+            let nextVC = MessagesVC(name: row.name,
+                                    image: row.image,
+                                    chatId: row.chatId,
+                                    userId: user.id)
+            navigate(.next(nextVC, .fullScreen))
+        } catch { print(error) }
     }
 }

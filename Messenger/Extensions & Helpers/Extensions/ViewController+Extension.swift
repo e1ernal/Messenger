@@ -119,7 +119,7 @@ extension UIViewController {
     }
     
     func showSnackBar(text: String, image: UIImage, on vc: UIViewController) {
-        print("[Snack Bar information] \n \(text)")
+        print("[Information]: \(text)")
         
         let snackBarViewModel = SnackBarViewModel(text: text, image: image)
         let vcWidth = vc.view.frame.size.width
@@ -168,7 +168,7 @@ extension UIViewController {
                                     height: snackBarHeight)
         }, completion: { done in
             if done {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
                     UIView.animate(withDuration: 0.5,
                                    delay: 0,
                                    usingSpringWithDamping: 0.5,
@@ -187,21 +187,5 @@ extension UIViewController {
                 }
             }
         })
-    }
-    
-    func loadingAlert(isPresenting: Bool) {
-        if isPresenting {
-            let alert = UIAlertController(title: nil, message: "Please wait...", preferredStyle: .alert)
-
-            let loadingIndicator = UIActivityIndicatorView(frame: CGRect(x: 10, y: 5, width: 50, height: 50))
-            loadingIndicator.hidesWhenStopped = true
-            loadingIndicator.style = UIActivityIndicatorView.Style.medium
-            loadingIndicator.startAnimating()
-
-            alert.view.addSubview(loadingIndicator)
-            present(alert, animated: true, completion: nil)
-        } else {
-            dismiss(animated: false, completion: nil)
-        }
     }
 }
