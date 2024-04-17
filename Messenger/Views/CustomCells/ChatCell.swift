@@ -19,9 +19,11 @@ class ChatCell: UITableViewCell {
         return imageView
     }()
     
-    private let nameLabel = BasicLabel("", .font(.secondaryTitle))
+    private let nameLabel = BasicLabel("", .font(.subtitleBold))
     private let messageLabel = BasicLabel("", .font(.subtitle))
     private let dateLabel = BasicLabel("", .font(.body))
+    
+    private var messageLabelBottomConstraint: NSLayoutConstraint?
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -32,7 +34,7 @@ class ChatCell: UITableViewCell {
         
         messageLabel.textAlignment = .left
         messageLabel.textColor = .secondaryLabel
-        messageLabel.numberOfLines = 1
+        messageLabel.numberOfLines = 0
         
         dateLabel.textColor = .secondaryLabel
         dateLabel.textAlignment = .right
@@ -60,11 +62,13 @@ class ChatCell: UITableViewCell {
             messageLabel.leadingAnchor.constraint(equalTo: roundImageView.trailingAnchor, constant: .constant(.spacing)),
             messageLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -.constant(.spacing)),
             messageLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor),
-            messageLabel.bottomAnchor.constraint(equalTo: roundImageView.bottomAnchor),
             
             dateLabel.centerYAnchor.constraint(equalTo: nameLabel.centerYAnchor),
             dateLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -.constant(.spacing))
         ])
+        
+        messageLabelBottomConstraint = messageLabel.bottomAnchor.constraint(equalTo: roundImageView.bottomAnchor)
+        messageLabelBottomConstraint?.isActive = true
     }
     
     func configure(image: UIImage, name: String, message: String?, date: String?) {
@@ -72,10 +76,34 @@ class ChatCell: UITableViewCell {
         nameLabel.text = name
         messageLabel.text = message ?? ""
         dateLabel.text = date ?? ""
+        
+        if messageLabel.actualNumberOfLines == 1 {
+            messageLabelBottomConstraint?.isActive = false
+            messageLabel.numberOfLines = 1
+        } else {
+            messageLabelBottomConstraint?.isActive = true
+            messageLabel.numberOfLines = 2
+        }
     }
     
     @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+}
+
+extension UILabel {
+    var actualNumberOfLines: Int {
+        guard let text = self.text else {
+            return 0
+        }
+        layoutIfNeeded()
+        let rect = CGSize(width: bounds.width, height: CGFloat.greatestFiniteMagnitude)
+        let labelSize = text.boundingRect(
+            with: rect,
+            options: .usesLineFragmentOrigin,
+            attributes: [NSAttributedString.Key.font: font as Any],
+            context: nil)
+        return Int(ceil(CGFloat(labelSize.height) / font.lineHeight))
     }
 }

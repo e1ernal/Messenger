@@ -121,6 +121,7 @@ struct Chat: Codable {
     let username, firstName, lastName, image: String
     let lastMessage: String?
     let lastMessageCreated: Int?
+    let created: Int
     let directId: Int
     
     enum CodingKeys: String, CodingKey {
@@ -130,6 +131,7 @@ struct Chat: Codable {
         case image = "image"
         case lastMessage = "last_message"
         case lastMessageCreated = "last_message_created"
+        case created = "created_at"
         case directId = "direct_id"
     }
 }

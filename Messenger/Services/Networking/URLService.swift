@@ -53,6 +53,11 @@ final class URLService {
         
         return baseURL
     }
+    
+    func createWebSocketURL(chatId: Int) -> URL? {
+        let urlString = "ws://\(host)/ws/direct_chat/\(chatId)/"
+        return URL(string: urlString)
+    }
 }
 
 enum Users {

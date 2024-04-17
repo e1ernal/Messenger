@@ -12,7 +12,8 @@ enum MessageType {
     case section(SectionRow)
 }
 
-struct MessageRow {
+struct MessageRow: Codable {
+    var type = "message"
     let authorId: Int
     let message: String
     let date: Int
@@ -23,16 +24,17 @@ struct SectionRow {
     let sectionDate: String
 }
 
-class MessagesVC: UIViewController {
+class MessagesVC: UIViewController, URLSessionWebSocketDelegate, WebSocketDelegate {
     internal var name: String
     internal var image: UIImage
     internal var chatId: Int
     internal var userId: Int
     
     internal var messages: [MessageType] = []
-    
     let scrollView = UIScrollView()
     let contentView = UIView()
+    
+    private var webSocket: WebSocket?
     
     internal let messagesTableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .plain)
@@ -97,6 +99,16 @@ class MessagesVC: UIViewController {
                                                object: nil)
         
         sendButton.addTarget(self, action: #selector(sendMessageButton), for: .touchUpInside)
+        connectWebSocket()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(true)
+        webSocket?.disconnect()
     }
     
     // MARK: - Init UIViewController
@@ -119,9 +131,26 @@ class MessagesVC: UIViewController {
         NotificationCenter.default.removeObserver(self)
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        tabBarController?.tabBar.isHidden = false
+    // MARK: - WebSockets
+    func didReceiveData(data: Data) {
+        print(data.prettyPrintedJSONString as Any)
+    }
+    
+    func didReceiveData(data: String) {
+        let messageData = Data(data.utf8)
+        let decoder = JSONDecoder()
+        do {
+            let message = try decoder.decode(MessageRow.self, from: messageData)
+            configureMessages(with: message, withAnimation: true)
+        } catch {
+            print("Can't receive message")
+        }
+    }
+    
+    private func connectWebSocket() {
+        guard let url = URLService.shared.createWebSocketURL(chatId: chatId) else { return }
+        webSocket = WebSocket(url: url, delegate: self)
+        webSocket?.connect()
     }
     
     // MARK: - Configure UI
@@ -258,19 +287,7 @@ class MessagesVC: UIViewController {
                                             date: messageData.createdAt,
                                             time: messageData.createdAt.toTime())
                 
-                let numberOfNewRows = configureMessages(with: newMessage)
-                
-                messagesTableView.scrollToBottom()
-                
-                // Inserting a rows at the end
-                var indexPaths: [IndexPath] = []
-                for rowNumber in 1...numberOfNewRows {
-                    indexPaths.append(IndexPath(row: messages.count - rowNumber, section: 0))
-                }
-                
-                messagesTableView.performBatchUpdates({
-                    messagesTableView.insertRows(at: indexPaths, with: .fade)
-                }, completion: nil)
+                webSocket?.send(message: newMessage)
                 
                 messageTextField.text = ""
                 sendButton.tintColor = .inactive
@@ -280,30 +297,46 @@ class MessagesVC: UIViewController {
         }
     }
     
-    func configureMessages(with newMessage: MessageRow) -> Int {
+    func configureMessages(with newMessage: MessageRow, withAnimation: Bool) {
         let messageTypeMessage: MessageType = .message(newMessage)
         
         let sectionRow = SectionRow(sectionDate: newMessage.date.toSectionDate())
         let messageTypeSection: MessageType = .section(sectionRow)
-        
+        var countOfNewMessages = 0
         if messages.isEmpty {
             messages.append(messageTypeSection)
             messages.append(messageTypeMessage)
-            return 2
+            countOfNewMessages = 2
+        } else {
+            switch messages.last {
+            case let .message(messageRow):
+                if messageRow.date.toDateWithoutTime() != newMessage.date.toDateWithoutTime() {
+                    messages.append(messageTypeSection)
+                    messages.append(messageTypeMessage)
+                    countOfNewMessages = 2
+                } else {
+                    messages.append(messageTypeMessage)
+                    countOfNewMessages = 1
+                }
+            default:
+                countOfNewMessages = 0
+            }
         }
         
-        switch messages.last {
-        case let .message(messageRow):
-            if messageRow.date.toDateWithoutTime() != newMessage.date.toDateWithoutTime() {
-                messages.append(messageTypeSection)
-                messages.append(messageTypeMessage)
-                return 2
+        if withAnimation {
+            messagesTableView.scrollToBottom()
+            
+            // Inserting a rows at the end
+            var indexPaths: [IndexPath] = []
+            for rowNumber in 1...countOfNewMessages {
+                indexPaths.append(IndexPath(row: messages.count - rowNumber, section: 0))
             }
             
-            messages.append(messageTypeMessage)
-            return 1
-        default:
-            return 0
+            DispatchQueue.main.async {
+                self.messagesTableView.performBatchUpdates({
+                    self.messagesTableView.insertRows(at: indexPaths, with: .fade)
+                }, completion: nil)
+            }
         }
     }
 }
@@ -319,5 +352,15 @@ extension UITableView {
                 self.scrollToRow(at: indexPath, at: .bottom, animated: true)
             }
         }
+    }
+}
+
+extension Data {
+    var prettyPrintedJSONString: NSString? {
+        guard let object = try? JSONSerialization.jsonObject(with: self, options: []),
+              let data = try? JSONSerialization.data(withJSONObject: object, options: [.prettyPrinted]),
+              let prettyPrintedString = NSString(data: data, encoding: String.Encoding.utf8.rawValue) else { return nil }
+
+        return prettyPrintedString
     }
 }

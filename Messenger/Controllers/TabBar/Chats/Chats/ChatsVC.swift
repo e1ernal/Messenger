@@ -11,7 +11,9 @@ struct ChatRow {
     let image: UIImage
     let name: String
     let message: String?
-    let date: String?
+    let dateString: String?
+    let date: Int?
+    let created: Int
     let chatId: Int
 }
 
@@ -34,6 +36,7 @@ class ChatsViewController: UITableViewController, UISearchResultsUpdating, UISea
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        tabBarController?.tabBar.isHidden = false
         configureChatsData()
     }
     
@@ -48,10 +51,14 @@ class ChatsViewController: UITableViewController, UISearchResultsUpdating, UISea
                     let chatRow = ChatRow(image: try await NetworkService.shared.getUserImage(imagePath: chatData.image),
                                           name: chatData.firstName + " " + chatData.lastName,
                                           message: chatData.lastMessage,
-                                          date: chatData.lastMessageCreated?.toChatDate(),
+                                          dateString: chatData.lastMessageCreated?.toChatDate(),
+                                          date: chatData.lastMessageCreated,
+                                          created: chatData.created,
                                           chatId: chatData.directId)
+                    print(chatData.created)
                     chats.append(chatRow)
                 }
+                
                 tableView.reloadData()
             } catch { print(error) }
         }

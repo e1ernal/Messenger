@@ -9,6 +9,7 @@ import Foundation
 import UIKit
 
 final class NetworkService {
+    let name: String = "Tom"
     static let shared = NetworkService(); private init() {}
     
     // MARK: - GET Methods

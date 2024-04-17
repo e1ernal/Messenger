@@ -28,7 +28,7 @@ extension ChatsViewController {
         cell.configure(image: row.image,
                        name: row.name,
                        message: row.message,
-                       date: row.date)
+                       date: row.dateString)
         return cell
     }
     

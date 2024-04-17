@@ -73,15 +73,13 @@ extension UIImage {
 extension Int {
     func toDate() -> Date {
         let myTimeInterval = TimeInterval(self)
-        let date = NSDate(timeIntervalSince1970: TimeInterval(myTimeInterval)) as Date
-        
-        return date
+        return NSDate(timeIntervalSince1970: TimeInterval(myTimeInterval)) as Date
     }
     
     func toDateWithoutTime() -> Date {
         let date = self.toDate()
         
-        guard let dateWithoutTime = Calendar.current.date(from: Calendar.current.dateComponents([.year, .month, .day], 
+        guard let dateWithoutTime = Calendar.current.date(from: Calendar.current.dateComponents([.year, .month, .day],
                                                                                                 from: date))
         else { return date }
         
@@ -93,7 +91,8 @@ extension Int {
         
         // Time interval between dates
         let calendar = Calendar.current
-        let interval = calendar.dateComponents([.day, .year], from: date, to: .now)
+        let interval = calendar.dateComponents([.day, .year], 
+                                               from: date, to: .now)
         
         guard let dayInterval = interval.day,
               let yearInterval = interval.year else {
@@ -274,9 +273,7 @@ extension String {
             if character == "X" {
                 result.append(number[index])
                 index = number.index(after: index)
-            } else {
-                result.append(character)
-            }
+            } else { result.append(character) }
         }
         return result
     }

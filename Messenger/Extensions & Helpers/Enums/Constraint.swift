@@ -34,7 +34,7 @@ extension CGFloat {
         case .imageHeight:
             return 60.0
         case .chatImageHeight:
-            return 50.0
+            return 56.0
         case .digitsHeight:
             return 54.0 /* height * 1.34 */
         case .height:
@@ -50,7 +50,7 @@ extension CGFloat {
         case .imageCornerRadius:
             return 30.0 /* imageHeight * 0.5 */
         case .chatImageCornerRadius:
-            return 25.0 /* chatImageHeight * 0.5 */
+            return 28.0 /* chatImageHeight * 0.5 */
         }
     }
 }
