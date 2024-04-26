@@ -21,7 +21,7 @@ class PhoneViewController: UIViewController {
         field.delegate = self
         field.textAlignment = .center
         field.keyboardType = .numberPad
-        field.heightAnchor.constraint(equalToConstant: .constant(.height)).isActive = true
+        field.heightAnchor.constraint(equalToConstant: .const(.height)).isActive = true
         field.translatesAutoresizingMaskIntoConstraints = false
         return field
     }()
@@ -35,7 +35,7 @@ class PhoneViewController: UIViewController {
         }
     }
     
-    private let numberStackView = BasicStackView(.vertical, .constant(.spacing), nil, nil)
+    private let numberStackView = BasicStackView(.vertical, .const(.spacing), nil, nil)
     private let numberLabel = BasicLabel("", .font(.title))
     private let questionLabel = BasicLabel("Is this the correct number?", .font(.subtitle))
     
@@ -49,7 +49,7 @@ class PhoneViewController: UIViewController {
         self.continueFinalButtonTapped()
     }
     
-    private let checkNumberStackView = BasicStackView(.vertical, .constant(.spacing), nil, nil)
+    private let checkNumberStackView = BasicStackView(.vertical, .const(.spacing), nil, nil)
     
     private let alphaView: UIView = {
         let view = UIView()
@@ -75,21 +75,21 @@ class PhoneViewController: UIViewController {
     private func configureUI() {
         configureVC(title: "", backButton: false)
         
-        popupView.layer.cornerRadius = .constant(.spacing) + .constant(.cornerRadius)
-        continueFinalButton.heightAnchor.constraint(equalToConstant: .constant(.height)).isActive = true
-        continueFinalButton.layer.cornerRadius = .constant(.cornerRadius)
+        popupView.layer.cornerRadius = .const(.spacing) + .const(.cornerRadius)
+        continueFinalButton.heightAnchor.constraint(equalToConstant: .const(.height)).isActive = true
+        continueFinalButton.layer.cornerRadius = .const(.cornerRadius)
         
         numberStackView.addArrangedSubview(emojiLabel)
         numberStackView.addArrangedSubview(titleLabel)
         numberStackView.addArrangedSubview(subtitleLabel)
-        numberStackView.setCustomSpacing(.constant(.doubleSpacing), after: subtitleLabel)
+        numberStackView.setCustomSpacing(.const(.doubleSpacing), after: subtitleLabel)
         numberStackView.addArrangedSubview(numberTextField)
-        numberStackView.setCustomSpacing(.constant(.doubleSpacing), after: numberTextField)
+        numberStackView.setCustomSpacing(.const(.doubleSpacing), after: numberTextField)
         numberStackView.addArrangedSubview(continueButton)
         
         checkNumberStackView.addArrangedSubview(numberLabel)
         checkNumberStackView.addArrangedSubview(questionLabel)
-        checkNumberStackView.setCustomSpacing(.constant(.doubleSpacing), after: questionLabel)
+        checkNumberStackView.setCustomSpacing(.const(.doubleSpacing), after: questionLabel)
         checkNumberStackView.addArrangedSubview(editButton)
         checkNumberStackView.addArrangedSubview(continueFinalButton)
         
@@ -108,10 +108,10 @@ class PhoneViewController: UIViewController {
             checkNumberStackView.widthAnchor.constraint(equalToConstant: view.frame.width * 2 / 3),
             checkNumberStackView.topAnchor.constraint(equalTo: numberTextField.topAnchor),
             
-            popupView.topAnchor.constraint(equalTo: checkNumberStackView.topAnchor, constant: -.constant(.spacing)),
-            popupView.bottomAnchor.constraint(equalTo: checkNumberStackView.bottomAnchor, constant: .constant(.spacing)),
-            popupView.leadingAnchor.constraint(equalTo: checkNumberStackView.leadingAnchor, constant: -.constant(.spacing)),
-            popupView.trailingAnchor.constraint(equalTo: checkNumberStackView.trailingAnchor, constant: .constant(.spacing)),
+            popupView.topAnchor.constraint(equalTo: checkNumberStackView.topAnchor, constant: -.const(.spacing)),
+            popupView.bottomAnchor.constraint(equalTo: checkNumberStackView.bottomAnchor, constant: .const(.spacing)),
+            popupView.leadingAnchor.constraint(equalTo: checkNumberStackView.leadingAnchor, constant: -.const(.spacing)),
+            popupView.trailingAnchor.constraint(equalTo: checkNumberStackView.trailingAnchor, constant: .const(.spacing)),
             
             alphaView.topAnchor.constraint(equalTo: view.topAnchor),
             alphaView.bottomAnchor.constraint(equalTo: view.bottomAnchor),

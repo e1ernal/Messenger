@@ -30,15 +30,15 @@ class DoubleLabelCell: UITableViewCell {
         contentView.addSubview(rightLabel)
 
         NSLayoutConstraint.activate([
-            leftLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: .constant(.spacing)),
-            leftLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: .constant(.spacing)),
-            leftLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -.constant(.spacing)),
+            leftLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: .const(.spacing)),
+            leftLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: .const(.spacing)),
+            leftLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -.const(.spacing)),
             leftLabel.trailingAnchor.constraint(equalTo: contentView.centerXAnchor),
             
             rightLabel.leadingAnchor.constraint(equalTo: contentView.centerXAnchor),
-            rightLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -.constant(.spacing)),
-            rightLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: .constant(.spacing)),
-            rightLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -.constant(.spacing))
+            rightLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -.const(.spacing)),
+            rightLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: .const(.spacing)),
+            rightLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -.const(.spacing))
         ])
     }
     

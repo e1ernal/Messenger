@@ -36,7 +36,7 @@ class SnackBarView: UIView {
         
         backgroundColor = .backgroundSecondary
         clipsToBounds = true
-        layer.cornerRadius = .constant(.cornerRadius)
+        layer.cornerRadius = .const(.cornerRadius)
         layer.masksToBounds = true
         configure()
     }
@@ -55,14 +55,14 @@ class SnackBarView: UIView {
         super.layoutSubviews()
         
         if viewModel.image != nil {
-            imageView.frame = CGRect(x: .constant(.spacing),
-                                     y: .constant(.spacing),
-                                     width: frame.height - 2 * .constant(.spacing),
-                                     height: frame.height - 2 * .constant(.spacing))
-            label.frame = CGRect(x: imageView.frame.size.width + 2 * .constant(.spacing),
-                                 y: .constant(.spacing),
-                                 width: frame.size.width - imageView.frame.size.width - 3 * .constant(.spacing),
-                                 height: frame.height - 2 * .constant(.spacing))
+            imageView.frame = CGRect(x: .const(.spacing),
+                                     y: .const(.spacing),
+                                     width: frame.height - 2 * .const(.spacing),
+                                     height: frame.height - 2 * .const(.spacing))
+            label.frame = CGRect(x: imageView.frame.size.width + 2 * .const(.spacing),
+                                 y: .const(.spacing),
+                                 width: frame.size.width - imageView.frame.size.width - 3 * .const(.spacing),
+                                 height: frame.height - 2 * .const(.spacing))
         } else {
             label.frame = bounds
         }

@@ -12,7 +12,7 @@ class ProfileInfoViewController: UIViewController {
     internal lazy var userImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.clipsToBounds = true
-        imageView.layer.cornerRadius = .constant(.imageCornerRadius)
+        imageView.layer.cornerRadius = .const(.imageCornerRadius)
         imageView.image = .assetImage(.addPhoto)
         imageView.contentMode = .scaleAspectFit
         imageView.isUserInteractionEnabled = true
@@ -32,7 +32,7 @@ class ProfileInfoViewController: UIViewController {
         self.continueButtonTapped()
     }
 
-    private let uiStackView = BasicStackView(.vertical, .constant(.spacing), nil, nil)
+    private let uiStackView = BasicStackView(.vertical, .const(.spacing), nil, nil)
     
     // MARK: - Controller Lifecycle
     override func viewDidLoad() {
@@ -49,10 +49,10 @@ class ProfileInfoViewController: UIViewController {
         
         uiStackView.addArrangedSubview(titleLabel)
         uiStackView.addArrangedSubview(subtitleLabel)
-        uiStackView.setCustomSpacing(.constant(.doubleSpacing), after: subtitleLabel)
+        uiStackView.setCustomSpacing(.const(.doubleSpacing), after: subtitleLabel)
         uiStackView.addArrangedSubview(firstNameTextField)
         uiStackView.addArrangedSubview(lastNameTextField)
-        uiStackView.setCustomSpacing(.constant(.doubleSpacing), after: lastNameTextField)
+        uiStackView.setCustomSpacing(.const(.doubleSpacing), after: lastNameTextField)
         uiStackView.addArrangedSubview(continueButton)
         
         view.addSubview(userImageView)
@@ -61,12 +61,12 @@ class ProfileInfoViewController: UIViewController {
         NSLayoutConstraint.activate([
             userImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             userImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            userImageView.heightAnchor.constraint(equalToConstant: .constant(.imageHeight)),
-            userImageView.widthAnchor.constraint(equalToConstant: .constant(.imageHeight)),
+            userImageView.heightAnchor.constraint(equalToConstant: .const(.imageHeight)),
+            userImageView.widthAnchor.constraint(equalToConstant: .const(.imageHeight)),
             
             uiStackView.widthAnchor.constraint(equalToConstant: view.frame.width * 2 / 3),
             uiStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            uiStackView.topAnchor.constraint(equalTo: userImageView.bottomAnchor, constant: .constant(.spacing))
+            uiStackView.topAnchor.constraint(equalTo: userImageView.bottomAnchor, constant: .const(.spacing))
         ])
     }
     

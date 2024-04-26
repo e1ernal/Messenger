@@ -51,8 +51,8 @@ class FloatingTextField: UITextField, UITextFieldDelegate {
         textAlignment = .center
         autocapitalizationType = .none
         keyboardType = .default
-        borderView.layer.cornerRadius = .constant(.cornerRadius)
-        heightAnchor.constraint(equalToConstant: .constant(.height)).isActive = true
+        borderView.layer.cornerRadius = .const(.cornerRadius)
+        heightAnchor.constraint(equalToConstant: .const(.height)).isActive = true
         borderView.frame = bounds
         titleLabel.text = " \(placeholder) "
 
@@ -61,7 +61,7 @@ class FloatingTextField: UITextField, UITextFieldDelegate {
 
         NSLayoutConstraint.activate([
             titleLabel.centerYAnchor.constraint(equalTo: self.topAnchor),
-            titleLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: .constant(.spacing))
+            titleLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: .const(.spacing))
         ])
     }
 

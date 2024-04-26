@@ -19,7 +19,7 @@ class ImageWithButtonCell: UITableViewCell {
     private lazy var photoImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.clipsToBounds = true
-        imageView.layer.cornerRadius = .constant(.doubleHeight) * 0.5
+        imageView.layer.cornerRadius = .const(.doubleHeight) * 0.5
         imageView.image = .assetImage(.addPhoto)
         imageView.contentMode = .scaleAspectFit
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -40,19 +40,19 @@ class ImageWithButtonCell: UITableViewCell {
         backgroundColor = .clear
         
         // Lower priority to avoid warnings
-        let photoImageViewHeightConstraint = photoImageView.heightAnchor.constraint(equalToConstant: .constant(.doubleHeight))
+        let photoImageViewHeightConstraint = photoImageView.heightAnchor.constraint(equalToConstant: .const(.doubleHeight))
         photoImageViewHeightConstraint.priority = .defaultHigh
         
         NSLayoutConstraint.activate([
-            photoImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: .constant(.spacing)),
+            photoImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: .const(.spacing)),
             photoImageViewHeightConstraint,
-            photoImageView.widthAnchor.constraint(equalToConstant: .constant(.doubleHeight)),
+            photoImageView.widthAnchor.constraint(equalToConstant: .const(.doubleHeight)),
             photoImageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             
-            newPhotoButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: .constant(.spacing)),
-            newPhotoButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -.constant(.spacing)),
+            newPhotoButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: .const(.spacing)),
+            newPhotoButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -.const(.spacing)),
             newPhotoButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
-            newPhotoButton.topAnchor.constraint(equalTo: photoImageView.bottomAnchor, constant: .constant(.spacing))
+            newPhotoButton.topAnchor.constraint(equalTo: photoImageView.bottomAnchor, constant: .const(.spacing))
         ])
     }
     

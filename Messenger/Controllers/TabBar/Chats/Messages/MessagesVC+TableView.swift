@@ -25,10 +25,9 @@ extension MessagesVC: UITableViewDelegate, UITableViewDataSource {
                 fatalError("Error: The TableView could not dequeue a \(MessageCell.identifier)")
             }
             
-            let isReceived = messageRow.authorId == userId ? false : true
-            
             cell.configure(message: messageRow.message,
-                           side: isReceived ? .left : .right,
+                           side: messageRow.side,
+                           roundType: messageRow.roundType,
                            superViewWidth: view.frame.width,
                            time: messageRow.time)
             return cell
@@ -68,78 +67,15 @@ extension MessagesVC: UITableViewDelegate, UITableViewDataSource {
                     let newMessage = MessageRow(authorId: messageData.author.id,
                                                 message: messageData.text,
                                                 date: messageData.createdAt,
-                                                time: messageData.createdAt.toTime())
+                                                time: messageData.createdAt.toTime(),
+                                                side: messageData.author.id == userId ? .right : .left,
+                                                roundType: .end)
                     configureMessages(with: newMessage, withAnimation: false)
-                    messagesTableView.reloadData()
                 }
+                messagesTableView.reloadData()
             } catch {
                 showSnackBar(text: error.localizedDescription, image: .systemImage(.warning, color: nil), on: self)
             }
         }
     }
-}
-
-extension UITableView {
-    func setEmptyView(name: String) {
-        let backgroundView = UIView(frame: CGRect(x: self.center.x,
-                                                  y: self.center.y,
-                                                  width: self.bounds.size.width,
-                                                  height: self.bounds.size.height))
-        let titleLabel = UILabel()
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.textColor = .label
-        titleLabel.font = .systemFont(ofSize: CGFloat(14), weight: .bold)
-        titleLabel.text = "You invited \(name) to join a Chat"
-        titleLabel.numberOfLines = 0
-        titleLabel.textAlignment = .center
-        
-        let attributedString = NSMutableAttributedString(string: "Chats:\n🔒 Use end-to-end encryption\n🔒 Leave no trace on our servers\n🔒 Do not allow forwarding")
-        let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.lineSpacing = .constant(.halfSpacing)
-        attributedString.addAttribute(NSAttributedString.Key.paragraphStyle, 
-                                      value: paragraphStyle,
-                                      range: NSRange(location: 0, length: attributedString.length))
-        
-        let messageLabel = UILabel()
-        messageLabel.translatesAutoresizingMaskIntoConstraints = false
-        messageLabel.textColor = .secondaryLabel
-        messageLabel.font = .systemFont(ofSize: CGFloat(13), weight: .regular)
-        messageLabel.attributedText = attributedString
-        messageLabel.numberOfLines = 0
-        messageLabel.textAlignment = .left
-        
-        let bubbleView = UIView()
-        bubbleView.translatesAutoresizingMaskIntoConstraints = false
-        bubbleView.backgroundColor = .secondarySystemBackground
-        bubbleView.layer.cornerRadius = .constant(.cornerRadius)
-        
-        let stack = UIStackView()
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        stack.axis = .vertical
-        stack.alignment = .center
-        stack.spacing = .constant(.spacing)
-        stack.addArrangedSubview(titleLabel)
-        stack.addArrangedSubview(messageLabel)
-        
-        backgroundView.addSubview(bubbleView)
-        backgroundView.addSubview(stack)
-        
-        NSLayoutConstraint.activate([
-            stack.centerYAnchor.constraint(equalTo: backgroundView.centerYAnchor),
-            stack.centerXAnchor.constraint(equalTo: backgroundView.centerXAnchor),
-            stack.widthAnchor.constraint(equalTo: backgroundView.widthAnchor, multiplier: 0.6),
-            
-            titleLabel.leadingAnchor.constraint(equalTo: messageLabel.leadingAnchor),
-            titleLabel.trailingAnchor.constraint(equalTo: messageLabel.trailingAnchor),
-            
-            bubbleView.topAnchor.constraint(equalTo: stack.topAnchor, constant: -.constant(.cornerRadius)),
-            bubbleView.leadingAnchor.constraint(equalTo: stack.leadingAnchor, constant: -.constant(.cornerRadius)),
-            bubbleView.trailingAnchor.constraint(equalTo: stack.trailingAnchor, constant: .constant(.cornerRadius)),
-            bubbleView.bottomAnchor.constraint(equalTo: stack.bottomAnchor, constant: .constant(.cornerRadius))
-        ])
-        
-        self.backgroundView = backgroundView
-    }
-    
-    func restore() { self.backgroundView = nil }
 }

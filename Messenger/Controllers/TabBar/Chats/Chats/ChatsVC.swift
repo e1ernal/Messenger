@@ -55,10 +55,9 @@ class ChatsViewController: UITableViewController, UISearchResultsUpdating, UISea
                                           date: chatData.lastMessageCreated,
                                           created: chatData.created,
                                           chatId: chatData.directId)
-                    print(chatData.created)
                     chats.append(chatRow)
                 }
-                
+                chats.sort { $0.date ?? $0.created > $1.date ?? $1.created }
                 tableView.reloadData()
             } catch { print(error) }
         }

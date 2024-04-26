@@ -16,7 +16,7 @@ class WebSocket: NSObject, URLSessionDelegate, URLSessionWebSocketDelegate {
     weak var delegate: WebSocketDelegate?
     private var webSocket: URLSessionWebSocketTask?
     private var url: URL
-    private var isConnected: Bool = false
+    private var isConnected = false
 
     init(url: URL, delegate: WebSocketDelegate) {
         self.url = url
@@ -79,7 +79,6 @@ class WebSocket: NSObject, URLSessionDelegate, URLSessionWebSocketDelegate {
     func urlSession(_ session: URLSession,
                     webSocketTask: URLSessionWebSocketTask,
                     didOpenWithProtocol protocol: String?) {
-        print("WebSocket: Connected")
         isConnected = true
         receive()
     }
@@ -89,7 +88,6 @@ class WebSocket: NSObject, URLSessionDelegate, URLSessionWebSocketDelegate {
                     didCloseWith closeCode: URLSessionWebSocketTask.CloseCode,
                     reason: Data?) {
         isConnected = false
-        print("WebSocket: Disconnected")
     }
 
     private func ping() {

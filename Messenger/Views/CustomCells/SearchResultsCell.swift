@@ -13,7 +13,7 @@ class SearchResultsCell: UITableViewCell {
     private lazy var photoImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.clipsToBounds = true
-        imageView.layer.cornerRadius = .constant(.height) / 2
+        imageView.layer.cornerRadius = .const(.height) / 2
         imageView.image = .assetImage(.addPhoto)
         imageView.contentMode = .scaleAspectFit
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -38,23 +38,23 @@ class SearchResultsCell: UITableViewCell {
         contentView.addSubview(usernameLabel)
 
         // Lower priority to avoid warnings
-        let photoImageViewHeightConstraint = photoImageView.heightAnchor.constraint(equalToConstant: .constant(.height))
+        let photoImageViewHeightConstraint = photoImageView.heightAnchor.constraint(equalToConstant: .const(.height))
         photoImageViewHeightConstraint.priority = .defaultHigh
         
         NSLayoutConstraint.activate([
-            photoImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: .constant(.spacing)),
-            photoImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: .constant(.spacing)),
-            photoImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -.constant(.spacing)),
+            photoImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: .const(.spacing)),
+            photoImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: .const(.spacing)),
+            photoImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -.const(.spacing)),
             photoImageViewHeightConstraint,
-            photoImageView.widthAnchor.constraint(equalToConstant: .constant(.height)),
+            photoImageView.widthAnchor.constraint(equalToConstant: .const(.height)),
 
-            nameLabel.leadingAnchor.constraint(equalTo: photoImageView.trailingAnchor, constant: .constant(.spacing)),
-            nameLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -.constant(.spacing)),
+            nameLabel.leadingAnchor.constraint(equalTo: photoImageView.trailingAnchor, constant: .const(.spacing)),
+            nameLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -.const(.spacing)),
             nameLabel.bottomAnchor.constraint(equalTo: photoImageView.centerYAnchor),
             nameLabel.topAnchor.constraint(equalTo: photoImageView.topAnchor),
             
-            usernameLabel.leadingAnchor.constraint(equalTo: photoImageView.trailingAnchor, constant: .constant(.spacing)),
-            usernameLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -.constant(.spacing)),
+            usernameLabel.leadingAnchor.constraint(equalTo: photoImageView.trailingAnchor, constant: .const(.spacing)),
+            usernameLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -.const(.spacing)),
             usernameLabel.topAnchor.constraint(equalTo: photoImageView.centerYAnchor),
             usernameLabel.bottomAnchor.constraint(equalTo: photoImageView.bottomAnchor)
         ])

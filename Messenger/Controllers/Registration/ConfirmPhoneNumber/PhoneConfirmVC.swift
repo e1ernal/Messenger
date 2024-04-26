@@ -26,7 +26,7 @@ class PhoneConfirmViewController: UIViewController {
         .font(phoneNumber ?? "undefined", .font(.subtitleBold))
     )
     
-    private let digitsStackView = BasicStackView(.horizontal, .constant(.spacing), .fillEqually, .fill)
+    private let digitsStackView = BasicStackView(.horizontal, .const(.spacing), .fillEqually, .fill)
     
     private lazy var digitsTextField: UITextField = {
         let field = UITextField()
@@ -35,7 +35,7 @@ class PhoneConfirmViewController: UIViewController {
         field.delegate = self
         field.textContentType = .oneTimeCode
         field.keyboardType = .numberPad
-        field.heightAnchor.constraint(equalToConstant: .constant(.digitsHeight)).isActive = true
+        field.heightAnchor.constraint(equalToConstant: .const(.digitsHeight)).isActive = true
         field.translatesAutoresizingMaskIntoConstraints = false
         return field
     }()
@@ -46,7 +46,7 @@ class PhoneConfirmViewController: UIViewController {
         }
     }
     
-    private let uiStackView = BasicStackView(.vertical, .constant(.spacing), nil, nil)
+    private let uiStackView = BasicStackView(.vertical, .const(.spacing), nil, nil)
     
     private lazy var helpLabel = BasicLabel(NSMutableAttributedString()
         .font("Sorry", .font(.title))
@@ -67,7 +67,7 @@ class PhoneConfirmViewController: UIViewController {
         }
     }
     
-    private let helpStackView = BasicStackView(.vertical, .constant(.spacing), nil, nil)
+    private let helpStackView = BasicStackView(.vertical, .const(.spacing), nil, nil)
     
     private let popupView: UIView = {
         let view = UIView()
@@ -98,7 +98,7 @@ class PhoneConfirmViewController: UIViewController {
             let label = UILabel()
             label.translatesAutoresizingMaskIntoConstraints = false
             label.textAlignment = .center
-            label.layer.cornerRadius = .constant(.cornerRadius)
+            label.layer.cornerRadius = .const(.cornerRadius)
             label.layer.borderWidth = 1.0
             label.layer.borderColor = .color(.inactive)
             label.font = .font(.codeField)
@@ -111,12 +111,12 @@ class PhoneConfirmViewController: UIViewController {
         uiStackView.addArrangedSubview(emojiLabel)
         uiStackView.addArrangedSubview(titleLabel)
         uiStackView.addArrangedSubview(subtitleLabel)
-        uiStackView.setCustomSpacing(.constant(.doubleSpacing), after: subtitleLabel)
+        uiStackView.setCustomSpacing(.const(.doubleSpacing), after: subtitleLabel)
         uiStackView.addArrangedSubview(digitsTextField)
-        uiStackView.setCustomSpacing(.constant(.doubleSpacing), after: digitsTextField)
+        uiStackView.setCustomSpacing(.const(.doubleSpacing), after: digitsTextField)
         uiStackView.addArrangedSubview(helpButton)
         
-        popupView.layer.cornerRadius = .constant(.spacing) + .constant(.cornerRadius)
+        popupView.layer.cornerRadius = .const(.spacing) + .const(.cornerRadius)
         
         helpStackView.addArrangedSubview(helpLabel)
         helpStackView.addArrangedSubview(closeButton)
@@ -143,10 +143,10 @@ class PhoneConfirmViewController: UIViewController {
             helpStackView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             helpStackView.widthAnchor.constraint(equalToConstant: view.frame.width * 2 / 3),
             
-            popupView.topAnchor.constraint(equalTo: helpStackView.topAnchor, constant: -.constant(.spacing)),
-            popupView.bottomAnchor.constraint(equalTo: helpStackView.bottomAnchor, constant: .constant(.spacing)),
-            popupView.leadingAnchor.constraint(equalTo: helpStackView.leadingAnchor, constant: -.constant(.spacing)),
-            popupView.trailingAnchor.constraint(equalTo: helpStackView.trailingAnchor, constant: .constant(.spacing)),
+            popupView.topAnchor.constraint(equalTo: helpStackView.topAnchor, constant: -.const(.spacing)),
+            popupView.bottomAnchor.constraint(equalTo: helpStackView.bottomAnchor, constant: .const(.spacing)),
+            popupView.leadingAnchor.constraint(equalTo: helpStackView.leadingAnchor, constant: -.const(.spacing)),
+            popupView.trailingAnchor.constraint(equalTo: helpStackView.trailingAnchor, constant: .const(.spacing)),
             
             alphaView.topAnchor.constraint(equalTo: view.topAnchor),
             alphaView.bottomAnchor.constraint(equalTo: view.bottomAnchor),

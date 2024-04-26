@@ -13,7 +13,7 @@ extension InfoProfileViewController {
         tableView.tableHeaderView = UIView(frame: CGRect(x: 0,
                                                          y: 0,
                                                          width: 0,
-                                                         height: .constant(.doubleSpacing)))
+                                                         height: .const(.doubleSpacing)))
         
         tableView.register(DoubleLabelCell.self, forCellReuseIdentifier: DoubleLabelCell.identifier)
         tableView.register(SquareImageCell.self, forCellReuseIdentifier: SquareImageCell.identifier)

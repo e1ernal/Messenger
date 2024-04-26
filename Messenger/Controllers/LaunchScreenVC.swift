@@ -54,7 +54,7 @@ class LaunchScreenVC: UIViewController {
             nameLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             
             loadingIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            loadingIndicator.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: .constant(.spacing))
+            loadingIndicator.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: .const(.spacing))
         ])
     }
     

@@ -24,8 +24,8 @@ class BasicButton: UIButton {
     }
     
     private func initSetup() {
-        heightAnchor.constraint(equalToConstant: .constant(.height)).isActive = true
-        layer.cornerRadius = .constant(.cornerRadius)
+        heightAnchor.constraint(equalToConstant: .const(.height)).isActive = true
+        layer.cornerRadius = .const(.cornerRadius)
         setupColors(type)
         translatesAutoresizingMaskIntoConstraints = false
     }
@@ -43,13 +43,9 @@ class BasicButton: UIButton {
         addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
     }
     
-    func configure(title: String) {
-        setTitle(title, for: .normal)
-    }
+    func configure(title: String) { setTitle(title, for: .normal) }
     
-    @objc func buttonTapped() {
-        action()
-    }
+    @objc func buttonTapped() { action() }
     
     // Change button state: active / inactive
     func setState(_ state: ViewState) {
@@ -83,6 +79,7 @@ class BasicButton: UIButton {
                 buttonTitleColor = .color(.inactive)
             }
         }
+        
         UIView.animate(withDuration: 0.25) {
             self.setTitleColor(buttonTitleColor, for: .normal)
             self.backgroundColor = buttonBackgroundColor

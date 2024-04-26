@@ -23,8 +23,8 @@ class MessageSectionCell: UITableViewCell {
         contentView.addSubview(sectionDateLabel)
         
         NSLayoutConstraint.activate([
-            sectionDateLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: .constant(.spacing)),
-            sectionDateLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -.constant(.spacing)),
+            sectionDateLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: .const(.spacing)),
+            sectionDateLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -.const(.spacing)),
             sectionDateLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             sectionDateLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor)
         ])

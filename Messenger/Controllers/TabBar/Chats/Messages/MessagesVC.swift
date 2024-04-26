@@ -12,12 +12,26 @@ enum MessageType {
     case section(SectionRow)
 }
 
+enum Side: Int, Codable {
+    case left = 0
+    case right = 1
+}
+
+enum RoundType: Int, Codable {
+    case start = 0
+    case between = 1
+    case end = 2
+    case startEnd = 3
+}
+
 struct MessageRow: Codable {
     var type = "message"
     let authorId: Int
     let message: String
     let date: Int
     let time: String
+    let side: Side
+    var roundType: RoundType
 }
 
 struct SectionRow {
@@ -46,7 +60,7 @@ class MessagesVC: UIViewController, URLSessionWebSocketDelegate, WebSocketDelega
     internal let sendButton: UIButton = {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.layer.cornerRadius = (.constant(.height) - 2 * .constant(.halfSpacing)) * 0.5
+        button.layer.cornerRadius = (.const(.height) - 2 * .const(.halfSpacing)) * 0.5
         button.setImage(.systemImage(.sendButton, color: .inactive).withRenderingMode(.alwaysTemplate), for: .normal)
         button.tintColor = .inactive
         button.imageView?.contentMode = .scaleAspectFill
@@ -75,7 +89,7 @@ class MessagesVC: UIViewController, URLSessionWebSocketDelegate, WebSocketDelega
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
         view.backgroundColor = .backgroundSecondary
-        view.layer.cornerRadius = .constant(.height) * 0.5
+        view.layer.cornerRadius = .const(.height) * 0.5
         return view
     }()
     
@@ -127,9 +141,7 @@ class MessagesVC: UIViewController, URLSessionWebSocketDelegate, WebSocketDelega
     }
     
     // MARK: - Deinit UIViewController
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
+    deinit { NotificationCenter.default.removeObserver(self) }
     
     // MARK: - WebSockets
     func didReceiveData(data: Data) {
@@ -142,9 +154,7 @@ class MessagesVC: UIViewController, URLSessionWebSocketDelegate, WebSocketDelega
         do {
             let message = try decoder.decode(MessageRow.self, from: messageData)
             configureMessages(with: message, withAnimation: true)
-        } catch {
-            print("Can't receive message")
-        }
+        } catch { print("Can't receive message") }
     }
     
     private func connectWebSocket() {
@@ -206,20 +216,20 @@ class MessagesVC: UIViewController, URLSessionWebSocketDelegate, WebSocketDelega
         contentView.addSubview(sendMessageView)
         
         NSLayoutConstraint.activate([
-            sendMessageView.heightAnchor.constraint(equalToConstant: .constant(.height)),
+            sendMessageView.heightAnchor.constraint(equalToConstant: .const(.height)),
             sendMessageView.bottomAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.bottomAnchor),
-            sendMessageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: .constant(.spacing)),
-            sendMessageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -.constant(.spacing)),
+            sendMessageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: .const(.spacing)),
+            sendMessageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -.const(.spacing)),
             
-            sendButton.trailingAnchor.constraint(equalTo: sendMessageView.trailingAnchor, constant: -.constant(.halfSpacing)),
+            sendButton.trailingAnchor.constraint(equalTo: sendMessageView.trailingAnchor, constant: -.const(.halfSpacing)),
             sendButton.centerYAnchor.constraint(equalTo: sendMessageView.centerYAnchor),
-            sendButton.widthAnchor.constraint(equalToConstant: .constant(.height) - 2 * .constant(.halfSpacing)),
-            sendButton.heightAnchor.constraint(equalToConstant: .constant(.height) - 2 * .constant(.halfSpacing)),
+            sendButton.widthAnchor.constraint(equalToConstant: .const(.height) - 2 * .const(.halfSpacing)),
+            sendButton.heightAnchor.constraint(equalToConstant: .const(.height) - 2 * .const(.halfSpacing)),
             
-            messageTextField.leadingAnchor.constraint(equalTo: sendMessageView.leadingAnchor, constant: .constant(.height) * 0.5),
-            messageTextField.trailingAnchor.constraint(equalTo: sendButton.leadingAnchor, constant: -.constant(.halfSpacing)),
-            messageTextField.topAnchor.constraint(equalTo: sendMessageView.topAnchor, constant: .constant(.halfSpacing)),
-            messageTextField.bottomAnchor.constraint(equalTo: sendMessageView.bottomAnchor, constant: -.constant(.halfSpacing))
+            messageTextField.leadingAnchor.constraint(equalTo: sendMessageView.leadingAnchor, constant: .const(.height) * 0.5),
+            messageTextField.trailingAnchor.constraint(equalTo: sendButton.leadingAnchor, constant: -.const(.halfSpacing)),
+            messageTextField.topAnchor.constraint(equalTo: sendMessageView.topAnchor, constant: .const(.halfSpacing)),
+            messageTextField.bottomAnchor.constraint(equalTo: sendMessageView.bottomAnchor, constant: -.const(.halfSpacing))
         ])
         
         contentView.addSubview(messagesTableView)
@@ -227,7 +237,7 @@ class MessagesVC: UIViewController, URLSessionWebSocketDelegate, WebSocketDelega
         NSLayoutConstraint.activate([
             messagesTableView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             messagesTableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            messagesTableView.bottomAnchor.constraint(equalTo: sendMessageView.topAnchor, constant: -.constant(.spacing)),
+            messagesTableView.bottomAnchor.constraint(equalTo: sendMessageView.topAnchor, constant: -.const(.spacing)),
             messagesTableView.widthAnchor.constraint(equalTo: contentView.widthAnchor)
         ])
     }
@@ -247,7 +257,7 @@ class MessagesVC: UIViewController, URLSessionWebSocketDelegate, WebSocketDelega
                        delay: 0,
                        options: animationCurve,
                        animations: {
-            self.scrollView.setContentOffset(CGPoint(x: 0, y: endFrame.height + .constant(.spacing)), animated: false)
+            self.scrollView.setContentOffset(CGPoint(x: 0, y: endFrame.height + .const(.spacing)), animated: false)
             self.view.layoutIfNeeded()
         }, completion: nil)
     }
@@ -285,7 +295,9 @@ class MessagesVC: UIViewController, URLSessionWebSocketDelegate, WebSocketDelega
                 let newMessage = MessageRow(authorId: messageData.author.id,
                                             message: messageData.text,
                                             date: messageData.createdAt,
-                                            time: messageData.createdAt.toTime())
+                                            time: messageData.createdAt.toTime(),
+                                            side: .right,
+                                            roundType: .end)
                 
                 webSocket?.send(message: newMessage)
                 
@@ -303,6 +315,7 @@ class MessagesVC: UIViewController, URLSessionWebSocketDelegate, WebSocketDelega
         let sectionRow = SectionRow(sectionDate: newMessage.date.toSectionDate())
         let messageTypeSection: MessageType = .section(sectionRow)
         var countOfNewMessages = 0
+        
         if messages.isEmpty {
             messages.append(messageTypeSection)
             messages.append(messageTypeMessage)
@@ -323,44 +336,91 @@ class MessagesVC: UIViewController, URLSessionWebSocketDelegate, WebSocketDelega
             }
         }
         
+        // MARK: Set RoundType of messages
+        let lastIndex = messages.count - 1
+        if countOfNewMessages == 2 {
+            setMessageRoundType(message: &messages[lastIndex], roundType: .startEnd)
+        } else {
+            guard let currentMessageRow = getMessageRow(message: messages[lastIndex]),
+                  let previousMessageRow = getMessageRow(message: messages[lastIndex - 1]) else {
+                return
+            }
+            
+            if currentMessageRow.side != previousMessageRow.side {
+                setMessageRoundType(message: &messages[lastIndex], roundType: .startEnd)
+            } else {
+                switch previousMessageRow.roundType {
+                case .startEnd:
+                    let timeDelay = currentMessageRow.date - previousMessageRow.date
+                    if timeDelay > 120 {
+                        setMessageRoundType(message: &messages[lastIndex], roundType: .startEnd)
+                    } else {
+                        setMessageRoundType(message: &messages[lastIndex], roundType: .end)
+                        setMessageRoundType(message: &messages[lastIndex - 1], roundType: .start)
+                    }
+                case .end:
+                    var startIndex = lastIndex - 2
+                    while getMessageRow(message: messages[startIndex])?.roundType != .start {
+                        startIndex -= 1
+                    }
+                    guard let startMessageRow = getMessageRow(message: messages[startIndex]) else { return }
+                    let timeDelay = currentMessageRow.date - startMessageRow.date
+                    if timeDelay > 120 {
+                        setMessageRoundType(message: &messages[lastIndex], roundType: .startEnd)
+                    } else {
+                        setMessageRoundType(message: &messages[lastIndex], roundType: .end)
+                        setMessageRoundType(message: &messages[lastIndex - 1], roundType: .between)
+                    }
+                default:
+                    return
+                }
+            }
+        }
+        
         if withAnimation {
             messagesTableView.scrollToBottom()
             
             // Inserting a rows at the end
-            var indexPaths: [IndexPath] = []
+            var indexPathsAdded: [IndexPath] = []
             for rowNumber in 1...countOfNewMessages {
-                indexPaths.append(IndexPath(row: messages.count - rowNumber, section: 0))
+                indexPathsAdded.append(IndexPath(row: messages.count - rowNumber, section: 0))
+            }
+            
+            var indexPathsUpdated: [IndexPath] = []
+            if !messages.isEmpty {
+                for rowNumber in 1...countOfNewMessages + 1 {
+                    indexPathsUpdated.append(IndexPath(row: messages.count - rowNumber, section: 0))
+                }
+            } else {
+                indexPathsUpdated = [IndexPath(row: 0, section: 0)]
             }
             
             DispatchQueue.main.async {
                 self.messagesTableView.performBatchUpdates({
-                    self.messagesTableView.insertRows(at: indexPaths, with: .fade)
+                    self.messagesTableView.insertRows(at: indexPathsAdded, with: .fade)
+                    self.messagesTableView.reloadRows(at: indexPathsUpdated, with: .none)
                 }, completion: nil)
             }
         }
-    }
-}
-
-extension UITableView {
-    // Scroll to bottom of TableView
-    func scrollToBottom() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(1)) {
-            let numberOfSections = self.numberOfSections
-            let numberOfRows = self.numberOfRows(inSection: numberOfSections - 1)
-            if numberOfRows > 0 {
-                let indexPath = IndexPath(row: numberOfRows - 1, section: numberOfSections - 1)
-                self.scrollToRow(at: indexPath, at: .bottom, animated: true)
+        
+        func getMessageRow(message: MessageType) -> MessageRow? {
+            switch message {
+            case let .message(messageRow):
+                return messageRow
+            default:
+                return nil
             }
         }
-    }
-}
-
-extension Data {
-    var prettyPrintedJSONString: NSString? {
-        guard let object = try? JSONSerialization.jsonObject(with: self, options: []),
-              let data = try? JSONSerialization.data(withJSONObject: object, options: [.prettyPrinted]),
-              let prettyPrintedString = NSString(data: data, encoding: String.Encoding.utf8.rawValue) else { return nil }
-
-        return prettyPrintedString
+        
+        func setMessageRoundType(message: inout MessageType, roundType: RoundType) {
+            guard let messageRow = getMessageRow(message: message) else { return }
+            let newMessage = MessageType.message(MessageRow(authorId: messageRow.authorId,
+                                                            message: messageRow.message,
+                                                            date: messageRow.date,
+                                                            time: messageRow.time,
+                                                            side: messageRow.side,
+                                                            roundType: roundType))
+            message = newMessage
+        }
     }
 }

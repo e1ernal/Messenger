@@ -32,8 +32,8 @@ class OnboardingViewController: UIViewController {
             
             startButton.widthAnchor.constraint(equalToConstant: view.frame.width * 2 / 3),
             startButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            startButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -.constant(.doubleHeight)),
-            startButton.heightAnchor.constraint(equalToConstant: .constant(.height))
+            startButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -.const(.doubleHeight)),
+            startButton.heightAnchor.constraint(equalToConstant: .const(.height))
         ])
     }
 }

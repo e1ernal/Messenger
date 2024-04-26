@@ -22,13 +22,13 @@ class UsernameViewController: UIViewController {
         field.placeholder = "username"
         field.autocapitalizationType = .none
         field.layer.borderWidth = 1.0
-        field.layer.cornerRadius = .constant(.cornerRadius)
+        field.layer.cornerRadius = .const(.cornerRadius)
         field.font = .font(.textField)
         field.autocorrectionType = .no
         field.delegate = self
         field.textAlignment = .center
         field.keyboardType = .namePhonePad
-        field.heightAnchor.constraint(equalToConstant: .constant(.height)).isActive = true
+        field.heightAnchor.constraint(equalToConstant: .const(.height)).isActive = true
         field.translatesAutoresizingMaskIntoConstraints = false
         return field
     }()
@@ -37,7 +37,7 @@ class UsernameViewController: UIViewController {
         self.continueButtonTapped()
     }
     
-    private let uiStackView = BasicStackView(.vertical, .constant(.spacing), nil, nil)
+    private let uiStackView = BasicStackView(.vertical, .const(.spacing), nil, nil)
     
     // MARK: - Init UIViewController
     init(firstName: String, lastName: String, profileImage: UIImage) {
@@ -66,9 +66,9 @@ class UsernameViewController: UIViewController {
         uiStackView.addArrangedSubview(emojiLabel)
         uiStackView.addArrangedSubview(titleLabel)
         uiStackView.addArrangedSubview(subtitleLabel)
-        uiStackView.setCustomSpacing(.constant(.doubleSpacing), after: subtitleLabel)
+        uiStackView.setCustomSpacing(.const(.doubleSpacing), after: subtitleLabel)
         uiStackView.addArrangedSubview(usernameTextField)
-        uiStackView.setCustomSpacing(.constant(.doubleSpacing), after: usernameTextField)
+        uiStackView.setCustomSpacing(.const(.doubleSpacing), after: usernameTextField)
         uiStackView.addArrangedSubview(continueButton)
         
         view.addSubview(uiStackView)

@@ -9,7 +9,6 @@ import Foundation
 import UIKit
 
 final class NetworkService {
-    let name: String = "Tom"
     static let shared = NetworkService(); private init() {}
     
     // MARK: - GET Methods
@@ -35,9 +34,7 @@ final class NetworkService {
         do {
             let decoder = JSONDecoder()
             return try decoder.decode(UserGet.self, from: data)
-        } catch {
-            throw DescriptionError.error("Can't get user info. Can't decode")
-        }
+        } catch { throw DescriptionError.error("Can't get user info. Can't decode") }
     }
     
     func getUserImage(imagePath: String) async throws -> UIImage {

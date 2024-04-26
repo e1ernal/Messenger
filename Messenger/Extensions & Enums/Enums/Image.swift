@@ -28,24 +28,3 @@ enum Image: String {
     // MARK: - Assets Images
     case addPhoto = "addPhoto"
 }
-
-extension UIImage {
-    static func assetImage(_ name: Image) -> UIImage {
-        guard let image = UIImage(named: name.rawValue) else {
-            return UIImage()
-        }
-        return image
-    }
-    
-    static func systemImage(_ name: Image, color: UIColor?) -> UIImage {
-        guard let image = UIImage(systemName: name.rawValue) else {
-            return UIImage()
-        }
-        
-        guard let color else {
-            return image.withTintColor(.secondaryLabel, renderingMode: .alwaysOriginal)
-        }
-        
-        return image.withTintColor(color, renderingMode: .alwaysOriginal)
-    }
-}

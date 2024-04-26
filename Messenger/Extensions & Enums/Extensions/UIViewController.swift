@@ -126,7 +126,7 @@ extension UIViewController {
         let vcHeight = vc.view.frame.size.height
         
         let snackBarWidth = vcWidth * 0.9
-        let snackBarHeight: CGFloat = .constant(.height)
+        let snackBarHeight: CGFloat = .const(.height)
         
         let frame = CGRect(x: 0,
                            y: 0,
@@ -152,7 +152,7 @@ extension UIViewController {
         
         var snackBarY: CGFloat
         if KeyboardStateListener.shared.isVisible {
-            snackBarY = vcHeight - snackBarHeight - .constant(.spacing) - KeyboardStateListener.shared.keyboardHeight
+            snackBarY = vcHeight - snackBarHeight - .const(.spacing) - KeyboardStateListener.shared.keyboardHeight
         } else {
             snackBarY = vcHeight - snackBarHeight * 2 - tabBarControllerHeight
         }

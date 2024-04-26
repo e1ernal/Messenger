@@ -29,10 +29,10 @@ class TextFieldCell: UITableViewCell {
         contentView.addSubview(textField)
         
         NSLayoutConstraint.activate([
-            textField.topAnchor.constraint(equalTo: contentView.topAnchor, constant: .constant(.spacing)),
-            textField.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -.constant(.spacing)),
-            textField.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: .constant(.spacing)),
-            textField.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -.constant(.spacing))
+            textField.topAnchor.constraint(equalTo: contentView.topAnchor, constant: .const(.spacing)),
+            textField.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -.const(.spacing)),
+            textField.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: .const(.spacing)),
+            textField.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -.const(.spacing))
         ])
     }
     

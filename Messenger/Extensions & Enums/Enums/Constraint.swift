@@ -27,7 +27,7 @@ enum Constraint {
 }
 
 extension CGFloat {
-    static func constant(_ constant: Constraint) -> CGFloat {
+    static func const(_ constant: Constraint) -> CGFloat {
         switch constant {
         case .doubleHeight:
             return 80.0

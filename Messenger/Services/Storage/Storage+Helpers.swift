@@ -12,9 +12,7 @@ extension Storage {
         do {
             _ = try get(service: .token, as: String.self, in: .account)
             return true
-        } catch {
-            return false
-        }
+        } catch { return false }
     }
     
     func logOut() throws {

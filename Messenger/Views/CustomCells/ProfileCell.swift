@@ -13,7 +13,7 @@ class ProfileCell: UITableViewCell {
     private lazy var roundImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.clipsToBounds = true
-        imageView.layer.cornerRadius = .constant(.imageCornerRadius)
+        imageView.layer.cornerRadius = .const(.imageCornerRadius)
         imageView.image = .systemImage(.addPhoto, color: nil)
         imageView.contentMode = .scaleAspectFit
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -38,22 +38,22 @@ class ProfileCell: UITableViewCell {
         contentView.addSubview(subtitleLabel)
 
         // Lower priority to avoid warnings
-        let roundImageViewHeightConstraint = roundImageView.heightAnchor.constraint(equalToConstant: ceil(.constant(.imageHeight)))
+        let roundImageViewHeightConstraint = roundImageView.heightAnchor.constraint(equalToConstant: ceil(.const(.imageHeight)))
         roundImageViewHeightConstraint.priority = .defaultHigh
         
         NSLayoutConstraint.activate([
-            roundImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: .constant(.spacing)),
-            roundImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: .constant(.spacing)),
-            roundImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -.constant(.spacing)),
+            roundImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: .const(.spacing)),
+            roundImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: .const(.spacing)),
+            roundImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -.const(.spacing)),
             roundImageViewHeightConstraint,
-            roundImageView.widthAnchor.constraint(equalToConstant: .constant(.imageHeight)),
+            roundImageView.widthAnchor.constraint(equalToConstant: .const(.imageHeight)),
 
-            titleLabel.leadingAnchor.constraint(equalTo: roundImageView.trailingAnchor, constant: .constant(.spacing)),
-            titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -.constant(.spacing)),
+            titleLabel.leadingAnchor.constraint(equalTo: roundImageView.trailingAnchor, constant: .const(.spacing)),
+            titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -.const(.spacing)),
             titleLabel.bottomAnchor.constraint(equalTo: roundImageView.centerYAnchor),
             
-            subtitleLabel.leadingAnchor.constraint(equalTo: roundImageView.trailingAnchor, constant: .constant(.spacing)),
-            subtitleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -.constant(.spacing)),
+            subtitleLabel.leadingAnchor.constraint(equalTo: roundImageView.trailingAnchor, constant: .const(.spacing)),
+            subtitleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -.const(.spacing)),
             subtitleLabel.topAnchor.constraint(equalTo: roundImageView.centerYAnchor)
         ])
     }
