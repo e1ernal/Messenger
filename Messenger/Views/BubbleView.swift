@@ -32,11 +32,11 @@ class BubbleView: UIView {
         set { bubbleColor = newValue }
     }
     
-    @IBInspectable var borderWidth: CGFloat = 0 {
+    var borderWidth: CGFloat = 0 {
         didSet { setNeedsDisplay() }
     }
     
-    @IBInspectable var borderColor: UIColor = .clear {
+    var borderColor: UIColor = .clear {
         didSet { setNeedsDisplay() }
     }
     
@@ -59,17 +59,17 @@ class BubbleView: UIView {
         
         switch side {
         case .left:
+            bezierPath.move(to: CGPoint(x: 22 + borderWidth, y: bottom))
+            bezierPath.addLine(to: CGPoint(x: right - 17, y: bottom))
+            bezierPath.addCurve(to: CGPoint(x: right, y: bottom - 17),
+                                controlPoint1: CGPoint(x: right - 7.61, y: bottom),
+                                controlPoint2: CGPoint(x: right, y: bottom - 7.61))
+            bezierPath.addLine(to: CGPoint(x: right, y: 17 + borderWidth))
+            bezierPath.addCurve(to: CGPoint(x: right - 17, y: top),
+                                controlPoint1: CGPoint(x: right, y: 7.61 + borderWidth),
+                                controlPoint2: CGPoint(x: right - 7.61, y: top))
             switch roundType {
             case .start:
-                bezierPath.move(to: CGPoint(x: 22 + borderWidth, y: bottom))
-                bezierPath.addLine(to: CGPoint(x: right - 17, y: bottom))
-                bezierPath.addCurve(to: CGPoint(x: right, y: bottom - 17),
-                                    controlPoint1: CGPoint(x: right - 7.61, y: bottom),
-                                    controlPoint2: CGPoint(x: right, y: bottom - 7.61))
-                bezierPath.addLine(to: CGPoint(x: right, y: 17 + borderWidth))
-                bezierPath.addCurve(to: CGPoint(x: right - 17, y: top),
-                                    controlPoint1: CGPoint(x: right, y: 7.61 + borderWidth),
-                                    controlPoint2: CGPoint(x: right - 7.61, y: top))
                 bezierPath.addLine(to: CGPoint(x: 21 + borderWidth, y: top))
                 bezierPath.addCurve(to: CGPoint(x: 4 + borderWidth, y: 17 + borderWidth),
                                     controlPoint1: CGPoint(x: 11.61 + borderWidth, y: top),
@@ -81,15 +81,6 @@ class BubbleView: UIView {
                                   endAngle: .pi / 2,
                                   clockwise: false)
             case .between:
-                bezierPath.move(to: CGPoint(x: 22 + borderWidth, y: bottom))
-                bezierPath.addLine(to: CGPoint(x: right - 17, y: bottom))
-                bezierPath.addCurve(to: CGPoint(x: right, y: bottom - 17),
-                                    controlPoint1: CGPoint(x: right - 7.61, y: bottom),
-                                    controlPoint2: CGPoint(x: right, y: bottom - 7.61))
-                bezierPath.addLine(to: CGPoint(x: right, y: 17 + borderWidth))
-                bezierPath.addCurve(to: CGPoint(x: right - 17, y: top),
-                                    controlPoint1: CGPoint(x: right, y: 7.61 + borderWidth),
-                                    controlPoint2: CGPoint(x: right - 7.61, y: top))
                 bezierPath.addLine(to: CGPoint(x: 21 + borderWidth, y: top))
                 bezierPath.addArc(withCenter: CGPoint(x: borderWidth + 9, y: top + 5),
                                   radius: 5,
@@ -103,15 +94,6 @@ class BubbleView: UIView {
                                   endAngle: .pi / 2,
                                   clockwise: false)
             case .end:
-                bezierPath.move(to: CGPoint(x: 22 + borderWidth, y: bottom))
-                bezierPath.addLine(to: CGPoint(x: right - 17, y: bottom))
-                bezierPath.addCurve(to: CGPoint(x: right, y: bottom - 17),
-                                    controlPoint1: CGPoint(x: right - 7.61, y: bottom),
-                                    controlPoint2: CGPoint(x: right, y: bottom - 7.61))
-                bezierPath.addLine(to: CGPoint(x: right, y: 17 + borderWidth))
-                bezierPath.addCurve(to: CGPoint(x: right - 17, y: top),
-                                    controlPoint1: CGPoint(x: right, y: 7.61 + borderWidth),
-                                    controlPoint2: CGPoint(x: right - 7.61, y: top))
                 bezierPath.addLine(to: CGPoint(x: 9 + borderWidth, y: top))
                 bezierPath.addArc(withCenter: CGPoint(x: borderWidth + 9, y: top + 5),
                                   radius: 5,
@@ -130,15 +112,6 @@ class BubbleView: UIView {
                                     controlPoint1: CGPoint(x: borderWidth + 16, y: bottom),
                                     controlPoint2: CGPoint(x: borderWidth + 19, y: bottom))
             case .startEnd:
-                bezierPath.move(to: CGPoint(x: 22 + borderWidth, y: bottom))
-                bezierPath.addLine(to: CGPoint(x: right - 17, y: bottom))
-                bezierPath.addCurve(to: CGPoint(x: right, y: bottom - 17),
-                                    controlPoint1: CGPoint(x: right - 7.61, y: bottom),
-                                    controlPoint2: CGPoint(x: right, y: bottom - 7.61))
-                bezierPath.addLine(to: CGPoint(x: right, y: 17 + borderWidth))
-                bezierPath.addCurve(to: CGPoint(x: right - 17, y: top),
-                                    controlPoint1: CGPoint(x: right, y: 7.61 + borderWidth),
-                                    controlPoint2: CGPoint(x: right - 7.61, y: top))
                 bezierPath.addLine(to: CGPoint(x: 21 + borderWidth, y: top))
                 bezierPath.addCurve(to: CGPoint(x: 4 + borderWidth, y: 17 + borderWidth),
                                     controlPoint1: CGPoint(x: 11.61 + borderWidth, y: top),
@@ -156,17 +129,17 @@ class BubbleView: UIView {
                                     controlPoint2: CGPoint(x: borderWidth + 19, y: bottom))
             }
         case .right:
+            bezierPath.move(to: CGPoint(x: right - 22, y: bottom))
+            bezierPath.addLine(to: CGPoint(x: 17 + borderWidth, y: bottom))
+            bezierPath.addCurve(to: CGPoint(x: left, y: bottom - 18),
+                                controlPoint1: CGPoint(x: 7.61 + borderWidth, y: bottom),
+                                controlPoint2: CGPoint(x: left, y: bottom - 7.61))
+            bezierPath.addLine(to: CGPoint(x: left, y: 17 + borderWidth))
+            bezierPath.addCurve(to: CGPoint(x: 17 + borderWidth, y: top),
+                                controlPoint1: CGPoint(x: left, y: 7.61 + borderWidth),
+                                controlPoint2: CGPoint(x: 7.61 + borderWidth, y: top))
             switch roundType {
             case .start:
-                bezierPath.move(to: CGPoint(x: right - 22, y: bottom))
-                bezierPath.addLine(to: CGPoint(x: 17 + borderWidth, y: bottom))
-                bezierPath.addCurve(to: CGPoint(x: left, y: bottom - 18),
-                                    controlPoint1: CGPoint(x: 7.61 + borderWidth, y: bottom),
-                                    controlPoint2: CGPoint(x: left, y: bottom - 7.61))
-                bezierPath.addLine(to: CGPoint(x: left, y: 17 + borderWidth))
-                bezierPath.addCurve(to: CGPoint(x: 17 + borderWidth, y: top),
-                                    controlPoint1: CGPoint(x: left, y: 7.61 + borderWidth),
-                                    controlPoint2: CGPoint(x: 7.61 + borderWidth, y: top))
                 bezierPath.addLine(to: CGPoint(x: right - 21, y: top))
                 bezierPath.addCurve(to: CGPoint(x: right - 4, y: 17 + borderWidth),
                                     controlPoint1: CGPoint(x: right - 11.61, y: top),
@@ -178,15 +151,6 @@ class BubbleView: UIView {
                                   endAngle: .pi / 2,
                                   clockwise: true)
             case .between:
-                bezierPath.move(to: CGPoint(x: right - 22, y: bottom))
-                bezierPath.addLine(to: CGPoint(x: 17 + borderWidth, y: bottom))
-                bezierPath.addCurve(to: CGPoint(x: left, y: bottom - 18),
-                                    controlPoint1: CGPoint(x: 7.61 + borderWidth, y: bottom),
-                                    controlPoint2: CGPoint(x: left, y: bottom - 7.61))
-                bezierPath.addLine(to: CGPoint(x: left, y: 17 + borderWidth))
-                bezierPath.addCurve(to: CGPoint(x: 17 + borderWidth, y: top),
-                                    controlPoint1: CGPoint(x: left, y: 7.61 + borderWidth),
-                                    controlPoint2: CGPoint(x: 7.61 + borderWidth, y: top))
                 bezierPath.addLine(to: CGPoint(x: right - 21, y: top))
                 bezierPath.addArc(withCenter: CGPoint(x: right - 9, y: 5),
                                   radius: 5,
@@ -200,15 +164,6 @@ class BubbleView: UIView {
                                   endAngle: .pi / 2,
                                   clockwise: true)
             case .end:
-                bezierPath.move(to: CGPoint(x: right - 22, y: bottom))
-                bezierPath.addLine(to: CGPoint(x: 17 + borderWidth, y: bottom))
-                bezierPath.addCurve(to: CGPoint(x: left, y: bottom - 18),
-                                    controlPoint1: CGPoint(x: 7.61 + borderWidth, y: bottom),
-                                    controlPoint2: CGPoint(x: left, y: bottom - 7.61))
-                bezierPath.addLine(to: CGPoint(x: left, y: 17 + borderWidth))
-                bezierPath.addCurve(to: CGPoint(x: 17 + borderWidth, y: top),
-                                    controlPoint1: CGPoint(x: left, y: 7.61 + borderWidth),
-                                    controlPoint2: CGPoint(x: 7.61 + borderWidth, y: top))
                 bezierPath.addLine(to: CGPoint(x: right - 21, y: top))
                 bezierPath.addArc(withCenter: CGPoint(x: right - 9, y: 5),
                                   radius: 5,
@@ -227,15 +182,6 @@ class BubbleView: UIView {
                                     controlPoint1: CGPoint(x: right - 16, y: bottom),
                                     controlPoint2: CGPoint(x: right - 19, y: bottom))
             case .startEnd:
-                bezierPath.move(to: CGPoint(x: right - 22, y: bottom))
-                bezierPath.addLine(to: CGPoint(x: 17 + borderWidth, y: bottom))
-                bezierPath.addCurve(to: CGPoint(x: left, y: bottom - 18),
-                                    controlPoint1: CGPoint(x: 7.61 + borderWidth, y: bottom),
-                                    controlPoint2: CGPoint(x: left, y: bottom - 7.61))
-                bezierPath.addLine(to: CGPoint(x: left, y: 17 + borderWidth))
-                bezierPath.addCurve(to: CGPoint(x: 17 + borderWidth, y: top),
-                                    controlPoint1: CGPoint(x: left, y: 7.61 + borderWidth),
-                                    controlPoint2: CGPoint(x: 7.61 + borderWidth, y: top))
                 bezierPath.addLine(to: CGPoint(x: right - 21, y: top))
                 bezierPath.addCurve(to: CGPoint(x: right - 4, y: 17 + borderWidth),
                                     controlPoint1: CGPoint(x: right - 11.61, y: top),
@@ -255,7 +201,6 @@ class BubbleView: UIView {
         }
         
         bezierPath.close()
-        
         backgroundColor?.setFill()
         borderColor.setStroke()
         bezierPath.fill()

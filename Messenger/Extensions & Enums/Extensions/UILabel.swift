@@ -10,9 +10,7 @@ import UIKit
 
 extension UILabel {
     var actualNumberOfLines: Int {
-        guard let text = self.text else {
-            return 0
-        }
+        guard let text = self.text else { return 0 }
         layoutIfNeeded()
         let rect = CGSize(width: bounds.width, height: CGFloat.greatestFiniteMagnitude)
         let labelSize = text.boundingRect(

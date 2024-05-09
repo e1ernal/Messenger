@@ -15,12 +15,39 @@ extension Storage {
         } catch { return false }
     }
     
-    func logOut() throws {
-        do {
-            try Storage.shared.delete(service: .token, in: .account)
-            try Storage.shared.delete(service: .user, in: .account)
-            try Storage.shared.delete(service: .chats, in: .account)
-        } catch { throw error }
+    func logOut() {
+        let services = Service.allCases
+        services.forEach { service in
+            do { try Storage.shared.delete(service: service, in: .account) } catch {}
+        }
+    }
+    
+    func showAllData() {
+        print("Storage:")
+        let services = Service.allCases
+        services.forEach { service in
+            let type: Codable.Type
+            switch service {
+            case .user:
+                type = User.self
+            case .chats:
+                type = [Chat].self
+            case .symmetricKeys:
+                type = ChatSymmetricKey.self
+            default:
+                type = String.self
+            }
+            do {
+                let object = try Storage.shared.get(service: service, as: type, in: .account)
+                if type == String.self {
+                    print("- \(service.rawValue): \(Print.objectInfo(object: object))")
+                } else {
+                    print("- \(service.rawValue): \(Print.objectInfo(object: object, spacer: "    "))")
+                }
+            } catch {
+                print("- \(service.rawValue): -")
+            }
+        }
     }
     
     func getChatsData() async throws {
@@ -41,7 +68,8 @@ extension Storage {
                         lastName: userGet.last_name ?? "",
                         image: image,
                         phoneNumber: userGet.phone_number.numberFormatter(),
-                        username: userGet.username)
+                        username: userGet.username,
+                        publicKey: userGet.public_key)
         
         do { try Storage.shared.save(user, as: .user, in: .account)
         } catch { try Storage.shared.update(user, as: .user, in: .account) }

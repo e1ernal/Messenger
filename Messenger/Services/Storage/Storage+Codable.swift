@@ -14,7 +14,7 @@ extension Storage {
             let encoder = JSONEncoder()
             return try encoder.encode(object)
         } catch {
-            throw KeychainError.error_Encoding
+            throw DescriptionError.error("Can't encode")
         }
     }
     
@@ -23,7 +23,7 @@ extension Storage {
             let decoder = JSONDecoder()
             return try decoder.decode(T.self, from: object)
         } catch {
-            throw KeychainError.error_Decoding
+            throw DescriptionError.error("Can't decode")
         }
     }
 }

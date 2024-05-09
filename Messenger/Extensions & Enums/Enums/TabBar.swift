@@ -1,8 +1,8 @@
 //
-//  TabBarItem.swift
+//  TabBar.swift
 //  Messenger
 //
-//  Created by e1ernal on 05.01.2024.
+//  Created by e1ernal on 05.05.2024.
 //
 
 import Foundation

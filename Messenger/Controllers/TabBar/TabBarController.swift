@@ -45,9 +45,8 @@ final class TabBarController: UITabBarController {
         let secondItemView = self.tabBar.subviews[1]
         
         guard let firstItem = firstItemView.subviews.first as? UIImageView,
-              let secondItem = secondItemView.subviews.first as? UIImageView else {
-            return
-        }
+              let secondItem = secondItemView.subviews.first as? UIImageView else { return }
+        
         firstItemImageView = firstItem
         secondItemImageView = secondItem
         firstItemImageView.contentMode = .center
@@ -59,9 +58,7 @@ final class TabBarController: UITabBarController {
     ///   - tabBar: Chats & Settings tabBar
     ///   - item: Chats or Settings item
     override func tabBar(_ tabBar: UITabBar, didSelect item: UITabBarItem) {
-        guard selectedIndex != item.tag else {
-            return
-        }
+        guard selectedIndex != item.tag else { return }
         
         switch item.tag {
         case 0:

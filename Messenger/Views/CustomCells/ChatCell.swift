@@ -19,13 +19,6 @@ class ChatCell: UITableViewCell {
         return imageView
     }()
     
-    private let separatorView: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.backgroundColor = .separator
-        return view
-    }()
-    
     private let nameLabel = BasicLabel("", .font(.subtitleBold))
     private let messageLabel = BasicLabel("", .font(.subtitle))
     private let dateLabel = BasicLabel("", .font(.body))
@@ -50,7 +43,6 @@ class ChatCell: UITableViewCell {
         contentView.addSubview(nameLabel)
         contentView.addSubview(messageLabel)
         contentView.addSubview(dateLabel)
-        contentView.addSubview(separatorView)
 
         // Lower priority to avoid warnings
         let roundImageViewHeightConstraint = roundImageView.heightAnchor.constraint(equalToConstant: ceil(.const(.chatImageHeight)))
@@ -60,8 +52,8 @@ class ChatCell: UITableViewCell {
             roundImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: .const(.spacing)),
             roundImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: .const(.spacing)),
             roundImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -.const(.spacing)),
-            roundImageViewHeightConstraint,
             roundImageView.widthAnchor.constraint(equalToConstant: .const(.chatImageHeight)),
+            roundImageViewHeightConstraint,
 
             nameLabel.leadingAnchor.constraint(equalTo: roundImageView.trailingAnchor, constant: .const(.spacing)),
             nameLabel.topAnchor.constraint(equalTo: roundImageView.topAnchor),
@@ -72,16 +64,13 @@ class ChatCell: UITableViewCell {
             messageLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor),
             
             dateLabel.centerYAnchor.constraint(equalTo: nameLabel.centerYAnchor),
-            dateLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -.const(.spacing)),
-            
-            separatorView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
-            separatorView.leadingAnchor.constraint(equalTo: roundImageView.trailingAnchor),
-            separatorView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            separatorView.heightAnchor.constraint(equalToConstant: 0.5)
+            dateLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -.const(.spacing))
         ])
         
         messageLabelBottomConstraint = messageLabel.bottomAnchor.constraint(equalTo: roundImageView.bottomAnchor)
         messageLabelBottomConstraint?.isActive = true
+        
+        self.separatorInset = UIEdgeInsets(top: 0, left: .const(.chatImageHeight) + 2 * .const(.spacing), bottom: 0, right: 0)
     }
     
     func configure(image: UIImage, name: String, message: String?, date: String?) {

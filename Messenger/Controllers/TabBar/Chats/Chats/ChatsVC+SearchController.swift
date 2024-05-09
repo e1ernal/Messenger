@@ -30,7 +30,7 @@ extension ChatsViewController {
             do {
                 let token = try Storage.shared.get(service: .token, as: String.self, in: .account)
                 
-                let usersGet = try await NetworkService.shared.searchUsersByUsername(username: text, token: token)
+                let usersGet = try await NetworkService.shared.searchUsers(userInfo: text, token: token)
                 var users: [User] = []
                 for user in usersGet {
                     let image = try await NetworkService.shared.getUserImage(imagePath: user.image)
@@ -39,7 +39,8 @@ extension ChatsViewController {
                                     lastName: user.last_name ?? "",
                                     image: image,
                                     phoneNumber: user.phone_number,
-                                    username: user.username)
+                                    username: user.username,
+                                    publicKey: user.public_key)
                     users.append(user)
                 }
                 resultsViewController.updateSearchResults(results: users)

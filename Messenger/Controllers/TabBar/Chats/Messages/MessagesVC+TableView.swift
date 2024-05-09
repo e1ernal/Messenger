@@ -64,8 +64,9 @@ extension MessagesVC: UITableViewDelegate, UITableViewDataSource {
                 let messagesData = try await NetworkService.shared.getMessages(chatId: chatId, token: token)
                 
                 for messageData in messagesData {
+                    let decodedMessage = try SymmetricEncryption.shared.decrypt(message: messageData.text, key: symmetricKey)
                     let newMessage = MessageRow(authorId: messageData.author.id,
-                                                message: messageData.text,
+                                                message: decodedMessage,
                                                 date: messageData.createdAt,
                                                 time: messageData.createdAt.toTime(),
                                                 side: messageData.author.id == userId ? .right : .left,

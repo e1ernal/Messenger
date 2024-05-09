@@ -5,6 +5,7 @@
 //  Created by e1ernal on 15.03.2024.
 //
 
+import CryptoKit
 import UIKit
 
 enum MessageType {
@@ -27,10 +28,10 @@ enum RoundType: Int, Codable {
 struct MessageRow: Codable {
     var type = "message"
     let authorId: Int
-    let message: String
+    var message: String
     let date: Int
     let time: String
-    let side: Side
+    var side: Side
     var roundType: RoundType
 }
 
@@ -43,6 +44,7 @@ class MessagesVC: UIViewController, URLSessionWebSocketDelegate, WebSocketDelega
     internal var image: UIImage
     internal var chatId: Int
     internal var userId: Int
+    internal var symmetricKey: String
     
     internal var messages: [MessageType] = []
     let scrollView = UIScrollView()
@@ -126,11 +128,12 @@ class MessagesVC: UIViewController, URLSessionWebSocketDelegate, WebSocketDelega
     }
     
     // MARK: - Init UIViewController
-    init(name: String, image: UIImage, chatId: Int, userId: Int) {
+    init(name: String, image: UIImage, chatId: Int, userId: Int, symmetricKey: String) {
         self.name = name
         self.image = image
         self.chatId = chatId
         self.userId = userId
+        self.symmetricKey = symmetricKey
         
         super.init(nibName: nil, bundle: nil)
     }
@@ -152,7 +155,9 @@ class MessagesVC: UIViewController, URLSessionWebSocketDelegate, WebSocketDelega
         let messageData = Data(data.utf8)
         let decoder = JSONDecoder()
         do {
-            let message = try decoder.decode(MessageRow.self, from: messageData)
+            var message = try decoder.decode(MessageRow.self, from: messageData)
+            message.side = message.authorId == userId ? .right : .left
+            message.message = try SymmetricEncryption.shared.decrypt(message: message.message, key: symmetricKey)
             configureMessages(with: message, withAnimation: true)
         } catch { print("Can't receive message") }
     }
@@ -290,7 +295,10 @@ class MessagesVC: UIViewController, URLSessionWebSocketDelegate, WebSocketDelega
         Task {
             do {
                 let token = try Storage.shared.get(service: .token, as: String.self, in: .account)
-                let messageData = try await NetworkService.shared.sendMessage(chatId: chatId, token: token, message: message)
+                let encryptedMessage = try SymmetricEncryption.shared.encrypt(message: message, key: symmetricKey)
+                let messageData = try await NetworkService.shared.sendMessage(chatId: chatId,
+                                                                              token: token,
+                                                                              message: encryptedMessage)
                 
                 let newMessage = MessageRow(authorId: messageData.author.id,
                                             message: messageData.text,
@@ -311,7 +319,6 @@ class MessagesVC: UIViewController, URLSessionWebSocketDelegate, WebSocketDelega
     
     func configureMessages(with newMessage: MessageRow, withAnimation: Bool) {
         let messageTypeMessage: MessageType = .message(newMessage)
-        
         let sectionRow = SectionRow(sectionDate: newMessage.date.toSectionDate())
         let messageTypeSection: MessageType = .section(sectionRow)
         var countOfNewMessages = 0
@@ -388,7 +395,7 @@ class MessagesVC: UIViewController, URLSessionWebSocketDelegate, WebSocketDelega
             
             var indexPathsUpdated: [IndexPath] = []
             if !messages.isEmpty {
-                for rowNumber in 1...countOfNewMessages + 1 {
+                for rowNumber in 1...min(countOfNewMessages + 1, messages.count) {
                     indexPathsUpdated.append(IndexPath(row: messages.count - rowNumber, section: 0))
                 }
             } else {

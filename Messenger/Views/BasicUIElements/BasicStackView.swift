@@ -24,8 +24,8 @@ class BasicStackView: UIStackView {
     
     convenience init(_ stackAxis: NSLayoutConstraint.Axis,
                      _ stackSpacing: CGFloat,
-                     _ stackDistribution: UIStackView.Distribution?,
-                     _ stackAlignment: UIStackView.Alignment?) {
+                     _ stackDistribution: UIStackView.Distribution? = nil,
+                     _ stackAlignment: UIStackView.Alignment? = nil) {
         self.init()
         axis = stackAxis
         spacing = stackSpacing

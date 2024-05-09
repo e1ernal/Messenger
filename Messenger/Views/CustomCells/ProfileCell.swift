@@ -56,6 +56,8 @@ class ProfileCell: UITableViewCell {
             subtitleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -.const(.spacing)),
             subtitleLabel.topAnchor.constraint(equalTo: roundImageView.centerYAnchor)
         ])
+        
+        accessoryType = .disclosureIndicator
     }
     
     func configure(image: UIImage, title: String, subtitle: String) {

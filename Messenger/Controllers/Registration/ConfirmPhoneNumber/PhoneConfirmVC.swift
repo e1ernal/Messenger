@@ -22,8 +22,8 @@ class PhoneConfirmViewController: UIViewController {
     private let emojiLabel = BasicLabel("💬", .font(.large))
     private let titleLabel = BasicLabel("Enter Code", .font(.title))
     private lazy var subtitleLabel = BasicLabel(NSMutableAttributedString()
-        .font("We're sent an SMS with an activation code to your phone:\n", .font(.subtitle))
-        .font(phoneNumber ?? "undefined", .font(.subtitleBold))
+        .font("We're sent an SMS with an activation code to your phone:\n", .font(.subtitle), .center)
+        .font(phoneNumber ?? "undefined", .font(.subtitleBold), .center)
     )
     
     private let digitsStackView = BasicStackView(.horizontal, .const(.spacing), .fillEqually, .fill)
@@ -49,12 +49,12 @@ class PhoneConfirmViewController: UIViewController {
     private let uiStackView = BasicStackView(.vertical, .const(.spacing), nil, nil)
     
     private lazy var helpLabel = BasicLabel(NSMutableAttributedString()
-        .font("Sorry", .font(.title))
-        .font("\n\nIf you don't get the code by SMS, please check your ", .font(.subtitle))
-        .font("cellular data settings", .font(.subtitleBold))
-        .font(" and phone number:\n\n", .font(.subtitle))
-        .font(phoneNumber ?? "undefined", .font(.subtitleBold))
-        .font("\n\nYour remaining option is to try another number", .font(.subtitle))
+        .font("Sorry", .font(.title), .center)
+        .font("\n\nIf you don't get the code by SMS, please check your ", .font(.subtitle), .center)
+        .font("cellular data settings", .font(.subtitleBold), .center)
+        .font(" and phone number:\n\n", .font(.subtitle), .center)
+        .font(phoneNumber ?? "undefined", .font(.subtitleBold), .center)
+        .font("\n\nYour remaining option is to try another number", .font(.subtitle), .center)
     )
     
     private lazy var editNumberButton = BasicButton(title: "Edit Number", style: .filled(.active)) {
@@ -158,8 +158,6 @@ class PhoneConfirmViewController: UIViewController {
     }
     
     private func showConfirmCode() {
-        self.showSnackBar(text: "Your code: \(code ?? "Error: No code")",
-                          image: .systemImage(.number, color: nil),
-                          on: self)
+        Print.info(screen: self, action: #function, reason: ["Code": code ?? "-"], show: true)
     }
 }

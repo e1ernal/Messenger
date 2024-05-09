@@ -82,27 +82,56 @@ extension FoundUserTableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
-        guard indexPath.section == 2 && indexPath.row == 0 else {
-            return
-        }
+        guard indexPath.section == 2 && indexPath.row == 0 else { return }
         
         Task {
             do {
                 var chats = try Storage.shared.get(service: .chats, as: [Chat].self, in: .account)
-                if !chats.contains(where: { chat in
-                    chat.username == user.username
-                }) {
+                if !chats.contains(where: { $0.username == user.username }) {
                     let token = try Storage.shared.get(service: .token, as: String.self, in: .account)
-                    try await NetworkService.shared.createChatWithUser(userId: user.id, token: token)
                     
+                    // Generate symmetric key and encrypt it
+                    let symmetricKey = SymmetricEncryption.shared.generateKey()
+                    let encryptedKey = try AsymmetricEncryption.shared.encrypt(message: symmetricKey, publicKey: user.publicKey)
+                    print("Encrypted with: ", user.publicKey.prefix(20))
+                    
+                    // Create chat with user
+                    try await NetworkService.shared.createChatWithUser(userId: user.id,
+                                                                       token: token,
+                                                                       encrypted_key: encryptedKey)
+                    
+                    // Get all chats and update local storage
                     chats = try await NetworkService.shared.getChats(token: token)
                     try Storage.shared.update(chats, as: .chats, in: .account)
                     
+                    // Get new chat id
+                    let newChat = chats.first { $0.username == user.username }
+                    let newChatId = newChat?.directChat.id
+                    
+                    // Update local storage with symmetric keys
+                    var symmetricKeys = ChatSymmetricKey()
+                    do {
+                        // Case when there are some symmetric keys
+                        symmetricKeys = try Storage.shared.get(service: .symmetricKeys,
+                                                               as: ChatSymmetricKey.self,
+                                                               in: .account)
+                    } catch {
+                        // Case when there aren't some symmetric keys
+                        symmetricKeys = ChatSymmetricKey()
+                    }
+                    
+                    if let newChatId {
+                        symmetricKeys.insert(chatId: newChatId, symmetricKey: symmetricKey)
+                    }
+                    do { try Storage.shared.update(symmetricKeys, as: .symmetricKeys, in: .account)
+                    } catch {try Storage.shared.save(symmetricKeys, as: .symmetricKeys, in: .account)}
+                    
+                    Storage.shared.showAllData()
                     navigate(.back)
                 }
                 dismiss(animated: true)
             } catch {
-                showSnackBar(text: error.localizedDescription, image: .systemImage(.warning, color: nil), on: self)
+                Print.error(screen: self, action: #function, reason: error, show: true)
             }
         }
     }

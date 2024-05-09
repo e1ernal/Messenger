@@ -68,16 +68,15 @@ class LaunchScreenVC: UIViewController {
                 try await Storage.shared.getChatsData()
                 
                 indicator(animating: .stop) { _ in
+                    Storage.shared.showAllData()
                     let nextVC = TabBarController()
                     self.navigate(.root(nextVC))
                 }
             } catch {
-                showSnackBar(text: error.localizedDescription, image: .systemImage(.warning, color: nil), on: self)
-                do {
-                    try Storage.shared.logOut()
-                    let nextVC = OnboardingViewController()
-                    navigate(.rootNavigation(nextVC))
-                } catch { print(error) }
+                Print.error(screen: self, action: #function, reason: error, show: true)
+                Storage.shared.logOut()
+                let nextVC = OnboardingViewController()
+                navigate(.rootNavigation(nextVC))
             }
         }
     }

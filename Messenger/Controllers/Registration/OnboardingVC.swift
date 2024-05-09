@@ -18,6 +18,7 @@ class OnboardingViewController: UIViewController {
         super.viewDidLoad()
         
         configureUI()
+        configureData()
     }
     
     private func configureUI() {
@@ -35,5 +36,9 @@ class OnboardingViewController: UIViewController {
             startButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -.const(.doubleHeight)),
             startButton.heightAnchor.constraint(equalToConstant: .const(.height))
         ])
+    }
+    
+    private func configureData() {
+        Storage.shared.logOut()
     }
 }

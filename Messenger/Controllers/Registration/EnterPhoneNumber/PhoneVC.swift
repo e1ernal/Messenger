@@ -140,7 +140,7 @@ class PhoneViewController: UIViewController {
                 let nextVC = PhoneConfirmViewController(phoneNumber: text, code: code)
                 navigate(.next(nextVC, .fullScreen))
             } catch {
-                self.showSnackBar(text: error.localizedDescription, image: .systemImage(.warning, color: nil), on: self)
+                Print.error(screen: self, action: #function, reason: error, show: true)
             }
         }
     }

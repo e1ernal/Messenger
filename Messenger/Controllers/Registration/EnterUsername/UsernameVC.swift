@@ -93,10 +93,13 @@ class UsernameViewController: UIViewController {
         
         Task {
             do {
+                let publicKey = try Storage.shared.get(service: .publicKey, as: String.self, in: .account)
+                
                 let token = try await NetworkService.shared.createUser(username: username,
                                                                        firstname: firstName,
                                                                        lastname: lastName,
-                                                                       image: profileImage)
+                                                                       image: profileImage,
+                                                                       public_key: publicKey)
                 
                 try Storage.shared.save(token, as: .token, in: .account)
                 let nextVC = LaunchScreenVC(greeting: "Welcome")

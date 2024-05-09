@@ -40,6 +40,8 @@ class DoubleLabelCell: UITableViewCell {
             rightLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: .const(.spacing)),
             rightLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -.const(.spacing))
         ])
+        
+        self.separatorInset = UIEdgeInsets(top: 0, left: .const(.spacing), bottom: 0, right: 0)
     }
     
     func configure(left: String, right: String) {

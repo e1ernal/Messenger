@@ -35,6 +35,8 @@ class FoundUserTableViewController: UITableViewController {
         configureNavigationBar()
         configureTableView()
         configureSections()
+        
+        print(Print.objectInfo(object: user))
     }
     
     private func configureSections() {

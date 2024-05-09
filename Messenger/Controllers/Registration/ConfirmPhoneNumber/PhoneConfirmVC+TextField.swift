@@ -28,8 +28,14 @@ extension PhoneConfirmViewController: UITextFieldDelegate {
         if text.count == digitsCount {
             Task {
                 do {
-                    // Сhecking whether the user has a token
-                    guard let token = try await NetworkService.shared.confirmVerificationCode(code: text) else {
+                    // MARK: - Сheck whether the user has a token
+                    // Generate Private and Public Keys
+                    let keys = try AsymmetricEncryption.shared.generateKeys()
+                    
+                    try Storage.shared.save(keys.publicKey, as: .publicKey, in: .account)
+                    try Storage.shared.save(keys.privateKey, as: .privateKey, in: .account)
+                    
+                    guard let token = try await NetworkService.shared.confirmVerificationCode(code: text, publicKey: keys.publicKey) else {
                         // The user does not have an account, he continues to register
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                             self.navigate(.next(ProfileInfoViewController(), .fullScreen))
@@ -42,16 +48,13 @@ extension PhoneConfirmViewController: UITextFieldDelegate {
                         label.layer.borderColor = .color(.success)
                     }
                     
-                    print("TOKEN:", token)
                     try Storage.shared.save(token, as: .token, in: .account)
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                         let nextVC = LaunchScreenVC(greeting: "Welcome")
                         self.navigate(.root(nextVC))
                     }
                 } catch {
-                    self.showSnackBar(text: "Invalid confirmation code", 
-                                      image: .systemImage(.warning, color: nil),
-                                      on: self)
+                    Print.error(screen: self, action: #function, reason: error, show: true)
                     for label in digitLabels {
                         label.layer.borderColor = .color(.failure)
                     }

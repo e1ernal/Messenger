@@ -10,61 +10,55 @@ import UIKit
 
 extension UITableView {
     func setEmptyView(name: String) {
-        let backgroundView = UIView(frame: CGRect(x: self.center.x,
-                                                  y: self.center.y,
-                                                  width: self.bounds.size.width,
-                                                  height: self.bounds.size.height))
-        let titleLabel = UILabel()
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.textColor = .label
-        titleLabel.font = .systemFont(ofSize: CGFloat(14), weight: .bold)
-        titleLabel.text = "You invited \(name) to join a Chat"
-        titleLabel.numberOfLines = 0
-        titleLabel.textAlignment = .center
+        let imageAttachment = NSTextAttachment()
+        imageAttachment.image = UIImage.systemImage(.lock)
+            .withConfiguration(UIImage.SymbolConfiguration(scale: .small))
+            .withTintColor(.label)
         
-        let attributedString = NSMutableAttributedString(string: "Chats:\n🔒 Use end-to-end encryption\n🔒 Leave no trace on our servers\n🔒 Do not allow forwarding")
-        let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.lineSpacing = .const(.halfSpacing)
-        attributedString.addAttribute(NSAttributedString.Key.paragraphStyle,
-                                      value: paragraphStyle,
-                                      range: NSRange(location: 0, length: attributedString.length))
+        let imageString = NSAttributedString(attachment: imageAttachment)
         
-        let messageLabel = UILabel()
-        messageLabel.translatesAutoresizingMaskIntoConstraints = false
-        messageLabel.textColor = .secondaryLabel
-        messageLabel.font = .systemFont(ofSize: CGFloat(13), weight: .regular)
-        messageLabel.attributedText = attributedString
-        messageLabel.numberOfLines = 0
-        messageLabel.textAlignment = .left
+        let attributedString = NSMutableAttributedString()
+        attributedString.append(NSMutableAttributedString()
+            .font("You invited \(name) to join a Chat\n", .systemFont(ofSize: CGFloat(14), weight: .bold), .center)
+            .font("\nChats:\n", .systemFont(ofSize: CGFloat(13), weight: .regular), .left)
+        )
         
+        let texts = ["Use end-to-end encryption\n", "Leave no trace on our servers\n", "Do not allow forwarding"]
+        for text in texts {
+            attributedString.append(imageString)
+            attributedString.append(NSMutableAttributedString()
+                .font("  \(text)", .systemFont(ofSize: CGFloat(13), weight: .regular), .left)
+            )
+            attributedString.addAttribute(.baselineOffset,
+                                          value: 2,
+                                          range: NSRange(location: attributedString.length - text.count, length: text.count))
+        }
+        
+        let attributedLabel = UILabel()
+        attributedLabel.attributedText = attributedString
+        attributedLabel.numberOfLines = 0
+        attributedLabel.isUserInteractionEnabled = true
+        attributedLabel.translatesAutoresizingMaskIntoConstraints = false
+
         let bubbleView = UIView()
+        bubbleView.backgroundColor = .secondarySystemFill
         bubbleView.translatesAutoresizingMaskIntoConstraints = false
-        bubbleView.backgroundColor = .secondarySystemBackground
         bubbleView.layer.cornerRadius = .const(.cornerRadius)
         
-        let stack = UIStackView()
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        stack.axis = .vertical
-        stack.alignment = .center
-        stack.spacing = .const(.spacing)
-        stack.addArrangedSubview(titleLabel)
-        stack.addArrangedSubview(messageLabel)
-        
+        let backgroundView = UIView()
+        backgroundView.backgroundColor = .clear
+        backgroundView.addSubview(attributedLabel)
         backgroundView.addSubview(bubbleView)
-        backgroundView.addSubview(stack)
-        
+
         NSLayoutConstraint.activate([
-            stack.centerYAnchor.constraint(equalTo: backgroundView.centerYAnchor),
-            stack.centerXAnchor.constraint(equalTo: backgroundView.centerXAnchor),
-            stack.widthAnchor.constraint(equalTo: backgroundView.widthAnchor, multiplier: 0.6),
-            
-            titleLabel.leadingAnchor.constraint(equalTo: messageLabel.leadingAnchor),
-            titleLabel.trailingAnchor.constraint(equalTo: messageLabel.trailingAnchor),
-            
-            bubbleView.topAnchor.constraint(equalTo: stack.topAnchor, constant: -.const(.cornerRadius)),
-            bubbleView.leadingAnchor.constraint(equalTo: stack.leadingAnchor, constant: -.const(.cornerRadius)),
-            bubbleView.trailingAnchor.constraint(equalTo: stack.trailingAnchor, constant: .const(.cornerRadius)),
-            bubbleView.bottomAnchor.constraint(equalTo: stack.bottomAnchor, constant: .const(.cornerRadius))
+            attributedLabel.centerYAnchor.constraint(equalTo: backgroundView.centerYAnchor),
+            attributedLabel.centerXAnchor.constraint(equalTo: backgroundView.centerXAnchor),
+            attributedLabel.widthAnchor.constraint(equalTo: backgroundView.widthAnchor, multiplier: 0.6),
+
+            bubbleView.topAnchor.constraint(equalTo: attributedLabel.topAnchor, constant: -.const(.cornerRadius)),
+            bubbleView.leadingAnchor.constraint(equalTo: attributedLabel.leadingAnchor, constant: -.const(.cornerRadius)),
+            bubbleView.trailingAnchor.constraint(equalTo: attributedLabel.trailingAnchor, constant: .const(.cornerRadius)),
+            bubbleView.bottomAnchor.constraint(equalTo: attributedLabel.bottomAnchor, constant: .const(.cornerRadius))
         ])
         
         self.backgroundView = backgroundView

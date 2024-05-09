@@ -23,7 +23,7 @@ extension UIImage {
         return image
     }
     
-    static func systemImage(_ name: Image, color: UIColor?) -> UIImage {
+    static func systemImage(_ name: Image, color: UIColor? = .inactive) -> UIImage {
         guard let image = UIImage(systemName: name.rawValue) else {
             return UIImage()
         }

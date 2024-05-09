@@ -10,9 +10,14 @@ import UIKit
 
 extension NSMutableAttributedString {
     func font(_ value: String,
-              _ font: UIFont) -> NSMutableAttributedString {
+              _ font: UIFont,
+              _ alignment: NSTextAlignment) -> NSMutableAttributedString {
+        let titleParagraphStyle = NSMutableParagraphStyle()
+        titleParagraphStyle.alignment = alignment
+        
         let attributes: [NSAttributedString.Key: Any] = [
-            .font: font
+            .font: font,
+            .paragraphStyle: titleParagraphStyle
         ]
         self.append(NSAttributedString(string: value, attributes: attributes))
         return self

@@ -14,6 +14,11 @@ class MessageCell: UITableViewCell {
     private let timeLabel = BasicLabel("", .font(.mini))
     private let maxCornerRadius: Double
     private let minCornerRadius: Double
+    private let checkUIImageView: UIImageView = {
+        let imageView = UIImageView(image: .systemImage(.check).withRenderingMode(.alwaysTemplate))
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        return imageView
+    }()
     
     private let messageBubble: BubbleView = {
         let view = BubbleView(frame: .zero)
@@ -52,6 +57,7 @@ class MessageCell: UITableViewCell {
         contentView.addSubview(messageBubble)
         contentView.addSubview(messageLabel)
         contentView.addSubview(timeLabel)
+        contentView.addSubview(checkUIImageView)
         
         messageLabelLeadingConstraint = messageLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor,
                                                                               constant: 2 * .const(.spacing))
@@ -73,10 +79,14 @@ class MessageCell: UITableViewCell {
         messageLabelBottomMaxConstraint?.priority = .defaultHigh
         messageLabelBottomMinConstraint?.priority = .defaultHigh
         
-        messageBubbleTopConstraint = messageBubble.topAnchor.constraint(equalTo: messageLabel.topAnchor, constant: -.const(.spacing))
-        messageBubbleBottomConstraint = messageBubble.bottomAnchor.constraint(equalTo: messageLabel.bottomAnchor, constant: .const(.spacing))
-        messageBubbleLeadingConstraint = messageBubble.trailingAnchor.constraint(equalTo: messageLabel.trailingAnchor, constant: .const(.spacing))
-        messageBubbleTrailingConstraint = messageBubble.leadingAnchor.constraint(equalTo: messageLabel.leadingAnchor, constant: -.const(.spacing))
+        messageBubbleTopConstraint = messageBubble.topAnchor.constraint(equalTo: messageLabel.topAnchor, 
+                                                                        constant: -.const(.spacing))
+        messageBubbleBottomConstraint = messageBubble.bottomAnchor.constraint(equalTo: messageLabel.bottomAnchor, 
+                                                                              constant: .const(.spacing))
+        messageBubbleLeadingConstraint = messageBubble.trailingAnchor.constraint(equalTo: messageLabel.trailingAnchor, 
+                                                                                 constant: .const(.spacing))
+        messageBubbleTrailingConstraint = messageBubble.leadingAnchor.constraint(equalTo: messageLabel.leadingAnchor, 
+                                                                                 constant: -.const(.spacing))
         
         messageBubbleTopConstraint?.priority = .defaultHigh
         messageBubbleBottomConstraint?.priority = .defaultHigh
@@ -98,6 +108,7 @@ class MessageCell: UITableViewCell {
         case .left:
             messageLabel.textColor = .label
             timeLabel.textColor = .secondaryLabel
+            checkUIImageView.tintColor = .secondaryLabel
             messageLabelLeadingConstraint?.isActive = true
             messageLabelTrailingConstraint?.isActive = false
             messageBubble.backgroundColor = .backgroundSecondary
@@ -105,15 +116,17 @@ class MessageCell: UITableViewCell {
         case .right:
             messageLabel.textColor = .white
             timeLabel.textColor = .lightText
+            checkUIImageView.tintColor = .lightText
             messageLabelLeadingConstraint?.isActive = false
             messageLabelTrailingConstraint?.isActive = true
             messageBubble.backgroundColor = .active
         }
         
         timeLabel.text = time
+        
         messageLabel.attributedText = NSMutableAttributedString()
-            .font(message, .font(.subtitle))
-            .highlighted("____",
+            .font(message, .font(.subtitle), .center)
+            .highlighted("______",
                          .font(.subtitle),
                          foreground: .clear,
                          background: .clear)
@@ -153,8 +166,13 @@ class MessageCell: UITableViewCell {
         }
         
         NSLayoutConstraint.activate([
+            checkUIImageView.centerYAnchor.constraint(equalTo: messageLabel.bottomAnchor),
+            checkUIImageView.trailingAnchor.constraint(equalTo: messageLabel.trailingAnchor),
+            checkUIImageView.widthAnchor.constraint(equalToConstant: 10),
+            checkUIImageView.heightAnchor.constraint(equalToConstant: 10),
+            
             timeLabel.centerYAnchor.constraint(equalTo: messageLabel.bottomAnchor),
-            timeLabel.trailingAnchor.constraint(equalTo: messageLabel.trailingAnchor)
+            timeLabel.trailingAnchor.constraint(equalTo: checkUIImageView.leadingAnchor, constant: -.const(.halfSpacing))
         ])
     }
     

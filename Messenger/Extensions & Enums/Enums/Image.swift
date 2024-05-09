@@ -8,7 +8,7 @@
 import UIKit
 
 enum Image: String {
-    // MARK: - System Images
+    // System Images
     case warning = "exclamationmark.circle"
     case number = "number.circle"
     case info = "info.circle"
@@ -24,7 +24,14 @@ enum Image: String {
     case sendMessage = "paperplane"
     case sendButton = "arrowshape.up.circle.fill"
     case clip = "paperclip.circle"
-    
-    // MARK: - Assets Images
+    case lock = "lock.fill"
+    case lockData = "lock.rectangle.stack"
+    case check = "checkmark"
+    case privacy = "lock"
+    case cylinder = "cylinder.split.1x2"
+    case appearance = "circle.righthalf.fill"
+    case language = "character.phonetic"
+    case help = "questionmark.circle"
+    // Assets Images
     case addPhoto = "addPhoto"
 }

@@ -36,6 +36,23 @@ class SettingsViewController: UITableViewController {
                     .imageDoubleLabelRow(image: user.image.toString(), 
                                          top: user.firstName + " " + user.lastName,
                                          bottom: "Account & Profile")
+                ]),
+                Section(rows: [
+                    .settingsRow(image: UIImage.systemImage(.privacy).toString(),
+                                 text: "Privacy and Security"),
+                    .settingsRow(image: UIImage.systemImage(.cylinder).toString(),
+                                 text: "Data and Storage"),
+                    .settingsRow(image: UIImage.systemImage(.appearance).toString(),
+                                 text: "Appearance"),
+                    .settingsRow(image: UIImage.systemImage(.language).toString(),
+                                 text: "Language",
+                                 detailedText: "English")
+                ]),
+                Section(rows: [
+                    .settingsRow(image: UIImage.systemImage(.info).toString(),
+                                 text: "About"),
+                    .settingsRow(image: UIImage.systemImage(.help).toString(),
+                                 text: "Help")
                 ])
             ]
             tableView.reloadData()

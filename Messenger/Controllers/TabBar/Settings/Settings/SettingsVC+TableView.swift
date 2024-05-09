@@ -10,9 +10,9 @@ import UIKit
 // MARK: - Configure Table View
 extension SettingsViewController {
     internal func configureTableView() {
-        tableView.register(ProfileCell.self, 
-                           forCellReuseIdentifier: ProfileCell.identifier)
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
+        tableView.register(ProfileCell.self, forCellReuseIdentifier: ProfileCell.identifier)
+        tableView.register(SettingsCell.self, forCellReuseIdentifier: SettingsCell.identifier)
+        tableView.register(DetailedCell.self, forCellReuseIdentifier: DetailedCell.identifier)
     }
     
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
@@ -45,24 +45,49 @@ extension SettingsViewController {
                 fatalError("Error: The TableView could not dequeue a \(ProfileCell.identifier)")
             }
             
-            guard let image = row["image"]?.toImage(),
-                  let top = row["top"],
-                  let bottom = row["bottom"] else {
-                return cell
+            if let image = row["image"]?.toImage(),
+               let top = row["top"],
+               let bottom = row["bottom"] {
+                cell.configure(image: image, title: top, subtitle: bottom)
             }
-            cell.configure(image: image,
-                           title: top,
-                           subtitle: bottom)
-            cell.accessoryType = .disclosureIndicator
+            
             return cell
         default:
-            fatalError("Error: Can't configure Cell for TableView")
+            switch indexPath.row {
+            case 3:
+                guard let cell = tableView.dequeueReusableCell(withIdentifier: DetailedCell.identifier,
+                                                               for: indexPath) as? DetailedCell else {
+                    fatalError("Error: The TableView could not dequeue a \(DetailedCell.identifier)")
+                }
+                
+                if let image = row["image"]?.toImage(),
+                    let text = row["text"],
+                    let detailedText = row["detailedText"] {
+                        cell.configure(image: image, titleText: text, detailText: detailedText)
+                    }
+                
+                return cell
+            default:
+                guard let cell = tableView.dequeueReusableCell(withIdentifier: SettingsCell.identifier,
+                                                               for: indexPath) as? SettingsCell else {
+                    fatalError("Error: The TableView could not dequeue a \(SettingsCell.identifier)")
+                }
+                
+                if let image = row["image"]?.toImage(),
+                    let text = row["text"] {
+                        cell.configure(image: image, text: text)
+                    }
+                
+                return cell
+            }
         }
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        let nextVC = InfoProfileViewController(style: .insetGrouped)
-        self.navigate(.next(nextVC, .fullScreen))
+        if indexPath.section == 0, indexPath.row == 0 {
+            let nextVC = InfoProfileViewController(style: .insetGrouped)
+            self.navigate(.next(nextVC, .fullScreen))
+        }
     }
 }

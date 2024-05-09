@@ -12,9 +12,8 @@ struct Chat: Codable {
     let username, firstName, lastName, image: String
     let lastMessage: String?
     let lastMessageCreated: Int?
-    let created: Int
-    let directId: Int
-    
+    let directChat: DirectChat
+
     enum CodingKeys: String, CodingKey {
         case username = "username"
         case firstName = "first_name"
@@ -22,7 +21,15 @@ struct Chat: Codable {
         case image = "image"
         case lastMessage = "last_message"
         case lastMessageCreated = "last_message_created"
-        case created = "created_at"
-        case directId = "direct_id"
+        case directChat = "direct_chat"
+    }
+    
+    func info() -> String {
+        return """
+                - Chat
+                with user: \(firstName) \(lastName),  @\(username)
+                last message: \(lastMessage?.prefix(10) ?? "-")...
+                \(directChat.info())
+                """
     }
 }

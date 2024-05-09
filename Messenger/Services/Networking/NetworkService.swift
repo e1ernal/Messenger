@@ -48,9 +48,9 @@ final class NetworkService {
         return image
     }
     
-    func searchUsersByUsername(username: String, token: String) async throws -> [UserGet] {
+    func searchUsers(userInfo: String, token: String) async throws -> [UserGet] {
         let url = try URLService.shared.createURL(endPoint: .users(.search), 
-                                                  parameters: ["search": username])
+                                                  parameters: ["search": userInfo])
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.setValue("application/json; charset=UTF-8", forHTTPHeaderField: "Content-type")
@@ -155,15 +155,24 @@ final class NetworkService {
     }
     
     // MARK: - POST Methods
-    func createUser(username: String, firstname: String, lastname: String?, image: UIImage) async throws -> String {
+    func createUser(username: String, firstname: String, lastname: String?, image: UIImage, public_key: String) async throws -> String {
         guard let imageBase64 = image.jpegData(compressionQuality: 1)?.base64EncodedString() else {
             throw DescriptionError.error("Can't update user. Can't convert image format")
         }
         
-        let user = UserPost(first_name: firstname,
-                            last_name: lastname,
-                            image: "data:image/png;base64," + imageBase64,
-                            username: username)
+        struct CreateUser: Codable {
+            let first_name: String?
+            let last_name: String?
+            let image: String?
+            let username: String?
+            let public_key: String
+        }
+        
+        let user = CreateUser(first_name: firstname,
+                              last_name: lastname,
+                              image: "data:image/png;base64," + imageBase64,
+                              username: username,
+                              public_key: public_key)
         
         let url = try URLService.shared.createURL(endPoint: .users(.createUser))
         var request = URLRequest(url: url)
@@ -254,13 +263,18 @@ final class NetworkService {
         }
     }
     
-    func confirmVerificationCode(code: String) async throws -> String? {
+    func confirmVerificationCode(code: String, publicKey: String) async throws -> String? {
         let url = try URLService.shared.createURL(endPoint: .verificationCode(.confirmCode))
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json; charset=UTF-8", forHTTPHeaderField: "Content-type")
         
-        let codeDTO = Code(code: code)
+        struct CodeDTO: Codable {
+            let code: String
+            let public_key: String
+        }
+        
+        let codeDTO = CodeDTO(code: code, public_key: publicKey)
         
         let encoder = JSONEncoder()
         let body = try encoder.encode(codeDTO)
@@ -288,14 +302,14 @@ final class NetworkService {
         }
     }
     
-    func createChatWithUser(userId: Int, token: String) async throws {
+    func createChatWithUser(userId: Int, token: String, encrypted_key: String) async throws {
         let url = try URLService.shared.createURL(endPoint: .users(.createChat(userId)))
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json; charset=UTF-8", forHTTPHeaderField: "Content-type")
         request.setValue("Token " + token, forHTTPHeaderField: "Authorization")
         
-        let key = EncryptedKey(encrypted_key: "123")
+        let key = EncryptedKey(encryptedSymmetricKey: encrypted_key)
         
         let encoder = JSONEncoder()
         let body = try encoder.encode(key)

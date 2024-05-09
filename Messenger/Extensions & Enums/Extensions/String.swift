@@ -37,4 +37,31 @@ extension String {
         }
         return result
     }
+    
+    func toSecKey() throws -> SecKey {
+        guard let data = Data(base64Encoded: self) else {
+            throw DescriptionError.error("String to SecKey: Can't convert Base64String to Data")
+        }
+
+        let keyDict: [NSObject: NSObject] = [
+           kSecAttrKeyType: kSecAttrKeyTypeRSA,
+           kSecAttrKeyClass: kSecAttrKeyClassPublic,
+           kSecAttrKeySizeInBits: NSNumber(value: 2048),
+           kSecReturnPersistentRef: true as NSObject
+        ]
+
+        guard let secKey = SecKeyCreateWithData(data as CFData, 
+                                                keyDict as CFDictionary,
+                                                nil) else {
+            throw DescriptionError.error("String to SecKey: Can't convert Data to SecKey")
+        }
+        return secKey
+    }
+    
+    func toData() throws -> Data {
+        guard let messageData = self.data(using: .utf8) else {
+            throw DescriptionError.error("String to Data: Can't convert String to Data")
+        }
+        return messageData
+    }
 }

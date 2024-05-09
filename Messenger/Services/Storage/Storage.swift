@@ -13,19 +13,13 @@ import Security
 final class Storage {
     static let shared = Storage(); private init() {}
     
-    enum KeychainError: Error {
-        case error_Item_Not_Found
-        case error_Duplicate_Item
-        case error_Invalid_Item_Format
-        case error_Unexpected_Status(OSStatus)
-        case error_Encoding
-        case error_Decoding
-    }
-    
-    enum Service: String {
+    enum Service: String, CaseIterable {
         case token = "Token"
         case user = "User"
         case chats = "Chats"
+        case publicKey = "PublicKey"
+        case privateKey = "PrivateKey"
+        case symmetricKeys = "SymmetricKeys"
     }
     
     enum Account: String {
@@ -47,11 +41,11 @@ final class Storage {
         let status = SecItemAdd(query as CFDictionary, nil)
         
         if status == errSecDuplicateItem {
-            throw KeychainError.error_Duplicate_Item
+            throw DescriptionError.error("Can't save \(Print.objectInfo(object: object)) as \(service). Duplicate item")
         }
         
         guard status == errSecSuccess else {
-            throw KeychainError.error_Unexpected_Status(status)
+            throw DescriptionError.error("Can't save \(Print.objectInfo(object: object)) as \(service). Unexpected status: \(status)")
         }
     }
     
@@ -71,11 +65,11 @@ final class Storage {
                                    attributes as CFDictionary)
 
         guard status != errSecItemNotFound else {
-            throw KeychainError.error_Item_Not_Found
+            throw DescriptionError.error("Can't update \(object) as  \(service). Item not found")
         }
 
         guard status == errSecSuccess else {
-            throw KeychainError.error_Unexpected_Status(status)
+            throw DescriptionError.error("Can't update \(object) as  \(service). Unexpected status: \(status)")
         }
     }
     
@@ -94,15 +88,15 @@ final class Storage {
                                          &itemCopy)
 
         guard status != errSecItemNotFound else {
-            throw KeychainError.error_Item_Not_Found
+            throw DescriptionError.error("Can't get item \(service) as \(type). Item not found")
         }
         
         guard status == errSecSuccess else {
-            throw KeychainError.error_Unexpected_Status(status)
+            throw DescriptionError.error("Can't get item \(service) as \(type). Unexpected status: \(status)")
         }
 
         guard let data = itemCopy as? Data else {
-            throw KeychainError.error_Invalid_Item_Format
+            throw DescriptionError.error("Can't get item \(service) as \(type). Invalid item format")
         }
         
         return try decode(data, as: T.self)
@@ -118,8 +112,8 @@ final class Storage {
         let status = SecItemDelete(query as CFDictionary)
 
         guard status == errSecSuccess else {
-            throw KeychainError.error_Unexpected_Status(status)
+            throw DescriptionError.error("Can't delete \(service.rawValue). Unexpected status: \(status)")
         }
-        print("[Storage]: \(service.rawValue) has been deleted")
+        print("Storage: \(service.rawValue) has been deleted")
     }
 }

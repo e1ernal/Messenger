@@ -13,7 +13,7 @@ enum Color: String {
     case secondaryBackground = "BackgroundSecondary"
     case transparentBackground = "BackgroundTransparent"
     
-    // Elements
+    // UI Elements
     case active = "Active"
     case inactive = "Inactive"
     case pageControlCurrent = "PageControlCurrent"
@@ -22,22 +22,4 @@ enum Color: String {
     // Result
     case success = "Success"
     case failure = "Failure"
-}
-
-extension UIColor {
-    static func color(_ name: Color) -> UIColor {
-        guard let color = UIColor(named: name.rawValue) else {
-            return .black
-        }
-        return color
-    }
-}
-
-extension CGColor {
-    static func color(_ name: Color) -> CGColor {
-        guard let color = UIColor(named: name.rawValue) else {
-            return UIColor.black.cgColor
-        }
-        return color.cgColor
-    }
 }
